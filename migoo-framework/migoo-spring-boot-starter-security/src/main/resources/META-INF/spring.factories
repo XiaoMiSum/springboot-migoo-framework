@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  xyz.migoo.framework.security.config.MiGooWebSecurityConfigurerAdapter,\
+  xyz.migoo.framework.security.config.MiGooSecurityAutoConfiguration

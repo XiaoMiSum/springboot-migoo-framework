@@ -1,0 +1,36 @@
+package xyz.migoo.framework.captcha.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
+import java.time.Duration;
+
+/**
+ * 验证码配置
+ *
+ * @author xiaomi
+ * Created on 2021/11/21 16:47
+ */
+@ConfigurationProperties(prefix = "migoo.captcha")
+@Validated
+@Data
+public class CaptchaProperties {
+
+    /**
+     * 验证码的过期时间
+     */
+    @NotNull(message = "验证码的过期时间不为空")
+    private Duration timeout;
+    /**
+     * 验证码的高度
+     */
+    @NotNull(message = "验证码的高度不能为空")
+    private Integer height;
+    /**
+     * 验证码的宽度
+     */
+    @NotNull(message = "验证码的宽度不能为空")
+    private Integer width;
+}
