@@ -43,7 +43,11 @@ public class LoginUser implements UserDetails {
      */
     private String name;
     /**
-     * 用户名
+     * 用户头像
+     */
+    private String avatar;
+    /**
+     * 邮箱地址
      */
     private String email;
     /**
@@ -60,11 +64,13 @@ public class LoginUser implements UserDetails {
     private Boolean enabled;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public String getUsername() {
         return loginName;
     }
@@ -81,16 +87,19 @@ public class LoginUser implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
@@ -105,3 +114,5 @@ public class LoginUser implements UserDetails {
         return String.format("%s(%s)", StrUtil.isBlank(name) ? loginName : name, email);
     }
 }
+
+
