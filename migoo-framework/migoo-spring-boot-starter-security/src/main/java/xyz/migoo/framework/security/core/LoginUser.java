@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,10 +23,6 @@ public class LoginUser implements UserDetails {
      */
     private Long id;
     /**
-     * 部门编号
-     */
-    private Long teamId;
-    /**
      * 复合名称：username(email)
      */
     private String compoundName;
@@ -37,31 +33,21 @@ public class LoginUser implements UserDetails {
     /**
      * 登录名
      */
+    @JsonIgnore
     private String loginName;
-    /**
-     * 用户名
-     */
-    private String name;
-    /**
-     * 用户头像
-     */
-    private String avatar;
-    /**
-     * 邮箱地址
-     */
-    private String email;
     /**
      * 密码
      */
     private String password;
     /**
-     * 手机号
-     */
-    private String phone;
-    /**
      * 启用标识
      */
     private Boolean enabled;
+
+    /**
+     * 扩展参数
+     */
+    private JSONObject extra;
 
     @Override
     @JsonIgnore
@@ -111,7 +97,7 @@ public class LoginUser implements UserDetails {
 
     @JsonIgnore
     public String getCompoundName() {
-        return String.format("%s(%s)", StrUtil.isBlank(name) ? loginName : name, email);
+        return String.format("%s(%s)", extra.getStr("name", loginName) , extra.getStr("email", ""));
     }
 }
 
