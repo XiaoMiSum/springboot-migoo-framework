@@ -35,4 +35,30 @@ public class StrUtils {
         return result;
     }
 
+    /**
+     * 将指定字符串首字母转小写
+     *
+     * @param str 字符串
+     * @return 首字母小写
+     */
+    public static String firstLetter2Lower(String str) {
+        assert StrUtil.isNotBlank(str);
+        char[] cs = str.toCharArray();
+        cs[0] += 32;
+        return String.valueOf(cs);
+    }
+
+    /**
+     * 将指定字符串首字母转大写
+     *
+     * @param str 字符串
+     * @return 首字母大写
+     */
+    public static String firstLetter2Updater(String str) {
+        assert StrUtil.isNotBlank(str);
+        char[] cs = str.toCharArray();
+        cs[0] -= 32;
+        return String.valueOf(cs);
+    }
+
 }

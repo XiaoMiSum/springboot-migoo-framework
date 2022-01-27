@@ -28,15 +28,12 @@ public class DefaultFieldHandler implements MetaObjectHandler {
             // 更新时间为空，则以当前时间为更新时间
             baseDO.setUpdateTime(Objects.isNull(baseDO.getUpdateTime()) ? baseDO.getCreateTime() : baseDO.getUpdateTime());
             // 状态标识为空，则默认为已启用状态
-            baseDO.setEnabled(Objects.isNull(baseDO.getEnabled()) || baseDO.getEnabled());
-            Long userId = WebFrameworkUtils.getLoginUserId();
             String compoundName = WebFrameworkUtils.getLoginUserCompoundName();
             // 当前登录用户不为空，创建人为空，则当前登录用户为创建人
-            baseDO.setCreatorId(Objects.isNull(baseDO.getCreatorId()) ? Objects.isNull(userId) ? -1 : userId : baseDO.getCreatorId());
-            baseDO.setCreatorName(Objects.isNull(baseDO.getCreatorName()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getCreatorName());
+            baseDO.setCreator(Objects.isNull(baseDO.getCreator()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getCreator());
             // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
-            baseDO.setUpdaterId(Objects.isNull(baseDO.getUpdaterId()) ? Objects.isNull(userId) ? -1 : userId : baseDO.getUpdaterId());
-            baseDO.setUpdaterName(Objects.isNull(baseDO.getUpdaterName()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getUpdaterName());
+            baseDO.setUpdater(Objects.isNull(baseDO.getUpdater()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getUpdater());
+            baseDO.setDeleted(false);
         }
     }
 
@@ -45,7 +42,9 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         // 默认以当前时间为更新时间
         setFieldValByName("updateTime", new Date(), metaObject);
         // 默认以当前登录用户为更新人
-        setFieldValByName("updaterId", WebFrameworkUtils.getLoginUserId(), metaObject);
-        setFieldValByName("updaterName", WebFrameworkUtils.getLoginUserCompoundName(), metaObject);
+        BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
+        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserCompoundName()
+                : baseDO.getUpdater();
+        setFieldValByName("updater", compoundName, metaObject);
     }
 }

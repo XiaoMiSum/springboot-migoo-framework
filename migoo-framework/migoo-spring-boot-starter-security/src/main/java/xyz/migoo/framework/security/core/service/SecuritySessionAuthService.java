@@ -14,11 +14,10 @@ public interface SecuritySessionAuthService {
      * 创建在线用户 Session
      *
      * @param loginUser 登录用户
-     * @param userIp    用户 IP
-     * @param userAgent 用户 UA
+     * @param params    扩展参数
      * @return Session 编号
      */
-    String createUserSession(LoginUser loginUser, String userIp, String userAgent);
+    String createUserSession(LoginUser loginUser, String... params);
 
     /**
      * 刷新在线用户 Session 的更新时间

@@ -13,7 +13,6 @@ public interface StreamMessage {
      *
      * @return Channel
      */
-    // 避免序列化
     @JsonIgnore
     String getStreamKey();
 }
