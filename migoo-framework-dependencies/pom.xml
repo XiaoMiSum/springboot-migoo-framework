@@ -14,7 +14,7 @@
     <properties>
         <revision>1.0.0</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.5.7</spring.boot.version>
+        <spring.boot.version>2.6.2</spring.boot.version>
         <!-- DB 相关 -->
         <mysql.version>8.0.25</mysql.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>

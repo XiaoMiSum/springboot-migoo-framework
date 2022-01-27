@@ -14,17 +14,17 @@ public class RedisKeyRegistry {
     /**
      * Redis RedisKeyDefine 数组
      */
-    private static final List<RedisKeyDefine> defines = new ArrayList<>();
+    private static final List<RedisKeyDefine> DEFINES = new ArrayList<>();
 
     public static void add(RedisKeyDefine define) {
-        defines.add(define);
+        DEFINES.add(define);
     }
 
     public static List<RedisKeyDefine> list() {
-        return defines;
+        return DEFINES;
     }
 
     public static int size() {
-        return defines.size();
+        return DEFINES.size();
     }
 }

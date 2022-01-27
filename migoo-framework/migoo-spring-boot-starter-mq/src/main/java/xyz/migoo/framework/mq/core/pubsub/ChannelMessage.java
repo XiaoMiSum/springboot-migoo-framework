@@ -13,7 +13,6 @@ public interface ChannelMessage {
      *
      * @return Channel
      */
-    // 避免序列化
     @JsonIgnore
     String getChannel();
 }

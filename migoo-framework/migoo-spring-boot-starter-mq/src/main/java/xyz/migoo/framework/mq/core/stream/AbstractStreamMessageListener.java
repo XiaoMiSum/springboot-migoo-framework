@@ -29,9 +29,9 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
     private final String streamKey;
 
     /**
-     * Redis 消费者分组，默认使用 spring.application.name 名字
+     * Redis 消费者分组，默认使用 migoo.mq.group 名字
      */
-    @Value("${spring.application.name:''}")
+    @Value("${migoo.mq.group:'migoo:mq:group'}")
     @Getter
     private String group;
     /**
