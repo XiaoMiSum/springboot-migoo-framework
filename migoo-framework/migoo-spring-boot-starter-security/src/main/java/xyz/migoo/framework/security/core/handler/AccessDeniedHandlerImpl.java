@@ -21,7 +21,7 @@ import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstant
  * <p>
  * 补充：Spring Security 通过 {@link ExceptionTranslationFilter#handleAccessDeniedException(HttpServletRequest, HttpServletResponse, FilterChain, AccessDeniedException)} 方法，调用当前类
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Slf4j
 @SuppressWarnings("JavadocReference")

@@ -28,12 +28,12 @@ public class DefaultFieldHandler implements MetaObjectHandler {
             // 更新时间为空，则以当前时间为更新时间
             baseDO.setUpdateTime(Objects.isNull(baseDO.getUpdateTime()) ? baseDO.getCreateTime() : baseDO.getUpdateTime());
             // 状态标识为空，则默认为已启用状态
-            String compoundName = WebFrameworkUtils.getLoginUserCompoundName();
+            String compoundName = WebFrameworkUtils.getLoginUserName();
             // 当前登录用户不为空，创建人为空，则当前登录用户为创建人
             baseDO.setCreator(Objects.isNull(baseDO.getCreator()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getCreator());
             // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
             baseDO.setUpdater(Objects.isNull(baseDO.getUpdater()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getUpdater());
-            baseDO.setDeleted(false);
+            baseDO.setDeleted(0);
         }
     }
 
@@ -43,7 +43,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         setFieldValByName("updateTime", new Date(), metaObject);
         // 默认以当前登录用户为更新人
         BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
-        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserCompoundName()
+        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName()
                 : baseDO.getUpdater();
         setFieldValByName("updater", compoundName, metaObject);
     }

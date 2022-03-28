@@ -23,18 +23,25 @@ public class LoginUser implements UserDetails {
      */
     private Long id;
     /**
-     * 复合名称：username(email)
-     */
-    private String compoundName;
-    /**
      * 最后更新时间
      */
     private Date updateTime;
+
+    /**
+     * 用户姓名
+     */
+    private String name;
+
+    /**
+     * 用户头像
+     */
+    private String avatar;
+
     /**
      * 登录名
      */
-    @JsonIgnore
-    private String loginName;
+    private String username;
+
     /**
      * 密码
      */
@@ -58,11 +65,11 @@ public class LoginUser implements UserDetails {
     @Override
     @JsonIgnore
     public String getUsername() {
-        return loginName;
+        return username;
     }
 
     public LoginUser setUsername(String username) {
-        this.loginName = username;
+        this.username = username;
         return this;
     }
 
@@ -93,11 +100,6 @@ public class LoginUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    @JsonIgnore
-    public String getCompoundName() {
-        return String.format("%s(%s)", extra.getStr("name", loginName) , extra.getStr("email", ""));
     }
 }
 

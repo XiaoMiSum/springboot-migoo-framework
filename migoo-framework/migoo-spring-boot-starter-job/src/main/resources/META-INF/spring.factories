@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  xyz.migoo.framework.quartz.MiGooQuartzAutoConfiguration
+  xyz.migoo.framework.quartz.config.MiGooQuartzAutoConfiguration

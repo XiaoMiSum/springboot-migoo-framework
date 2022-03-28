@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.config;
 
+import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +18,8 @@ import xyz.migoo.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import xyz.migoo.framework.security.core.resolver.CurrentUserMethodArgumentResolver;
 import xyz.migoo.framework.security.core.resolver.TokenMethodArgumentResolver;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
-import xyz.migoo.framework.web.config.WebProperties;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -34,12 +33,6 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
 public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
-
-    @Resource
-    private WebProperties webProperties;
-
-    @Resource
-    private SecurityProperties securityProperties;
 
     /**
      * 认证失败处理类 Bean
@@ -62,7 +55,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthFrameworkService securityFrameworkService) {
-        return new LogoutSuccessHandlerImpl(securityProperties, securityFrameworkService);
+        return new LogoutSuccessHandlerImpl(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService);
     }
 
     /**
@@ -82,7 +75,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
-        return new JWTAuthenticationTokenFilter(securityProperties, securityFrameworkService, globalExceptionHandler);
+        return new JWTAuthenticationTokenFilter(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService, globalExceptionHandler);
     }
 
     /**

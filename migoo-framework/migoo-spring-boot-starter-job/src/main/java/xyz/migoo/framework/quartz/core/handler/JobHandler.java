@@ -3,7 +3,7 @@ package xyz.migoo.framework.quartz.core.handler;
 /**
  * 任务处理器
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 public interface JobHandler {
 

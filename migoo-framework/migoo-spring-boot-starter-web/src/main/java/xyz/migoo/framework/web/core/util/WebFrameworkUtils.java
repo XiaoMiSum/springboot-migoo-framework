@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 public class WebFrameworkUtils {
 
     private static final String REQUEST_ATTRIBUTE_LOGIN_USER_ID = "login_user_id";
-    private static final String REQUEST_ATTRIBUTE_LOGIN_USER_COMPOUND_NAME = "login_user_compound_name";
+    private static final String REQUEST_ATTRIBUTE_LOGIN_USER_NAME = "login_user_compound_name";
 
     private static final String REQUEST_ATTRIBUTE_RESULT = "result";
 
@@ -23,8 +23,8 @@ public class WebFrameworkUtils {
         request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID, userId);
     }
 
-    public static void setLoginUserCompoundName(ServletRequest request, String compoundName) {
-        request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_COMPOUND_NAME, compoundName);
+    public static void setLoginUserName(ServletRequest request, String compoundName) {
+        request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_NAME, compoundName);
     }
 
     /**
@@ -46,11 +46,11 @@ public class WebFrameworkUtils {
      * @param request 请求
      * @return 用户编号
      */
-    public static String getLoginUserCompoundName(HttpServletRequest request) {
+    public static String getLoginUserName(HttpServletRequest request) {
         if (request == null) {
             return null;
         }
-        return (String) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_COMPOUND_NAME);
+        return (String) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_NAME);
     }
 
     public static Long getLoginUserId() {
@@ -58,9 +58,9 @@ public class WebFrameworkUtils {
         return getLoginUserId(request);
     }
 
-    public static String getLoginUserCompoundName() {
+    public static String getLoginUserName() {
         HttpServletRequest request = getRequest();
-        return getLoginUserCompoundName(request);
+        return getLoginUserName(request);
     }
 
     public static void setResult(ServletRequest request, Result<?> result) {

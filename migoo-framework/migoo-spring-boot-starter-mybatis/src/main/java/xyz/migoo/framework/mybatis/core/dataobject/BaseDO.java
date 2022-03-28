@@ -41,6 +41,7 @@ public class BaseDO implements Serializable {
      * 是否删除
      */
     @TableLogic
-    private Boolean deleted;
+    @TableField(fill = FieldFill.INSERT)
+    private Integer deleted;
 
 }

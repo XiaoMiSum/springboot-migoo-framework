@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Job 日志 Framework Service 接口
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 public interface JobLogFrameworkService {
 
