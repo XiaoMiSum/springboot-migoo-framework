@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>migoo-framework</artifactId>
+        <artifactId>migoo-framework-parent</artifactId>
         <groupId>xyz.migoo.springboot</groupId>
         <version>1.0.0</version>
     </parent>
@@ -11,6 +11,9 @@
 
     <artifactId>migoo-spring-boot-starter-web</artifactId>
     <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>spring-web 组件</description>
 
     <dependencies>
         <dependency>
