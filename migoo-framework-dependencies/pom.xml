@@ -49,6 +49,7 @@
         <hutool.version>5.7.16</hutool.version>
         <guava.version>30.1.1-jre</guava.version>
         <lombok.version>1.18.22</lombok.version>
+        <compiler.version>>3.8.1</compiler.version>
     </properties>
 
     <dependencyManagement>
@@ -221,6 +222,16 @@
                 </executions>
             </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${compiler.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <distributionManagement>

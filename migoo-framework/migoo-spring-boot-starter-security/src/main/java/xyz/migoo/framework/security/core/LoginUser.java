@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * 登录用户信息，如果不够可以在自己项目中继承扩展该对象
@@ -26,6 +27,11 @@ public class LoginUser implements UserDetails {
      * 最后更新时间
      */
     private Date updateTime;
+
+    /**
+     * 角色编号数组
+     */
+    private Set<Long> roleIds;
 
     /**
      * 用户姓名
