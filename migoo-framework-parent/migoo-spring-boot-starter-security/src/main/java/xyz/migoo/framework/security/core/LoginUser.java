@@ -51,6 +51,8 @@ public class LoginUser implements UserDetails {
      */
     private Boolean enabled;
 
+    private String securityCode;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

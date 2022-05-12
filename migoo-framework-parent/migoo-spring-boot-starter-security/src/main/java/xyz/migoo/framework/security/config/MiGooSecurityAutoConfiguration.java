@@ -24,6 +24,7 @@ import xyz.migoo.framework.security.core.service.SecurityAuthenticatorService;
 import xyz.migoo.framework.web.config.WebProperties;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * @param registry 拦截器注册
      */
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticatorInterceptor(SpringUtil.getBean(SecurityAuthenticatorService.class)))
+        registry.addInterceptor(new AuthenticatorInterceptor(securityAuthenticatorService))
                 .addPathPatterns(api("/**"))
                 .excludePathPatterns("/**/images/**", api("/**/images/**"));
     }
@@ -52,6 +53,9 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     private String api(String api) {
         return SpringUtil.getBean(WebProperties.class).getApiPrefix() + api;
     }
+
+    @Resource
+    private SecurityAuthenticatorService securityAuthenticatorService;
 
     /**
      * 认证失败处理类 Bean
