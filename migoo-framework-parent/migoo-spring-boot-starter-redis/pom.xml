@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>migoo-framework-parent</artifactId>
+        <groupId>xyz.migoo.springboot</groupId>
+        <version>1.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>migoo-spring-boot-starter-redis</artifactId>
+    <name>${project.artifactId}</name>
+    <description>redis 组件</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>xyz.migoo.springboot</groupId>
+            <artifactId>migoo-spring-boot-starter-common</artifactId>
+        </dependency>
+
+        <!-- DB 相关 -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

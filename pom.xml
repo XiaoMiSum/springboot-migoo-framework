@@ -7,7 +7,7 @@
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>springboot-migoo-framework</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>springboot-migoo-framework</name>
     <description>migoo-framework for springboot</description>
     <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
@@ -35,6 +35,6 @@
 
     <modules>
         <module>migoo-framework-dependencies</module>
-        <module>migoo-framework</module>
+        <module>migoo-framework-parent</module>
     </modules>
 </project>
