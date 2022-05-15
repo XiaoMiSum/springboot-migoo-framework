@@ -133,18 +133,17 @@ public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 // 登录、注册、获取验证码接口，可匿名访问
                 .antMatchers(api("/sign-in"), api("/captcha")).permitAll()
                 // 静态资源，可匿名访问
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/*.css", "/**/*.css", "/*.js",
+                        "/**/*.js", "/*.jpg", "/**/*.jpg", "/*.png", "/**/*.png", "/*.gif", "/**/*.gif").permitAll()
+                // druid 监控页面 可匿名访问
+                .antMatchers("/**/druid/**", "/druid/**").anonymous()
                 // 文件的获取接口，可匿名访问
-                .antMatchers(api("/infra/file/get/**")).anonymous()
-                // Swagger 接口文档
-                .antMatchers("/swagger-ui.html").anonymous()
-                .antMatchers("/swagger-resources/**").anonymous()
-                .antMatchers("/webjars/**").anonymous()
-                .antMatchers("/*/api-docs").anonymous()
+                .antMatchers(api("/file/**")).anonymous()
                 // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator").anonymous()
-                .antMatchers("/actuator/**").anonymous()
-                .antMatchers("/api/callback/**").anonymous()
+                .antMatchers("/actuator", "/**/actuator").anonymous()
+                .antMatchers("/actuator/**", "/**/actuator/**").anonymous()
+                .antMatchers("/actuator-admin/**", "/**/actuator-admin/**").anonymous()
+                .antMatchers("/actuator-admin", "/**/actuator-admin").anonymous()
                 // 设置每个请求的权限 ②：每个项目的自定义规则
                 .and().authorizeRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
