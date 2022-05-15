@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -44,10 +44,11 @@
         <module>migoo-spring-boot-starter-mq</module>
         <module>migoo-spring-boot-starter-job</module>
         <module>migoo-spring-boot-starter-captcha</module>
+        <module>migoo-spring-boot-starter-monitor</module>
     </modules>
 
     <properties>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <revision>1.0.2-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -61,7 +62,7 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-framework-dependencies</artifactId>
-                <version>1.0.1-SNAPSHOT</version>
+                <version>1.0.2-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

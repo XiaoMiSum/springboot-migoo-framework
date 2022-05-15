@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.migoo.springboot</groupId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <artifactId>migoo-framework-dependencies</artifactId>
     <packaging>pom</packaging>
     <name>migoo-framework-dependencies</name>
@@ -35,7 +35,7 @@
     </developers>
 
     <properties>
-        <revision>1.0.1-SNAPSHOT</revision>
+        <revision>1.0.2-SNAPSHOT</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>2.6.5</spring.boot.version>
         <!-- DB 相关 -->
@@ -129,7 +129,7 @@
 
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
+                <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${durid.version}</version>
             </dependency>
 
@@ -145,6 +145,25 @@
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-job</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <!-- 监控相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-monitor</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
+                <version>${spring-boot-admin.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
+                <version>${spring-boot-admin.version}</version>
             </dependency>
 
             <!-- 工具相关 -->
