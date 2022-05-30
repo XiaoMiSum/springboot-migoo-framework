@@ -9,6 +9,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.Nullable;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class JacksonAutoConfiguration {
     public BeanPostProcessor objectMapperBeanPostProcessor() {
         return new BeanPostProcessor() {
             @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+            public Object postProcessAfterInitialization(@Nullable Object bean, @Nullable String beanName) throws BeansException {
                 if (!(bean instanceof ObjectMapper)) {
                     return bean;
                 }
