@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.core.service;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Component;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
@@ -20,7 +21,7 @@ public class SecurityAuthenticatorService {
     public void verify(String code) {
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
         assert Objects.nonNull(loginUser);
-        if (!GoogleAuthenticator.verify(loginUser.getSecurityCode(), code)) {
+        if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(loginUser.getSecurityCode(), code)) {
             throw ServiceExceptionUtil.get(new ErrorCode(999, "身份验证失败!"));
         }
     }
