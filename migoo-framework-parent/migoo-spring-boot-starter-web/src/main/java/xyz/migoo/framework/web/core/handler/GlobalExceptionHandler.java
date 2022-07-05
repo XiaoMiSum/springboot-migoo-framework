@@ -2,7 +2,6 @@ package xyz.migoo.framework.web.core.handler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -14,7 +13,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -71,9 +69,6 @@ public class GlobalExceptionHandler {
         }
         if (ex instanceof ServiceException) {
             return serviceExceptionHandler((ServiceException) ex);
-        }
-        if (ex instanceof AccessDeniedException) {
-            return accessDeniedExceptionHandler(request, (AccessDeniedException) ex);
         }
         return defaultExceptionHandler(request, ex);
     }
@@ -164,18 +159,6 @@ public class GlobalExceptionHandler {
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
         log.warn("[httpRequestMethodNotSupportedExceptionHandler]", ex);
         return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("请求方法不正确:%s", ex.getMessage()));
-    }
-
-    /**
-     * 处理 Spring Security 权限不足的异常
-     * <p>
-     * 来源是，使用 @PreAuthorize 注解，AOP 进行权限拦截
-     */
-    @ExceptionHandler(value = AccessDeniedException.class)
-    public Result<?> accessDeniedExceptionHandler(HttpServletRequest req, AccessDeniedException ex) {
-        log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", WebFrameworkUtils.getLoginUserId(req),
-                req.getRequestURL(), ex);
-        return Result.getError(FORBIDDEN);
     }
 
     /**

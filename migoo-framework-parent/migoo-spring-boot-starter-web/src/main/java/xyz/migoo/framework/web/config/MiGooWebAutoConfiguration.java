@@ -20,6 +20,9 @@ import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 
 import javax.annotation.Resource;
 import javax.servlet.Filter;
+import java.util.Objects;
+
+import static java.lang.Boolean.TRUE;
 
 @Configuration
 @EnableConfigurationProperties({WebProperties.class, XssProperties.class})
@@ -36,7 +39,8 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         // 设置 API 前缀，仅仅匹配 controller 包下的
-        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz ->
+        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz -> Objects.equals(webProperties.getScanAll(), TRUE) ?
+                clazz.getPackage().getName().startsWith(webProperties.getControllerPackage()) :
                 clazz.isAnnotationPresent(RestController.class)
                         && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
     }
@@ -85,7 +89,7 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
         return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
     }
-    
+
 
     private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
         FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);

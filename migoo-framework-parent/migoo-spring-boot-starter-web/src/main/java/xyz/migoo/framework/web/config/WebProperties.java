@@ -34,4 +34,6 @@ public class WebProperties {
     @NotNull(message = "Controller 所在包不能为空")
     private String controllerPackage;
 
+    private Boolean scanAll;
+
 }
