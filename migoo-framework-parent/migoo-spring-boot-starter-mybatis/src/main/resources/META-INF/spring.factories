@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  xyz.migoo.framework.mybatis.config.MybatisAutoConfiguration

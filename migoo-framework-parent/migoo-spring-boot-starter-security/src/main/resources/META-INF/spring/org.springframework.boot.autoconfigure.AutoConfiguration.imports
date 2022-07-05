@@ -1,0 +1,2 @@
+xyz.migoo.framework.security.config.MiGooSecurityAutoConfiguration
+xyz.migoo.framework.security.config.MiGooWebSecurityConfigurerAdapter
