@@ -8,14 +8,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -33,7 +34,7 @@ import javax.annotation.Resource;
 @Configuration
 @AutoConfigureOrder(SecurityProperties.DEFAULT_FILTER_ORDER)
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+public class MiGooWebSecurityConfigurerAdapter {
 
     @Resource
     private WebProperties webProperties;
@@ -80,20 +81,13 @@ public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
      * 通过覆写父类的该方法，添加 @Bean 注解，解决该问题
      */
-    @Override
     @Bean
     @ConditionalOnMissingBean(AuthenticationManager.class)
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    /**
-     * 身份认证接口
-     */
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
+    public AuthenticationManager authenticationManagerBean(ObjectPostProcessor<Object> objectPostProcessor) throws Exception {
+        return new AuthenticationManagerBuilder(objectPostProcessor)
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder)
+                .and().build();
     }
 
     /**
@@ -113,9 +107,9 @@ public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
      * rememberMe          |   允许通过remember-me登录的用户访问
      * authenticated       |   用户登录后可访问
      */
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
                 // 开启跨域
                 .cors().and()
                 // CSRF 禁用，因为不使用 Session
@@ -126,10 +120,10 @@ public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 // 一堆自定义的 Spring Security 处理器
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler).and()
-                .logout().logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler); // 登出
-
-        // 设置每个请求的权限 ①：全局共享规则
-        httpSecurity.authorizeRequests()
+                .logout().logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler) // 登出
+                .and()
+                // 设置每个请求的权限 ①：全局共享规则
+                .authorizeRequests()
                 // 登录、注册、获取验证码接口，可匿名访问
                 .antMatchers(api("/sign-in"), api("/captcha")).permitAll()
                 // 静态资源，可匿名访问
@@ -148,9 +142,10 @@ public class MiGooWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdap
                 .and().authorizeRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
                 .authorizeRequests().anyRequest().authenticated()
-        ;
-        // 添加 JWT Filter
-        httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .and()
+                // 添加 JWT Filter
+                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     private String api(String url) {

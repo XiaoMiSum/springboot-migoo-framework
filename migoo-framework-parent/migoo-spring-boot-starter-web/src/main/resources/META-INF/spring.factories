@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  xyz.migoo.framework.jackson.config.JacksonAutoConfiguration,\
-  xyz.migoo.framework.web.config.MiGooWebAutoConfiguration

@@ -14,7 +14,7 @@ import java.time.Duration;
  * Created on 2021/11/21 16:12
  */
 @Data
-public class RedisKeyDefine {
+public class RedisKeyDefine<T> {
 
 
     @Getter
@@ -74,7 +74,7 @@ public class RedisKeyDefine {
      * <p>
      * 如果是使用分布式锁，设置为 {@link java.util.concurrent.locks.Lock} 类型
      */
-    private final Class<?> valueType;
+    private final Class<T> valueType;
     /**
      * 超时类型
      */
@@ -88,7 +88,7 @@ public class RedisKeyDefine {
      */
     private final String memo;
 
-    private RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType,
+    private RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<T> valueType,
                            TimeoutTypeEnum timeoutType, Duration timeout) {
         this.memo = memo;
         this.keyTemplate = keyTemplate;
@@ -100,11 +100,11 @@ public class RedisKeyDefine {
         RedisKeyRegistry.add(this);
     }
 
-    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, Duration timeout) {
+    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<T> valueType, Duration timeout) {
         this(memo, keyTemplate, keyType, valueType, TimeoutTypeEnum.FIXED, timeout);
     }
 
-    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<?> valueType, TimeoutTypeEnum timeoutType) {
+    public RedisKeyDefine(String memo, String keyTemplate, KeyTypeEnum keyType, Class<T> valueType, TimeoutTypeEnum timeoutType) {
         this(memo, keyTemplate, keyType, valueType, timeoutType, Duration.ZERO);
     }
 }
