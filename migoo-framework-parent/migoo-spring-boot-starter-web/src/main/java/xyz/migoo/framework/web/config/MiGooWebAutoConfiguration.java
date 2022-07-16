@@ -12,6 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
 import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
 import xyz.migoo.framework.web.core.filter.XssFilter;
@@ -46,8 +47,8 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public GlobalExceptionHandler globalExceptionHandler() {
-        return new GlobalExceptionHandler(applicationName);
+    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService apiErrorLogFrameworkService) {
+        return new GlobalExceptionHandler(applicationName, apiErrorLogFrameworkService);
     }
 
     @Bean

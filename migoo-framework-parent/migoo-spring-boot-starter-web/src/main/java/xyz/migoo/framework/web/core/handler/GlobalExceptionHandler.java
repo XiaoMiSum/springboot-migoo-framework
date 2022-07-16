@@ -1,7 +1,11 @@
 package xyz.migoo.framework.web.core.handler;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -11,13 +15,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import xyz.migoo.framework.apilog.core.ApiErrorLog;
+import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
+import xyz.migoo.framework.common.util.json.JsonUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
+import java.util.Date;
+import java.util.Map;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
@@ -32,6 +41,8 @@ import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstant
 public class GlobalExceptionHandler {
 
     private final String applicationName;
+
+    private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
 
 
     /**
@@ -176,9 +187,48 @@ public class GlobalExceptionHandler {
      * 处理系统异常，兜底处理所有的一切
      */
     @ExceptionHandler(value = Exception.class)
-    public Result<?> defaultExceptionHandler(HttpServletRequest req, Throwable ex) {
+    public Result<?> defaultExceptionHandler(HttpServletRequest request, Throwable ex) {
         log.error("[defaultExceptionHandler]", ex);
+        createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
         return Result.getError(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
+    }
+
+    private void createExceptionLog(HttpServletRequest request, Throwable e) {
+        // 插入错误日志
+        ApiErrorLog errorLog = new ApiErrorLog();
+        try {
+            // 初始化 errorLog
+            initExceptionLog(errorLog, request, e);
+            // 执行插入 errorLog
+            apiErrorLogFrameworkService.createApiErrorLog(errorLog);
+        } catch (Throwable th) {
+            log.error("[createExceptionLog][url({}) log({}) 发生异常]", request.getRequestURI(), JsonUtils.toJsonString(errorLog), th);
+        }
+    }
+
+    private void initExceptionLog(ApiErrorLog errorLog, HttpServletRequest request, Throwable e) {
+        // 设置异常字段
+        errorLog.setExceptionName(e.getClass().getName());
+        errorLog.setExceptionMessage(ExceptionUtil.getMessage(e));
+        errorLog.setExceptionRootCauseMessage(ExceptionUtil.getRootCauseMessage(e));
+        errorLog.setExceptionStackTrace(ExceptionUtil.stacktraceToString(e));
+        StackTraceElement[] stackTraceElements = e.getStackTrace();
+        Assert.notEmpty(stackTraceElements, "异常 stackTraceElements 不能为空");
+        StackTraceElement stackTraceElement = stackTraceElements[0];
+        errorLog.setExceptionClassName(stackTraceElement.getClassName());
+        errorLog.setExceptionFileName(stackTraceElement.getFileName());
+        errorLog.setExceptionMethodName(stackTraceElement.getMethodName());
+        errorLog.setExceptionLineNumber(stackTraceElement.getLineNumber());
+        // 设置其它字段
+        errorLog.setApplicationName(applicationName);
+        errorLog.setRequestUrl(request.getRequestURI());
+        Map<String, Object> requestParams = MapUtil.<String, Object>builder()
+                .put("query", ServletUtil.getParamMap(request))
+                .put("body", ServletUtil.getBody(request)).build();
+        errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
+        errorLog.setRequestMethod(request.getMethod());
+        errorLog.setUserIp(ServletUtil.getClientIP(request));
+        errorLog.setExceptionTime(new Date());
     }
 }

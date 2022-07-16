@@ -26,7 +26,7 @@ public class AuthenticatorInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             if (Objects.nonNull(((HandlerMethod) handler).getMethod().getAnnotation(Authenticator.class))) {
-                this.authService.verify(request.getParameter("_code"));
+                this.authService.verify(request);
             }
         }
         return true;
