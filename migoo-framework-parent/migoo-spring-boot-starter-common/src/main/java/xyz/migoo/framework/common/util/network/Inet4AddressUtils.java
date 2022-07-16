@@ -11,10 +11,20 @@ import java.util.Enumeration;
  */
 public class Inet4AddressUtils {
 
+    public static String getHostname() {
+        InetAddress ip = getInetAddress();
+        return ip != null ? ip.getHostName() : "";
+    }
+
     public static String getIpAddress() {
+        InetAddress ip = getInetAddress();
+        return ip != null ? ip.getHostAddress() : "";
+    }
+
+    private static InetAddress getInetAddress() {
         try {
             Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
-            InetAddress ip = null;
+            InetAddress ip;
             while (allNetInterfaces.hasMoreElements()) {
                 NetworkInterface netInterface = allNetInterfaces.nextElement();
                 if (netInterface.isLoopback() || netInterface.isVirtual() || !netInterface.isUp()) {
@@ -24,13 +34,13 @@ public class Inet4AddressUtils {
                 while (addresses.hasMoreElements()) {
                     ip = addresses.nextElement();
                     if (ip instanceof Inet4Address) {
-                        return ip.getHostAddress();
+                        return ip;
                     }
                 }
             }
         } catch (Exception e) {
             System.err.println("IP地址获取失败" + e);
         }
-        return "";
+        return null;
     }
 }

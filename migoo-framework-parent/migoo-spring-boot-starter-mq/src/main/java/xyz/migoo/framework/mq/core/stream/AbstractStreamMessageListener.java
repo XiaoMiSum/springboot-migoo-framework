@@ -53,6 +53,7 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
         this.onMessage(messageObj);
         // ack 消息消费完成
         redisTemplate.opsForStream().acknowledge(group, message);
+        redisTemplate.opsForStream().delete(message);
         // TODO: 2021/11/21
         // 1. 处理异常的情况
         // 2. 发送日志；以及事务的结合
