@@ -1,5 +1,8 @@
 package xyz.migoo.framework.security.core.handler;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -8,10 +11,6 @@ import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;

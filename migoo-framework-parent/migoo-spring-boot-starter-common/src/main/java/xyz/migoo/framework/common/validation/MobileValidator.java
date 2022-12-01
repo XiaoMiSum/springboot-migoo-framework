@@ -1,10 +1,9 @@
 package xyz.migoo.framework.common.validation;
 
 import cn.hutool.core.util.StrUtil;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import xyz.migoo.framework.common.util.validation.ValidationUtils;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class MobileValidator implements ConstraintValidator<Mobile, String> {
 

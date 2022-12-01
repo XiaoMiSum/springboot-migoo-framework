@@ -2,6 +2,7 @@ package xyz.migoo.framework.quartz.core.handler;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.thread.ThreadUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -12,7 +13,6 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import xyz.migoo.framework.quartz.core.enums.JobDataKeyEnum;
 import xyz.migoo.framework.quartz.core.service.JobLogFrameworkService;
 
-import javax.annotation.Resource;
 import java.util.Date;
 
 import static cn.hutool.core.exceptions.ExceptionUtil.getRootCauseMessage;

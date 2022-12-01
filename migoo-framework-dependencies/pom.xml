@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.migoo.springboot</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <artifactId>migoo-framework-dependencies</artifactId>
     <packaging>pom</packaging>
     <name>migoo-framework-dependencies</name>
@@ -35,9 +35,10 @@
     </developers>
 
     <properties>
-        <revision>1.0.2-SNAPSHOT</revision>
+        <revision>1.0.3-SNAPSHOT</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>2.7.1</spring.boot.version>
+        <spring.boot.version>3.0.0</spring.boot.version>
+        <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
         <mysql.version>8.0.25</mysql.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
@@ -47,7 +48,7 @@
         <spring-boot-admin.version>2.5.4</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <hutool.version>5.7.16</hutool.version>
+        <hutool.version>5.8.10</hutool.version>
         <guava.version>30.1.1-jre</guava.version>
         <zxing.version>3.5.0</zxing.version>
         <lombok.version>1.18.22</lombok.version>
@@ -74,7 +75,7 @@
                 <!-- 用于生成自定义的 Spring @ConfigurationProperties 配置类的说明文件 -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${spring.boot2.version}</version>
             </dependency>
 
             <!-- web 相关 -->

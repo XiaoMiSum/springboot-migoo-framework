@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -48,7 +48,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.2-SNAPSHOT</revision>
+        <revision>1.0.3-SNAPSHOT</revision>
         <!-- Maven 相关 -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-framework-dependencies</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>1.0.3-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

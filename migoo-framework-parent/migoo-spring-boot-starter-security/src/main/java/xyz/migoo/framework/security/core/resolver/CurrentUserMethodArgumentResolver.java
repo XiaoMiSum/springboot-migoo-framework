@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.core.resolver;
 
+import jakarta.annotation.Resource;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -11,8 +12,6 @@ import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.security.core.annotations.CurrentUser;
 import xyz.migoo.framework.security.core.service.SecuritySessionAuthService;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
-
-import javax.annotation.Resource;
 
 /**
  * @author xiaomi

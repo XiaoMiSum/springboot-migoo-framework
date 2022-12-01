@@ -1,9 +1,9 @@
 package xyz.migoo.framework.common.validation;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import xyz.migoo.framework.common.core.IntArrayValuable;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Target({

@@ -1,6 +1,8 @@
 package xyz.migoo.framework.security.core.service;
 
 import cn.hutool.core.util.StrUtil;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
@@ -10,8 +12,6 @@ import xyz.migoo.framework.security.core.service.dto.AuthenticatorDTO;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**

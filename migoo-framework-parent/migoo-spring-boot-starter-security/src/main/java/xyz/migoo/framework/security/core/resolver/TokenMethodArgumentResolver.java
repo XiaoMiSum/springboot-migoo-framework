@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.core.resolver;
 
+import jakarta.annotation.Resource;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -9,8 +10,6 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.annotations.Token;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
-
-import javax.annotation.Resource;
 
 /**
  * @author xiaomi

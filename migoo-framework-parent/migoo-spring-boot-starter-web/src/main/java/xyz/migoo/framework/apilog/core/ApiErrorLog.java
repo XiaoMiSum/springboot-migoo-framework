@@ -1,8 +1,8 @@
 package xyz.migoo.framework.apilog.core;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data

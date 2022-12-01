@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.core.util;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,8 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.NativeWebRequest;
 import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 安全服务工具类

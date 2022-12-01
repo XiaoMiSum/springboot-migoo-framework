@@ -2,7 +2,10 @@ package xyz.migoo.framework.web.core.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -20,11 +23,8 @@ import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.servlet.ServletUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
 import java.util.Date;
 import java.util.Map;
 
@@ -224,11 +224,11 @@ public class GlobalExceptionHandler {
         errorLog.setApplicationName(applicationName);
         errorLog.setRequestUrl(request.getRequestURI());
         Map<String, Object> requestParams = MapUtil.<String, Object>builder()
-                .put("query", ServletUtil.getParamMap(request))
-                .put("body", ServletUtil.getBody(request)).build();
+                .put("query", ServletUtils.getParamMap(request))
+                .put("body", ServletUtils.getBody(request)).build();
         errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
         errorLog.setRequestMethod(request.getMethod());
-        errorLog.setUserIp(ServletUtil.getClientIP(request));
+        errorLog.setUserIp(ServletUtils.getClientIP(request));
         errorLog.setExceptionTime(new Date());
     }
 }

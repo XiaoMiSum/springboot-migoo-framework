@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.config;
 
+import jakarta.annotation.Resource;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -10,9 +11,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,8 +25,6 @@ import xyz.migoo.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.web.config.WebProperties;
 
-import javax.annotation.Resource;
-
 /**
  * 自定义的 Spring Security 配置适配器实现
  *
@@ -33,7 +32,7 @@ import javax.annotation.Resource;
  */
 @Configuration
 @AutoConfigureOrder(SecurityProperties.DEFAULT_FILTER_ORDER)
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class MiGooWebSecurityConfigurerAdapter {
 
     @Resource
@@ -75,7 +74,7 @@ public class MiGooWebSecurityConfigurerAdapter {
      * @see #configure(HttpSecurity)
      */
     @Resource
-    private Customizer<ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry> authorizeRequestsCustomizer;
+    private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeRequestsCustomizer;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -123,25 +122,26 @@ public class MiGooWebSecurityConfigurerAdapter {
                 .logout().logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler) // 登出
                 .and()
                 // 设置每个请求的权限 ①：全局共享规则
-                .authorizeRequests()
+                .authorizeHttpRequests()
                 // 登录、注册、获取验证码接口，可匿名访问
-                .antMatchers(api("/sign-in"), api("/captcha")).permitAll()
+                .requestMatchers(api("/sign-in"), api("/captcha")).permitAll()
                 // 静态资源，可匿名访问
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/*.css", "/**/*.css", "/*.js",
+                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/*.css", "/**/*.css", "/*.js",
                         "/**/*.js", "/*.jpg", "/**/*.jpg", "/*.png", "/**/*.png", "/*.gif", "/**/*.gif").permitAll()
                 // druid 监控页面 可匿名访问
-                .antMatchers("/**/druid/**", "/druid/**").anonymous()
+                .requestMatchers("/**/druid/**", "/druid/**").anonymous()
                 // 文件的获取接口，可匿名访问
-                .antMatchers(api("/file/**")).anonymous()
+                .requestMatchers(api("/file/**")).anonymous()
                 // Spring Boot Actuator 的安全配置
-                .antMatchers("/actuator", "/**/actuator").anonymous()
-                .antMatchers("/actuator/**", "/**/actuator/**").anonymous()
-                .antMatchers("/actuator-admin/**", "/**/actuator-admin/**").anonymous()
-                .antMatchers("/actuator-admin", "/**/actuator-admin").anonymous()
+                .requestMatchers("/actuator", "/**/actuator").anonymous()
+                .requestMatchers("/actuator/**", "/**/actuator/**").anonymous()
+                .requestMatchers("/actuator-admin/**", "/**/actuator-admin/**").anonymous()
+                .requestMatchers("/actuator-admin", "/**/actuator-admin").anonymous()
                 // 设置每个请求的权限 ②：每个项目的自定义规则
-                .and().authorizeRequests(authorizeRequestsCustomizer)
+                .and()
+                .authorizeHttpRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
-                .authorizeRequests().anyRequest().authenticated()
+                .authorizeHttpRequests().anyRequest().authenticated()
                 .and()
                 // 添加 JWT Filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)

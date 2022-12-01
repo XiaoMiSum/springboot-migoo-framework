@@ -1,6 +1,8 @@
 package xyz.migoo.framework.security.core.handler;
 
 import cn.hutool.core.util.StrUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -9,9 +11,6 @@ import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 /**

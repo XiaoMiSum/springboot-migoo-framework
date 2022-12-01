@@ -1,11 +1,10 @@
 package xyz.migoo.framework.web.config;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-
-import javax.validation.constraints.NotNull;
 
 @ConfigurationProperties(prefix = "migoo.web")
 @Validated

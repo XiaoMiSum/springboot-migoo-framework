@@ -1,5 +1,7 @@
 package xyz.migoo.framework.web.config;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -19,8 +21,6 @@ import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 
-import javax.annotation.Resource;
-import javax.servlet.Filter;
 import java.util.Objects;
 
 import static java.lang.Boolean.TRUE;
