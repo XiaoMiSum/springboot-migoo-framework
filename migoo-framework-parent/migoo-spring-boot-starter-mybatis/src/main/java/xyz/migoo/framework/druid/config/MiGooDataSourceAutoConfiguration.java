@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import xyz.migoo.framework.druid.core.filter.DruidAdRemoveFilter;
 
+import java.util.Objects;
+
 /**
  * 数据库配置类
  *
@@ -29,7 +31,7 @@ public class MiGooDataSourceAutoConfiguration {
         // 获取 druid web 监控页面的参数
         DruidStatProperties.StatViewServlet config = properties.getStatViewServlet();
         // 提取 common.js 的配置路径
-        String pattern = config.getUrlPattern() != null ? config.getUrlPattern() : "/druid/*";
+        String pattern = Objects.nonNull(config.getUrlPattern()) ? config.getUrlPattern() : "/druid/*";
         String commonJsPattern = pattern.replaceAll("\\*", "js/common.js");
         // 创建 DruidAdRemoveFilter Bean
         FilterRegistrationBean<DruidAdRemoveFilter> registrationBean = new FilterRegistrationBean<>();

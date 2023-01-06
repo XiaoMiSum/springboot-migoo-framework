@@ -41,9 +41,11 @@
         <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
         <mysql.version>8.0.25</mysql.version>
-        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
-        <redisson.version>3.16.4</redisson.version>
-        <durid.version>1.2.9</durid.version>
+        <mybatis.version>3.5.11</mybatis.version>
+        <mybatis-spring.version>3.0.0</mybatis-spring.version>
+        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <redisson.version>3.18.1</redisson.version>
+        <durid.version>1.2.15</durid.version>
         <!-- 监控相关 -->
         <spring-boot-admin.version>2.5.4</spring-boot-admin.version>
         <!-- 工具类相关 -->
@@ -102,6 +104,18 @@
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-mybatis</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
             </dependency>
 
             <dependency>
@@ -245,5 +259,4 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
 </project>

@@ -126,17 +126,17 @@ public class MiGooWebSecurityConfigurerAdapter {
                 // 登录、注册、获取验证码接口，可匿名访问
                 .requestMatchers(api("/sign-in"), api("/captcha")).permitAll()
                 // 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/*.css", "/**/*.css", "/*.js",
-                        "/**/*.js", "/*.jpg", "/**/*.jpg", "/*.png", "/**/*.png", "/*.gif", "/**/*.gif").permitAll()
+                .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*.css", "/*/*.css", "/*.js",
+                        "/*/*.js", "/*.jpg", "/*/*.jpg", "/*.png", "/*/*.png", "/*.gif", "/*/*.gif").permitAll()
                 // druid 监控页面 可匿名访问
-                .requestMatchers("/**/druid/**", "/druid/**").anonymous()
+                .requestMatchers("/*/druid/*", "/druid/*").anonymous()
                 // 文件的获取接口，可匿名访问
-                .requestMatchers(api("/file/**")).anonymous()
+                .requestMatchers(api("/file/*")).anonymous()
                 // Spring Boot Actuator 的安全配置
-                .requestMatchers("/actuator", "/**/actuator").anonymous()
-                .requestMatchers("/actuator/**", "/**/actuator/**").anonymous()
-                .requestMatchers("/actuator-admin/**", "/**/actuator-admin/**").anonymous()
-                .requestMatchers("/actuator-admin", "/**/actuator-admin").anonymous()
+                .requestMatchers("/actuator", "/*/actuator").anonymous()
+                .requestMatchers("/actuator/*", "/*/actuator/*").anonymous()
+                .requestMatchers("/actuator-admin/*", "/*/actuator-admin/*").anonymous()
+                .requestMatchers("/actuator-admin", "/*/actuator-admin").anonymous()
                 // 设置每个请求的权限 ②：每个项目的自定义规则
                 .and()
                 .authorizeHttpRequests(authorizeRequestsCustomizer)
