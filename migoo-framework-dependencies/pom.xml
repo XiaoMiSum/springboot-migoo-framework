@@ -40,7 +40,7 @@
         <spring.boot.version>3.0.0</spring.boot.version>
         <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
-        <mysql.version>8.0.25</mysql.version>
+        <mysql.version>8.0.32</mysql.version>
         <mybatis.version>3.5.11</mybatis.version>
         <mybatis-spring.version>3.0.0</mybatis-spring.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
@@ -68,6 +68,10 @@
                     <exclusion>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -125,8 +129,8 @@
             </dependency>
 
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
 
