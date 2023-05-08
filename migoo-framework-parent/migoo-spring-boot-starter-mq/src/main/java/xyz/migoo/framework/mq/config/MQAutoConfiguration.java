@@ -4,7 +4,6 @@ import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -24,7 +23,6 @@ import java.util.List;
  * @author xiaomi
  * Created on 2021/11/21 14:13
  */
-@Configuration
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @Slf4j
 public class MQAutoConfiguration {
@@ -32,7 +30,7 @@ public class MQAutoConfiguration {
     /**
      * 创建 Redis Pub/Sub 广播消费的容器
      */
-    @Bean
+    @Bean(initMethod = "start", destroyMethod = "stop")
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory, List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
@@ -91,6 +89,8 @@ public class MQAutoConfiguration {
                     // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
                     .cancelOnError(throwable -> false);
             container.register(builder.build(), listener);
+            log.info("[redisStreamMessageListenerContainer][注册 Stream({}) 对应的监听器({})]",
+                    listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
     }

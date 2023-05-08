@@ -13,6 +13,7 @@ public class NumberConstants {
     public final static Integer N_5 = 5;
     public final static Integer N_6 = 6;
     public final static Integer N_7 = 7;
+    public final static Integer N_10 = 10;
     public final static Integer N_11 = 11;
     public final static Integer N_30 = 30;
     public final static Integer N_200 = 200;
