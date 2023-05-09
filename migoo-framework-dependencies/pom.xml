@@ -50,7 +50,7 @@
         <!-- 工具类相关 -->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <hutool.version>5.8.18</hutool.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <zxing.version>3.5.0</zxing.version>
         <lombok.version>1.18.22</lombok.version>
     </properties>
