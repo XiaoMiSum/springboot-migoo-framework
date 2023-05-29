@@ -1,5 +1,7 @@
 package xyz.migoo.framework.common.util.date;
 
+import cn.hutool.core.date.DateUtil;
+
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
@@ -120,4 +122,7 @@ public class DateUtils {
         return c.getTime();
     }
 
+    public static String format(String dateStr, String format) {
+        return DateUtil.format(DateUtil.parse(dateStr), format);
+    }
 }
