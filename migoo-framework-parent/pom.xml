@@ -46,6 +46,7 @@
         <module>migoo-spring-boot-starter-captcha</module>
         <module>migoo-spring-boot-starter-monitor</module>
         <module>migoo-spring-boot-starter-aliyun</module>
+        <module>migoo-spring-boot-starter-sms</module>
     </modules>
 
     <properties>

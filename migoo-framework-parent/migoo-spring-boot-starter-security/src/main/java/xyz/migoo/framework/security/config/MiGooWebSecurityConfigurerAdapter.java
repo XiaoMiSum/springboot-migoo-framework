@@ -28,7 +28,7 @@ import xyz.migoo.framework.web.config.WebProperties;
 /**
  * 自定义的 Spring Security 配置适配器实现
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Configuration
 @AutoConfigureOrder(SecurityProperties.DEFAULT_FILTER_ORDER)
