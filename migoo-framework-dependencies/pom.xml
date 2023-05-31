@@ -164,6 +164,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- aliyun相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-aliyun</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
