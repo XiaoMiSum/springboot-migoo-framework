@@ -1,13 +1,12 @@
-package xyz.migoo.framework.aliyun.core;
+package xyz.migoo.framework.aliyun.core.client.dto;
 
 import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
+import xyz.migoo.framework.aliyun.core.enums.CloudServerType;
 
 @Data
 @Builder
-public class CloudServer {
+public class CloudServerInstanceRespDTO {
 
     private String instanceId;
 
@@ -21,8 +20,6 @@ public class CloudServer {
 
     private String expiredTime;
 
-    private BigDecimal price;
-
-    private ServerType type;
+    private CloudServerType type;
 
 }
