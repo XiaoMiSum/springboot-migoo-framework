@@ -10,6 +10,10 @@ import xyz.migoo.framework.aliyun.core.property.CloudServiceProperties;
 
 import java.util.Map;
 
+import static xyz.migoo.framework.aliyun.core.enums.CloudServerType.ECS;
+import static xyz.migoo.framework.aliyun.core.enums.CloudServerType.RDS;
+import static xyz.migoo.framework.aliyun.core.enums.CloudServiceProvide.ALI_CLOUD;
+
 @Component
 public class CloudServiceClientFactoryImpl implements CloudServiceClientFactory {
 
@@ -22,13 +26,10 @@ public class CloudServiceClientFactoryImpl implements CloudServiceClientFactory 
 
     @Override
     public void createClient(CloudServiceProperties properties, CloudServiceProvide provide) throws Exception {
-        if (clientMap.containsKey(properties.getAccessKeyId() + properties.getServerType())) {
-            return;
-        }
         CloudServiceClient client = null;
-        if (provide == CloudServiceProvide.AliCloud && properties.getServerType() == CloudServerType.ESC) {
+        if (provide == ALI_CLOUD && properties.getServerType() == ECS) {
             client = new AliCloudServiceECSClient(properties);
-        } else if (provide == CloudServiceProvide.AliCloud && properties.getServerType() == CloudServerType.RDS) {
+        } else if (provide == ALI_CLOUD && properties.getServerType() == RDS) {
             client = new AliCloudServiceRDSClient(properties);
         }
         clientMap.put(properties.getAccessKeyId() + properties.getServerType(), client);

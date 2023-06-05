@@ -1,5 +1,6 @@
 package xyz.migoo.framework.aliyun.core.client.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.aliyun.ecs20140526.Client;
 import com.aliyun.ecs20140526.models.DescribeInstancesRequest;
 import com.aliyun.ecs20140526.models.DescribeInstancesResponse;
@@ -11,16 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.aliyun.core.client.AbstractCloudServerClient;
 import xyz.migoo.framework.aliyun.core.client.dto.CloudServerInstanceRespDTO;
 import xyz.migoo.framework.aliyun.core.client.dto.CloudServerPriceRespDTO;
-import xyz.migoo.framework.aliyun.core.enums.CloudServerType;
 import xyz.migoo.framework.aliyun.core.property.CloudServiceProperties;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.date.DateUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static xyz.migoo.framework.aliyun.core.enums.CloudServerType.ECS;
+
 @Slf4j
 public class AliCloudServiceECSClient extends AbstractCloudServerClient {
+
     private Client client;
 
     public AliCloudServiceECSClient(CloudServiceProperties properties) throws Exception {
@@ -43,13 +45,15 @@ public class AliCloudServiceECSClient extends AbstractCloudServerClient {
             DescribeInstancesRequest request = new DescribeInstancesRequest().setPageSize(100).setRegionId(regionId);
             DescribeInstancesResponse resp = client.describeInstances(request);
             for (DescribeInstancesResponseBody.DescribeInstancesResponseBodyInstancesInstance instance : resp.getBody().getInstances().getInstance()) {
+                String ipAddress = instance.getInstanceNetworkType().equals("vpc") ? instance.getEipAddress().getIpAddress()
+                        : instance.getPublicIpAddress().getIpAddress().get(0);
                 ecsList.add(CloudServerInstanceRespDTO.builder().instanceId(instance.getInstanceId())
-                        .createTime(DateUtils.format(instance.getCreationTime(), "yyyy-MM-dd HH:mm:ss"))
+                        .createdTime(DateUtil.format(DateUtil.parse(instance.getCreationTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .operateSystem(instance.getOSName())
                         .status(instance.getStatus())
-                        .ipAddress(instance.getPublicIpAddress().getIpAddress().get(0))
-                        .expiredTime(DateUtils.format(instance.getExpiredTime(), "yyyy-MM-dd HH:mm:ss"))
-                        .type(CloudServerType.RDS).build());
+                        .ipAddress(ipAddress)
+                        .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpiredTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
+                        .type(ECS).build());
             }
             return Result.getSuccessful(ecsList);
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package xyz.migoo.framework.aliyun.core.client.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.aliyun.rds20140815.Client;
 import com.aliyun.rds20140815.models.DescribeDBInstancesRequest;
 import com.aliyun.rds20140815.models.DescribeDBInstancesResponse;
@@ -11,16 +12,17 @@ import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.aliyun.core.client.AbstractCloudServerClient;
 import xyz.migoo.framework.aliyun.core.client.dto.CloudServerInstanceRespDTO;
 import xyz.migoo.framework.aliyun.core.client.dto.CloudServerPriceRespDTO;
-import xyz.migoo.framework.aliyun.core.enums.CloudServerType;
 import xyz.migoo.framework.aliyun.core.property.CloudServiceProperties;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.date.DateUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static xyz.migoo.framework.aliyun.core.enums.CloudServerType.RDS;
+
 @Slf4j
 public class AliCloudServiceRDSClient extends AbstractCloudServerClient {
+
     private Client client;
 
     public AliCloudServiceRDSClient(CloudServiceProperties properties) throws Exception {
@@ -44,12 +46,12 @@ public class AliCloudServiceRDSClient extends AbstractCloudServerClient {
             DescribeDBInstancesResponse resp = client.describeDBInstances(request);
             for (DescribeDBInstancesResponseBody.DescribeDBInstancesResponseBodyItemsDBInstance instance : resp.getBody().getItems().getDBInstance()) {
                 rdsList.add(CloudServerInstanceRespDTO.builder().instanceId(instance.getDBInstanceId())
-                        .createTime(DateUtils.format(instance.getCreateTime(), "yyyy-MM-dd HH:mm:ss"))
+                        .createdTime(DateUtil.format(DateUtil.parse(instance.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .operateSystem(instance.getEngine())
                         .status(instance.getDBInstanceStatus())
                         .ipAddress(instance.getConnectionString())
-                        .expiredTime(DateUtils.format(instance.getExpireTime(), "yyyy-MM-dd HH:mm:ss"))
-                        .type(CloudServerType.RDS).build());
+                        .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), "yyyy-MM-dd HH:mm:ss"))
+                        .type(RDS).build());
             }
             return Result.getSuccessful(rdsList);
         } catch (Exception e) {

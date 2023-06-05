@@ -6,6 +6,6 @@ package xyz.migoo.framework.aliyun.core.enums;
  */
 public enum CloudServiceProvide {
 
-    AliCloud,
+    ALI_CLOUD,
     ;
 }

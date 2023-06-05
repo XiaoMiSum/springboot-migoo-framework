@@ -10,7 +10,7 @@ public class CloudServerInstanceRespDTO {
 
     private String instanceId;
 
-    private String createTime;
+    private String createdTime;
 
     private String status;
 
