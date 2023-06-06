@@ -45,6 +45,7 @@
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <redisson.version>3.18.1</redisson.version>
         <durid.version>1.2.15</durid.version>
+        <mybatis-plus-join.version>1.4.5</mybatis-plus-join.version>
         <!-- 监控相关 -->
         <spring-boot-admin.version>3.0.3</spring-boot-admin.version>
         <!-- 工具类相关 -->
@@ -129,6 +130,12 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.yulichang</groupId>
+                <artifactId>mybatis-plus-join-boot-starter</artifactId>
+                <version>${mybatis-plus-join.version}</version>
             </dependency>
 
             <dependency>

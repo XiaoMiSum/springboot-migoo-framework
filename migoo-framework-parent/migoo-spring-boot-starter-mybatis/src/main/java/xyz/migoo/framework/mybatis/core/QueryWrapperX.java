@@ -12,7 +12,7 @@ import java.util.Collection;
  * Created on 2021/11/23 20:30
  */
 public class QueryWrapperX<T> extends QueryWrapper<T> {
-    
+
     public QueryWrapperX<T> likeIfPresent(String column, String val) {
         if (StringUtils.hasText(val)) {
             return (QueryWrapperX<T>) super.like(column, val);
@@ -118,6 +118,11 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     @Override
     public QueryWrapperX<T> in(String column, Collection<?> coll) {
         super.in(column, coll);
+        return this;
+    }
+
+    public QueryWrapperX<T> limit(int n) {
+        super.last("LIMIT " + n);
         return this;
     }
 }

@@ -32,15 +32,11 @@ public class BarkClient extends AbstractSmsClient {
     }
 
     @Override
-    public Long getId() {
-        return null;
-    }
-
-    @Override
     protected SmsResult<SmsSendRespDTO> doSendSms(Long sendLogId, String mobile, String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
         // 构建请求
         Map<String, Object> params = MapUtils.convertMap(templateParams);
-        params.put("device_key", properties.getApiKey());
+        params.put("body", apiTemplateId);
+        params.put("device_key", mobile);
         // 执行请求
         int status = HttpUtil.createPost("https://api.day.app/push")
                 .body(JsonUtils.toJsonString(params))
