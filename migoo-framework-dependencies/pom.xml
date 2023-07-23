@@ -56,6 +56,7 @@
         <lombok.version>1.18.22</lombok.version>
         <aliyun.ecs.version>4.24.56</aliyun.ecs.version>
         <aliyun.rds.version>1.1.5</aliyun.rds.version>
+        <alipay.sdk.version>4.38.10.ALL</alipay.sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -254,6 +255,13 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>rds20140815</artifactId>
                 <version>${aliyun.rds.version}</version>
+            </dependency>
+
+            <!-- 支付宝SDK -->
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-sdk-java</artifactId>
+                <version>${alipay.sdk.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

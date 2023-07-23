@@ -12,8 +12,6 @@ import xyz.migoo.framework.security.core.service.dto.AuthenticatorDTO;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
-import java.util.Objects;
-
 /**
  * @author xiaomi
  * Created on 2021/11/21 15:41
@@ -31,7 +29,10 @@ public class SecurityAuthenticatorService {
         String token = request.getParameterMap().containsKey("token") ? request.getParameter("token")
                 : SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
         LoginUser loginUser = loginUserService.getLoginUser(token);
-        assert Objects.nonNull(loginUser);
+        // assert Objects.nonNull(loginUser);
+        if (!loginUser.isRequiredVerifyAuthenticator()) {
+            return;
+        }
         if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(loginUser.getSecurityCode(), code)) {
             throw ServiceExceptionUtil.get(new ErrorCode(999, "身份验证失败!"));
         }

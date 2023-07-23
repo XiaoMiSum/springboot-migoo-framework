@@ -53,6 +53,8 @@ public class LoginUser implements UserDetails {
 
     private String securityCode;
 
+    private boolean requiredVerifyAuthenticator;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -66,6 +68,11 @@ public class LoginUser implements UserDetails {
 
     public LoginUser setUsername(String username) {
         this.username = username;
+        return this;
+    }
+
+    public LoginUser setRequiredVerifyAuthenticator(boolean b) {
+        this.requiredVerifyAuthenticator = b;
         return this;
     }
 
@@ -98,15 +105,19 @@ public class LoginUser implements UserDetails {
         return enabled;
     }
 
+    public boolean isRequiredVerifyAuthenticator() {
+        return requiredVerifyAuthenticator;
+    }
+
     public enum Client {
         /**
          * 客户端类型
          */
         MEMBER_CLIENT,
-        ADMIN_CLIENT;
+        MANAGER_CLIENT;
 
-        public static boolean isAdminClient(Client client) {
-            return Objects.equal(ADMIN_CLIENT, client);
+        public static boolean isManagerClient(Client client) {
+            return Objects.equal(MANAGER_CLIENT, client);
         }
     }
 }
