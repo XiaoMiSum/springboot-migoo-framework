@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import xyz.migoo.framework.security.core.annotations.Authenticator;
+import xyz.migoo.framework.security.core.annotation.Authenticator;
 import xyz.migoo.framework.security.core.service.SecurityAuthenticatorService;
 
 import java.util.Objects;

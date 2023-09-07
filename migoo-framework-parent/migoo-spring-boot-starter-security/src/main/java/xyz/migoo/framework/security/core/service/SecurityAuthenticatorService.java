@@ -1,6 +1,7 @@
 package xyz.migoo.framework.security.core.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.google.common.base.Strings;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
@@ -26,9 +27,10 @@ public class SecurityAuthenticatorService {
 
     public void verify(HttpServletRequest request) {
         String code = request.getParameter("_code");
-        String token = request.getParameterMap().containsKey("token") ? request.getParameter("token")
-                : SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
-        LoginUser loginUser = loginUserService.getLoginUser(token);
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
+        // 兼容绑定身份验证器时，token 在请求参数中
+        LoginUser loginUser = loginUserService.getLoginUser(!Strings.isNullOrEmpty(token) ? token :
+                request.getParameter("token"));
         // assert Objects.nonNull(loginUser);
         if (!loginUser.isRequiredVerifyAuthenticator()) {
             return;

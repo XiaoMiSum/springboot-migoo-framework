@@ -9,7 +9,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.LoginUser;
-import xyz.migoo.framework.security.core.annotations.CurrentUser;
+import xyz.migoo.framework.security.core.annotation.CurrentUser;
 import xyz.migoo.framework.security.core.service.SecuritySessionAuthService;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 

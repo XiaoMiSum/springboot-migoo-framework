@@ -8,7 +8,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import xyz.migoo.framework.security.config.SecurityProperties;
-import xyz.migoo.framework.security.core.annotations.Token;
+import xyz.migoo.framework.security.core.annotation.Token;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 /**
