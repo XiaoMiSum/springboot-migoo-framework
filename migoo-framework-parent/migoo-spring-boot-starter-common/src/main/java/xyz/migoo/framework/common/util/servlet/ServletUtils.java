@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -145,6 +146,16 @@ public class ServletUtils {
         return Collections.unmodifiableMap(map);
     }
 
+    public static Map<String, String> getHeaders(HttpServletRequest request) {
+        Map<String, String> headers = new HashMap<>();
+        Enumeration<String> names = request.getHeaderNames();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            headers.put(name, request.getHeader(name));
+        }
+        return headers;
+    }
+
     public static String getClientIP(HttpServletRequest request, String... otherHeaderNames) {
         String[] headers = {"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         if (ArrayUtil.isNotEmpty(otherHeaderNames)) {
@@ -158,7 +169,7 @@ public class ServletUtils {
         String ip;
         for (String header : headerNames) {
             ip = request.getHeader(header);
-            if (false == NetUtil.isUnknown(ip)) {
+            if (!NetUtil.isUnknown(ip)) {
                 return NetUtil.getMultistageReverseProxyIp(ip);
             }
         }
