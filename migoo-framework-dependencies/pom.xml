@@ -50,13 +50,17 @@
         <spring-boot-admin.version>3.0.3</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <hutool.version>5.8.18</hutool.version>
+        <hutool.version>5.8.21</hutool.version>
         <guava.version>31.1-jre</guava.version>
         <zxing.version>3.5.0</zxing.version>
+        <bcprov.version>1.70</bcprov.version>
         <lombok.version>1.18.22</lombok.version>
+
+        <!-- 三方 SDK -->
         <aliyun.ecs.version>4.24.56</aliyun.ecs.version>
         <aliyun.rds.version>1.1.5</aliyun.rds.version>
         <alipay.sdk.version>4.38.10.ALL</alipay.sdk.version>
+        <wechat-pay.version>0.2.11</wechat-pay.version>
     </properties>
 
     <dependencyManagement>
@@ -262,6 +266,18 @@
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java</artifactId>
                 <version>${alipay.sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bcprov.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.wechatpay-apiv3</groupId>
+                <artifactId>wechatpay-java</artifactId>
+                <version>${wechat-pay.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
