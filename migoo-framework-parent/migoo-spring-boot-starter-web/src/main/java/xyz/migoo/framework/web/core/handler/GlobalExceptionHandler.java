@@ -11,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -54,6 +56,9 @@ public class GlobalExceptionHandler {
      * @return 通用返回
      */
     public Result<?> allExceptionHandler(HttpServletRequest request, Throwable ex) {
+        if (ex instanceof HttpMediaTypeNotSupportedException) {
+            return httpMediaTypeNotSupportedException((HttpMediaTypeNotSupportedException) ex);
+        }
         if (ex instanceof MissingServletRequestParameterException) {
             return missingServletRequestParameterExceptionHandler((MissingServletRequestParameterException) ex);
         }
@@ -82,6 +87,18 @@ public class GlobalExceptionHandler {
             return serviceExceptionHandler((ServiceException) ex);
         }
         return defaultExceptionHandler(request, ex);
+    }
+
+    /**
+     * 处理 SpringMVC 请求Content-Type错误
+     * <p>
+     * 例如说，接口上设置了 consumes= application/x-www-form-urlencoded，结果传递的是 application/json
+     */
+    @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
+    @ResponseBody
+    public Result<?> httpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        log.warn("[httpMediaTypeNotSupportedException]", ex);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("Content-Type不支持:%s", ex.getContentType()));
     }
 
     /**
