@@ -30,7 +30,7 @@ public class SecurityAuthenticatorService {
         String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
         // 兼容绑定身份验证器时，token 在请求参数中
         LoginUser loginUser = loginUserService.getLoginUser(!Strings.isNullOrEmpty(token) ? token :
-                request.getParameter("token"));
+                request.getParameter("_token"));
         // assert Objects.nonNull(loginUser);
         if (!loginUser.isRequiredVerifyAuthenticator()) {
             return;
