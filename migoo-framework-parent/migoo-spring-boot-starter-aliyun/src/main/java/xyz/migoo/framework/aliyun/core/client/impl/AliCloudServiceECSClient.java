@@ -45,13 +45,13 @@ public class AliCloudServiceECSClient extends AbstractCloudServerClient {
             DescribeInstancesRequest request = new DescribeInstancesRequest().setPageSize(100).setRegionId(regionId);
             DescribeInstancesResponse resp = client.describeInstances(request);
             for (DescribeInstancesResponseBody.DescribeInstancesResponseBodyInstancesInstance instance : resp.getBody().getInstances().getInstance()) {
-                String ipAddress = instance.getInstanceNetworkType().equals("vpc") ? instance.getEipAddress().getIpAddress()
-                        : instance.getPublicIpAddress().getIpAddress().get(0);
                 ecsList.add(CloudServerInstanceRespDTO.builder().instanceId(instance.getInstanceId())
+                        .hostname(instance.getInstanceName())
                         .createdTime(DateUtil.format(DateUtil.parse(instance.getCreationTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .operateSystem(instance.getOSName())
                         .status(instance.getStatus())
-                        .ipAddress(ipAddress)
+                        .privateIpAddress(instance.getVpcAttributes().getPrivateIpAddress().getIpAddress().get(0))
+                        .publicIpAddress(instance.getPublicIpAddress().getIpAddress().get(0))
                         .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpiredTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .type(ECS).build());
             }

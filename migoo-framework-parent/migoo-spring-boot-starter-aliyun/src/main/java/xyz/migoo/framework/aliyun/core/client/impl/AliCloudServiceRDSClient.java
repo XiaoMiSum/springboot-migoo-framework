@@ -46,10 +46,11 @@ public class AliCloudServiceRDSClient extends AbstractCloudServerClient {
             DescribeDBInstancesResponse resp = client.describeDBInstances(request);
             for (DescribeDBInstancesResponseBody.DescribeDBInstancesResponseBodyItemsDBInstance instance : resp.getBody().getItems().getDBInstance()) {
                 rdsList.add(CloudServerInstanceRespDTO.builder().instanceId(instance.getDBInstanceId())
+                        .hostname(instance.DBInstanceDescription)
                         .createdTime(DateUtil.format(DateUtil.parse(instance.getCreateTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .operateSystem(instance.getEngine())
                         .status(instance.getDBInstanceStatus())
-                        .ipAddress(instance.getConnectionString())
+                        .publicIpAddress(instance.getConnectionString())
                         .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpireTime(), "yyyy-MM-dd'T'HH:mm:ss'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .type(RDS).build());
             }
@@ -65,7 +66,7 @@ public class AliCloudServiceRDSClient extends AbstractCloudServerClient {
     public Result<CloudServerPriceRespDTO> getRenewalPrice(String regionId, String instanceId) {
         try {
             DescribeRenewalPriceRequest request = new DescribeRenewalPriceRequest()
-                    .setDBInstanceId(instanceId).setRegionId(regionId);
+                    .setDBInstanceId(instanceId).setRegionId(regionId).setTimeType("Month").setUsedTime(1);
             String price = client.describeRenewalPrice(request)
                     .getBody()
                     .getPriceInfo().getTradePrice().toString();
