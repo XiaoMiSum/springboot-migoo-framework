@@ -19,10 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * 客户端工具类
@@ -53,7 +51,7 @@ public class ServletUtils {
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         // 输出附件
         IoUtil.write(response.getOutputStream(), false, content);
@@ -65,7 +63,7 @@ public class ServletUtils {
      */
     public static String getUserAgent(HttpServletRequest request) {
         String ua = request.getHeader("User-Agent");
-        return ua != null ? ua : "";
+        return Objects.isNull(ua) ? "" : ua;
     }
 
     /**
@@ -83,19 +81,13 @@ public class ServletUtils {
 
     public static String getUserAgent() {
         HttpServletRequest request = getRequest();
-        if (request == null) {
-            return null;
-        }
-        return getUserAgent(request);
+        return Objects.isNull(request) ? null : getUserAgent(request);
     }
 
     public static String getClientIP() {
         HttpServletRequest request = getRequest();
-        if (request == null) {
-            return null;
-        }
         String[] headers = {"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
-        return getClientIPByHeader(request, headers);
+        return Objects.isNull(request) ? null : getClientIPByHeader(request, headers);
     }
 
     public static boolean isJsonRequest(ServletRequest request) {
@@ -146,6 +138,15 @@ public class ServletUtils {
         return Collections.unmodifiableMap(map);
     }
 
+    public static String getReferer() {
+        HttpServletRequest request = getRequest();
+        return Objects.isNull(request) ? null : getReferer(request);
+    }
+
+    public static String getReferer(HttpServletRequest request) {
+        return request.getHeader("Referer");
+    }
+
     public static Map<String, String> getHeaders(HttpServletRequest request) {
         Map<String, String> headers = new HashMap<>();
         Enumeration<String> names = request.getHeaderNames();
@@ -161,7 +162,6 @@ public class ServletUtils {
         if (ArrayUtil.isNotEmpty(otherHeaderNames)) {
             headers = ArrayUtil.addAll(headers, otherHeaderNames);
         }
-
         return getClientIPByHeader(request, headers);
     }
 
@@ -173,7 +173,6 @@ public class ServletUtils {
                 return NetUtil.getMultistageReverseProxyIp(ip);
             }
         }
-
         ip = request.getRemoteAddr();
         return NetUtil.getMultistageReverseProxyIp(ip);
     }
