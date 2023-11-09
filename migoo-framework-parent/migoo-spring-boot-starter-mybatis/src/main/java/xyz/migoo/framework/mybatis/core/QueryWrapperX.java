@@ -12,6 +12,10 @@ import java.util.Collection;
  * Created on 2021/11/23 20:30
  */
 public class QueryWrapperX<T> extends QueryWrapper<T> {
+    
+    public QueryWrapperX<T> selectX(String... column) {
+        return (QueryWrapperX<T>) super.select(column);
+    }
 
     public QueryWrapperX<T> likeIfPresent(String column, String val) {
         if (StringUtils.hasText(val)) {
