@@ -31,7 +31,7 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
     /**
      * Redis 消费者分组，默认使用 migoo.mq.group 名字
      */
-    @Value("${migoo.mq.group:'migoo:mq:group'}")
+    @Value("${migoo.mq.group:def_group}")
     @Getter
     private String group;
     /**
@@ -43,7 +43,7 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
     @SneakyThrows
     protected AbstractStreamMessageListener() {
         this.messageType = getMessageClass();
-        this.streamKey = messageType.newInstance().getStreamKey();
+        this.streamKey = messageType.getConstructor().newInstance().getStreamKey();
     }
 
     @Override

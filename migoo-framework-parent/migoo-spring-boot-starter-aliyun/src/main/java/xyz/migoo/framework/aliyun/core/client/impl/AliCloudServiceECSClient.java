@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.aliyun.ecs20140526.Client;
 import com.aliyun.ecs20140526.models.DescribeInstancesRequest;
 import com.aliyun.ecs20140526.models.DescribeInstancesResponse;
-import com.aliyun.ecs20140526.models.DescribeInstancesResponseBody;
 import com.aliyun.ecs20140526.models.DescribeRenewalPriceRequest;
 import com.aliyun.teaopenapi.models.Config;
 import com.google.common.collect.Lists;
@@ -39,28 +38,30 @@ public class AliCloudServiceECSClient extends AbstractCloudServerClient {
 
     @Override
     public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId) {
-
         try {
             List<CloudServerInstanceRespDTO> ecsList = Lists.newArrayList();
             DescribeInstancesRequest request = new DescribeInstancesRequest().setPageSize(100).setRegionId(regionId);
             DescribeInstancesResponse resp = client.describeInstances(request);
-            for (DescribeInstancesResponseBody.DescribeInstancesResponseBodyInstancesInstance instance : resp.getBody().getInstances().getInstance()) {
-                ecsList.add(CloudServerInstanceRespDTO.builder().instanceId(instance.getInstanceId())
+            resp.getBody().getInstances().getInstance().forEach(instance -> {
+                CloudServerInstanceRespDTO.CloudServerInstanceRespDTOBuilder builder = CloudServerInstanceRespDTO.builder()
+                        .instanceId(instance.getInstanceId())
                         .hostname(instance.getInstanceName())
                         .createdTime(DateUtil.format(DateUtil.parse(instance.getCreationTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
                         .operateSystem(instance.getOSName())
                         .status(instance.getStatus())
                         .privateIpAddress(instance.getVpcAttributes().getPrivateIpAddress().getIpAddress().get(0))
-                        .publicIpAddress(instance.getPublicIpAddress().getIpAddress().get(0))
                         .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpiredTime(), "yyyy-MM-dd'T'HH:mm'Z'"), "yyyy-MM-dd HH:mm:ss"))
-                        .type(ECS).build());
-            }
+                        .type(ECS);
+                if (!"Stopped".equalsIgnoreCase(instance.getStatus())) {
+                    builder.publicIpAddress(instance.getPublicIpAddress().getIpAddress().get(0));
+                }
+                ecsList.add(builder.build());
+            });
             return Result.getSuccessful(ecsList);
         } catch (Exception e) {
             log.error("获取ECS实例列表失败", e);
             return Result.getError(400, "获取ECS实例列表失败");
         }
-
     }
 
     @Override
