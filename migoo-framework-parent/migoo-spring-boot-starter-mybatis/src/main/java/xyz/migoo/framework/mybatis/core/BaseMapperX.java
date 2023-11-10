@@ -23,6 +23,15 @@ import java.util.List;
  */
 public interface BaseMapperX<T> extends MPJBaseMapper<T> {
 
+    default <E> PageResult<E> selectJoinPage(PageParam pageParam, Class<E> clazz,
+                                             @Param("ew") MPJLambdaWrapperX<T> queryWrapper) {
+        // MyBatis Plus 查询
+        IPage<E> mpPage = MyBatisUtils.buildPage(pageParam);
+        selectJoinPage(mpPage, clazz, queryWrapper);
+        // 转换返回
+        return new PageResult<>(mpPage.getRecords(), mpPage.getTotal());
+    }
+
     default PageResult<T> selectPage(PageParam pageParam, @Param("ew") Wrapper<T> queryWrapper) {
         // MyBatis Plus 查询
         IPage<T> mpPage = MyBatisUtils.buildPage(pageParam);
