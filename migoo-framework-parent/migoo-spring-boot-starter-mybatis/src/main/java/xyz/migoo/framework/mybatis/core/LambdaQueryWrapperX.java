@@ -41,7 +41,7 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     public LambdaQueryWrapperX<T> notInIfPresent(SFunction<T, ?> column, Collection<?> coll) {
-        if (!ArrayUtil.isEmpty(coll)) {
+        if (!CollectionUtils.isEmpty(coll)) {
             return (LambdaQueryWrapperX<T>) super.notIn(column, coll);
         }
         return this;
