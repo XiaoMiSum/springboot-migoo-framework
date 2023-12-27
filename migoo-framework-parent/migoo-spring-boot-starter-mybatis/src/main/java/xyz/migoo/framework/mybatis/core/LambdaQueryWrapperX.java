@@ -19,6 +19,7 @@ import java.util.Collection;
  */
 public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
+
     public LambdaQueryWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
         if (StringUtils.hasText(val)) {
             return (LambdaQueryWrapperX<T>) super.like(column, val);
@@ -101,10 +102,10 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
             return (LambdaQueryWrapperX<T>) super.between(column, val1, val2);
         }
         if (val1 != null) {
-            return (LambdaQueryWrapperX<T>) ge(column, val1);
+            return ge(column, val1);
         }
         if (val2 != null) {
-            return (LambdaQueryWrapperX<T>) le(column, val2);
+            return le(column, val2);
         }
         return this;
     }
@@ -126,6 +127,30 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     @Override
     public LambdaQueryWrapperX<T> eq(SFunction<T, ?> column, Object val) {
         super.eq(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> gt(SFunction<T, ?> column, Object val) {
+        super.gt(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> ge(SFunction<T, ?> column, Object val) {
+        super.ge(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> le(SFunction<T, ?> column, Object val) {
+        super.le(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> lt(SFunction<T, ?> column, Object val) {
+        super.lt(column, val);
         return this;
     }
 

@@ -37,24 +37,22 @@
     <properties>
         <revision>1.1.0-SNAPSHOT</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.0.6</spring.boot.version>
+        <spring.boot.version>3.2.1</spring.boot.version>
         <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
-        <mybatis.version>3.5.11</mybatis.version>
-        <mybatis-spring.version>3.0.1</mybatis-spring.version>
-        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
-        <redisson.version>3.18.1</redisson.version>
-        <durid.version>1.2.15</durid.version>
-        <mybatis-plus-join.version>1.4.5</mybatis-plus-join.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <redisson.version>3.25.2</redisson.version>
+        <durid.version>1.2.20</durid.version>
+        <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
         <!-- 监控相关 -->
         <spring-boot-admin.version>3.0.3</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <hutool.version>5.8.21</hutool.version>
-        <guava.version>31.1-jre</guava.version>
-        <zxing.version>3.5.0</zxing.version>
+        <hutool.version>5.8.24</hutool.version>
+        <guava.version>33.0.0-jre</guava.version>
+        <zxing.version>3.5.2</zxing.version>
         <bcprov.version>1.70</bcprov.version>
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
 
         <!-- 三方 SDK -->
         <aliyun.ecs.version>4.24.56</aliyun.ecs.version>
@@ -77,14 +75,6 @@
                         <artifactId>mysql-connector-java</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-
-            <!-- Spring 核心 -->
-            <dependency>
-                <!-- 用于生成自定义的 Spring @ConfigurationProperties 配置类的说明文件 -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>${spring.boot2.version}</version>
             </dependency>
 
             <!-- web 相关 -->
@@ -114,18 +104,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis-spring</artifactId>
-                <version>${mybatis-spring.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-redis</artifactId>
                 <version>${revision}</version>
@@ -133,7 +111,7 @@
 
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
@@ -269,6 +247,7 @@
             </dependency>
 
             <dependency>
+                <!-- todo 测试 升级到 18on -->
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bcprov.version}</version>
