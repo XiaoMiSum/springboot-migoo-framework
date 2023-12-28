@@ -41,24 +41,25 @@
         <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <redisson.version>3.25.2</redisson.version>
-        <durid.version>1.2.20</durid.version>
+        <redisson.version>3.18.1</redisson.version>
+        <durid.version>1.2.15</durid.version>
         <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
         <!-- 监控相关 -->
-        <spring-boot-admin.version>3.0.3</spring-boot-admin.version>
+        <spring-boot-admin.version>3.2.0</spring-boot-admin.version>
         <!-- 工具类相关 -->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <hutool.version>5.8.24</hutool.version>
-        <guava.version>33.0.0-jre</guava.version>
-        <zxing.version>3.5.2</zxing.version>
+        <hutool.version>5.8.21</hutool.version>
+        <guava.version>31.1-jre</guava.version>
+        <zxing.version>3.5.0</zxing.version>
         <bcprov.version>1.70</bcprov.version>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
 
         <!-- 三方 SDK -->
-        <aliyun.ecs.version>4.24.56</aliyun.ecs.version>
-        <aliyun.rds.version>1.1.5</aliyun.rds.version>
+        <aliyun.ecs.version>4.24.17</aliyun.ecs.version>
+        <aliyun.rds.version>2.0.1</aliyun.rds.version>
         <alipay.sdk.version>4.38.10.ALL</alipay.sdk.version>
         <wechat-pay.version>0.2.11</wechat-pay.version>
+        <tencent.cloud.version>3.1.933</tencent.cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -75,6 +76,14 @@
                         <artifactId>mysql-connector-java</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <!-- Spring 核心 -->
+            <dependency>
+                <!-- 用于生成自定义的 Spring @ConfigurationProperties 配置类的说明文件 -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${spring.boot2.version}</version>
             </dependency>
 
             <!-- web 相关 -->
@@ -154,10 +163,10 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- aliyun相关 -->
+            <!-- 云服务器相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-aliyun</artifactId>
+                <artifactId>migoo-spring-boot-starter-cvs</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -230,13 +239,25 @@
             <!-- 阿里云SDK -->
             <dependency>
                 <groupId>com.aliyun</groupId>
-                <artifactId>ecs20140526</artifactId>
+                <artifactId>alibabacloud-ecs20140526</artifactId>
                 <version>${aliyun.ecs.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.aliyun</groupId>
-                <artifactId>rds20140815</artifactId>
+                <artifactId>alibabacloud-rds20140815</artifactId>
                 <version>${aliyun.rds.version}</version>
+            </dependency>
+
+            <!-- 腾讯云SDK -->
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-cvm</artifactId>
+                <version>${tencent.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-cdb</artifactId>
+                <version>${tencent.cloud.version}</version>
             </dependency>
 
             <!-- 支付宝SDK -->
@@ -247,12 +268,12 @@
             </dependency>
 
             <dependency>
-                <!-- todo 测试 升级到 18on -->
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bcprov.version}</version>
             </dependency>
 
+            <!-- 微信支付 -->
             <dependency>
                 <groupId>com.github.wechatpay-apiv3</groupId>
                 <artifactId>wechatpay-java</artifactId>
