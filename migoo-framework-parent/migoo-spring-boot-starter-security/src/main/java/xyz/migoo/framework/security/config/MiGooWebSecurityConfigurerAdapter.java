@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,10 +84,9 @@ public class MiGooWebSecurityConfigurerAdapter {
     @Bean
     @ConditionalOnMissingBean(AuthenticationManager.class)
     public AuthenticationManager authenticationManagerBean(ObjectPostProcessor<Object> objectPostProcessor) throws Exception {
-        return new AuthenticationManagerBuilder(objectPostProcessor)
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder)
-                .and().build();
+        AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(objectPostProcessor);
+        builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        return builder.build();
     }
 
     /**
@@ -109,41 +109,38 @@ public class MiGooWebSecurityConfigurerAdapter {
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                // 开启跨域
-                .cors().and()
                 // CSRF 禁用，因为不使用 Session
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // 基于 token 机制，所以不需要 Session
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .headers().frameOptions().disable().and()
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(AbstractHttpConfigurer::disable)
                 // 一堆自定义的 Spring Security 处理器
-                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler).and()
-                .logout().logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler) // 登出
-                .and()
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                // 登出
+                .logout(logout -> logout.logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler))
                 // 设置每个请求的权限 ①：全局共享规则
-                .authorizeHttpRequests()
-                // 登录、注册、获取验证码接口，可匿名访问
-                .requestMatchers(api("/sign-in"), api("/captcha")).permitAll()
-                // 静态资源，可匿名访问
-                .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*.css", "/*/*.css", "/*.js",
-                        "/*/*.js", "/*.jpg", "/*/*.jpg", "/*.png", "/*/*.png", "/*.gif", "/*/*.gif").permitAll()
-                // druid 监控页面 可匿名访问
-                .requestMatchers("/*/druid/*", "/druid/*").permitAll()
-                // 文件的获取接口，可匿名访问
-                .requestMatchers(api("/file/*")).anonymous()
-                // Spring Boot Actuator 的安全配置
-                .requestMatchers("/actuator", "/*/actuator").anonymous()
-                .requestMatchers("/actuator/*", "/*/actuator/*").anonymous()
-                .requestMatchers("/actuator/*/*", "/*/actuator/*/*").anonymous()
-                .requestMatchers("/actuator/*/*/*", "/*/actuator/*/*/*").anonymous()
-                .requestMatchers("/actuator/*/*/*/*", "/*/actuator/*/*/*/*").anonymous()
+                .authorizeHttpRequests(requests -> requests
+                        // 登录、注册、获取验证码接口，可匿名访问
+                        .requestMatchers(api("/sign-in"), api("/captcha")).permitAll()
+                        // 静态资源，可匿名访问
+                        .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*.css", "/*/*.css", "/*.js",
+                                "/*/*.js", "/*.jpg", "/*/*.jpg", "/*.png", "/*/*.png", "/*.gif", "/*/*.gif").permitAll()
+                        // druid 监控页面 可匿名访问
+                        .requestMatchers("/*/druid/*", "/druid/*").anonymous()
+                        // 文件的获取接口，可匿名访问
+                        .requestMatchers(api("/file/*")).anonymous()// Spring Boot Actuator 的安全配置
+                        .requestMatchers("/actuator", "/*/actuator").anonymous()
+                        .requestMatchers("/actuator/*", "/*/actuator/*").anonymous()
+                        .requestMatchers("/actuator/*/*", "/*/actuator/*/*").anonymous()
+                        .requestMatchers("/actuator/*/*/*", "/*/actuator/*/*/*").anonymous()
+                        .requestMatchers("/actuator/*/*/*/*", "/*/actuator/*/*/*/*").anonymous()
+                )
                 // 设置每个请求的权限 ②：每个项目的自定义规则
-                .and()
                 .authorizeHttpRequests(authorizeRequestsCustomizer)
                 // 设置每个请求的权限 ③：兜底规则，必须认证
-                .authorizeHttpRequests().anyRequest().authenticated()
-                .and()
+                .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
                 // 添加 JWT Filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
