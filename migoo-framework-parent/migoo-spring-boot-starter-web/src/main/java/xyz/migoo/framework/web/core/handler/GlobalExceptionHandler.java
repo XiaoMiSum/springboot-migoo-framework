@@ -2,6 +2,7 @@ package xyz.migoo.framework.web.core.handler;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.socket.SocketRuntimeException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -187,6 +188,17 @@ public class GlobalExceptionHandler {
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
         log.warn("[httpRequestMethodNotSupportedExceptionHandler]", ex);
         return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("请求方法不正确:%s", ex.getMessage()));
+    }
+
+    /**
+     * 处理请求超时异常 SocketRuntimeException
+     * <p>
+     * 例如说，请求连接超时、响应数据读取超时。
+     */
+    @ExceptionHandler(value = SocketRuntimeException.class)
+    public Result<?> socketRuntimeExceptionHandler(SocketRuntimeException ex) {
+        log.info("[socketRuntimeExceptionHandler]", ex);
+        return Result.getError(SOCKET_TIME_OUT.getCode(), SOCKET_TIME_OUT.getMsg());
     }
 
     /**

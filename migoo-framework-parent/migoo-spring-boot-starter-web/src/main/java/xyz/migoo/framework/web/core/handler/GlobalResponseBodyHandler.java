@@ -18,7 +18,7 @@ import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
  * 原因是，GlobalResponseBodyHandler 本质上是 AOP，它不应该改变 Controller 返回的数据结构
  */
 @ControllerAdvice
-public class GlobalResponseBodyHandler implements ResponseBodyAdvice {
+public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     @SuppressWarnings("NullableProblems") // 避免 IDEA 警告
