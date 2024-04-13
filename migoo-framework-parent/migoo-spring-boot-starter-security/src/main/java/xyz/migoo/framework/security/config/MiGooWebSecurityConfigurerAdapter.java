@@ -6,15 +6,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,7 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import xyz.migoo.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
-import xyz.migoo.framework.web.config.WebProperties;
 
 /**
  * 自定义的 Spring Security 配置适配器实现
@@ -37,7 +33,7 @@ import xyz.migoo.framework.web.config.WebProperties;
 public class MiGooWebSecurityConfigurerAdapter {
 
     @Resource
-    private WebProperties webProperties;
+    private xyz.migoo.framework.security.config.SecurityProperties properties;
 
     /**
      * 自定义用户【认证】逻辑
@@ -69,13 +65,6 @@ public class MiGooWebSecurityConfigurerAdapter {
      */
     @Resource
     private JWTAuthenticationTokenFilter authenticationTokenFilter;
-    /**
-     * 自定义的权限映射 Bean
-     *
-     * @see #configure(HttpSecurity)
-     */
-    @Resource
-    private Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeRequestsCustomizer;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -115,39 +104,17 @@ public class MiGooWebSecurityConfigurerAdapter {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(AbstractHttpConfigurer::disable)
                 // 一堆自定义的 Spring Security 处理器
-                .exceptionHandling(handling -> handling
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler))
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
                 // 登出
-                .logout(logout -> logout.logoutUrl(api("/sign-out")).logoutSuccessHandler(logoutSuccessHandler))
-                // 设置每个请求的权限 ①：全局共享规则
-                .authorizeHttpRequests(requests -> requests
-                        // 登录、注册、获取验证码接口，可匿名访问
-                        .requestMatchers(api("/sign-in"), api("/captcha")).permitAll()
-                        // 静态资源，可匿名访问
-                        .requestMatchers(HttpMethod.GET, "/*.html", "/*/*.html", "/*.css", "/*/*.css", "/*.js",
-                                "/*/*.js", "/*.jpg", "/*/*.jpg", "/*.png", "/*/*.png", "/*.gif", "/*/*.gif").permitAll()
-                        // druid 监控页面 可匿名访问
-                        .requestMatchers("/*/druid/*", "/druid/*").anonymous()
-                        // 文件的获取接口，可匿名访问
-                        .requestMatchers(api("/file/*")).anonymous()// Spring Boot Actuator 的安全配置
-                        .requestMatchers("/actuator", "/*/actuator").anonymous()
-                        .requestMatchers("/actuator/*", "/*/actuator/*").anonymous()
-                        .requestMatchers("/actuator/*/*", "/*/actuator/*/*").anonymous()
-                        .requestMatchers("/actuator/*/*/*", "/*/actuator/*/*/*").anonymous()
-                        .requestMatchers("/actuator/*/*/*/*", "/*/actuator/*/*/*/*").anonymous()
+                .logout(logout -> logout.logoutUrl(properties.getLogoutUrl()).logoutSuccessHandler(logoutSuccessHandler))
+                // 设置每个请求的权限 ①：配置的可以任意访问的url
+                .authorizeHttpRequests(requests -> requests.requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll()
                 )
-                // 设置每个请求的权限 ②：每个项目的自定义规则
-                .authorizeHttpRequests(authorizeRequestsCustomizer)
-                // 设置每个请求的权限 ③：兜底规则，必须认证
+                // 设置每个请求的权限 ②：兜底规则，必须认证
                 .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
                 // 添加 JWT Filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-    }
-
-    private String api(String url) {
-        return webProperties.getApiPrefix() + url;
     }
 
 }

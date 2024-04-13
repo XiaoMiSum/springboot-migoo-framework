@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.config;
 
+import com.google.common.collect.Lists;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -7,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
+import java.util.List;
 
 @ConfigurationProperties(prefix = "migoo.security")
 @Validated
@@ -35,5 +37,15 @@ public class SecurityProperties {
      */
     @NotNull(message = "Session 过期时间不能为空")
     private Duration sessionTimeout;
+
+    /**
+     * 登出url
+     */
+    private String logoutUrl;
+
+    /**
+     * 用户可以任意访问的url
+     */
+    private List<String> permitAllUrls = Lists.newArrayList();
 
 }

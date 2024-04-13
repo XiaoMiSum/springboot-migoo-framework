@@ -55,12 +55,11 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      */
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthenticatorInterceptor(SpringUtil.getBean(SecurityAuthenticatorService.class)))
-                .addPathPatterns(api("/**"))
-                .excludePathPatterns("/**/images/**", api("/**/images/**"));
+                .addPathPatterns(api());
     }
 
-    private String api(String api) {
-        return SpringUtil.getBean(WebProperties.class).getApiPrefix() + api;
+    private String api() {
+        return SpringUtil.getBean(WebProperties.class).getApiPrefix() + "/**";
     }
 
     /**
