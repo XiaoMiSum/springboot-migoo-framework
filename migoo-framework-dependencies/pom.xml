@@ -37,29 +37,30 @@
     <properties>
         <revision>1.1.1-SNAPSHOT</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.2.1</spring.boot.version>
+        <spring.boot.version>3.2.4</spring.boot.version>
         <spring.boot2.version>2.7.5</spring.boot2.version>
         <!-- DB 相关 -->
-        <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <redisson.version>3.18.1</redisson.version>
+        <mybatis-plus.version>3.5.6</mybatis-plus.version>
+        <redisson.version>3.28.0</redisson.version>
         <durid.version>1.2.15</durid.version>
-        <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.4.12</mybatis-plus-join.version>
         <!-- 监控相关 -->
-        <spring-boot-admin.version>3.2.0</spring-boot-admin.version>
+        <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
         <!-- 工具类相关 -->
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <hutool.version>5.8.24</hutool.version>
-        <guava.version>31.1-jre</guava.version>
-        <zxing.version>3.5.0</zxing.version>
-        <bcprov.version>1.70</bcprov.version>
-        <lombok.version>1.18.22</lombok.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <hutool.version>5.8.27</hutool.version>
+        <guava.version>33.1.0-jre</guava.version>
+        <zxing.version>3.5.3</zxing.version>
+        <bcprov.version>1.78</bcprov.version>
+        <lombok.version>1.18.32</lombok.version>
 
         <!-- 三方 SDK -->
-        <aliyun.ecs.version>4.24.17</aliyun.ecs.version>
-        <aliyun.rds.version>2.0.1</aliyun.rds.version>
-        <alipay.sdk.version>4.38.10.ALL</alipay.sdk.version>
-        <wechat-pay.version>0.2.11</wechat-pay.version>
-        <tencent.cloud.version>3.1.933</tencent.cloud.version>
+        <aliyun.ecs.version>5.0.6</aliyun.ecs.version>
+        <aliyun.rds.version>3.0.3</aliyun.rds.version>
+        <alipay.sdk.version>4.39.40.ALL</alipay.sdk.version>
+        <wechat-pay.version>0.2.12</wechat-pay.version>
+        <tencent-cvm.version>3.1.994</tencent-cvm.version>
+        <tencent-cbd.version>3.1.987</tencent-cbd.version>
     </properties>
 
     <dependencyManagement>
@@ -266,12 +267,12 @@
             <dependency>
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java-cvm</artifactId>
-                <version>${tencent.cloud.version}</version>
+                <version>${tencent-cvm.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java-cdb</artifactId>
-                <version>${tencent.cloud.version}</version>
+                <version>${tencent-cbd.version}</version>
             </dependency>
 
             <!-- 支付宝SDK -->
@@ -283,8 +284,14 @@
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.bouncycastle</groupId>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- 微信支付 -->
