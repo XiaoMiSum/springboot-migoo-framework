@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.enums.sms;
+package xyz.migoo.framework.infra.enums.sms;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

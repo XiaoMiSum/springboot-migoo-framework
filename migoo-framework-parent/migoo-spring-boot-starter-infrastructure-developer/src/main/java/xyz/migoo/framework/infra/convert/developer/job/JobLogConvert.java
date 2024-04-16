@@ -1,10 +1,10 @@
-package xyz.migoo.franework.infra.convert.developer.job;
+package xyz.migoo.framework.infra.convert.developer.job;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobLogRespVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobLogDO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogRespVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobLogDO;
 
 import java.util.List;
 

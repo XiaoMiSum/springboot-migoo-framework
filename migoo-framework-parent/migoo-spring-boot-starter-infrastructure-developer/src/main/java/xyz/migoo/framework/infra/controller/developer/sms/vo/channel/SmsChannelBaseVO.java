@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms.vo.channel;
+package xyz.migoo.framework.infra.controller.developer.sms.vo.channel;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

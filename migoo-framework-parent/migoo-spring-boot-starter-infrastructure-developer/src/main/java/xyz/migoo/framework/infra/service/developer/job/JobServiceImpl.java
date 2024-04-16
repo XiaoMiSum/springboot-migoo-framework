@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.service.developer.job;
+package xyz.migoo.framework.infra.service.developer.job;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -10,20 +10,20 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.quartz.core.scheduler.SchedulerManager;
 import xyz.migoo.framework.quartz.core.util.CronUtils;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobCreateReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobUpdateReqVO;
-import xyz.migoo.franework.infra.convert.developer.job.JobConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobDO;
-import xyz.migoo.franework.infra.dal.mapper.developer.job.JobMapper;
-import xyz.migoo.franework.infra.enums.JobStatusEnum;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobCreateReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobUpdateReqVO;
+import xyz.migoo.framework.infra.convert.developer.job.JobConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobDO;
+import xyz.migoo.framework.infra.dal.mapper.developer.job.JobMapper;
+import xyz.migoo.framework.infra.enums.JobStatusEnum;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 import static xyz.migoo.framework.common.util.collection.CollectionUtils.containsAny;
-import static xyz.migoo.franework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
 
 @Service
 @Validated

@@ -1,13 +1,13 @@
-package xyz.migoo.franework.infra.dal.dataobject.developer.sms;
+package xyz.migoo.framework.infra.dal.dataobject.developer.sms;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import xyz.migoo.framework.sms.core.enums.SmsFrameworkErrorCodeConstants;
-import xyz.migoo.franework.infra.dal.dataobject.IdEnhanceDO;
-import xyz.migoo.franework.infra.enums.sms.SmsReceiveStatusEnum;
-import xyz.migoo.franework.infra.enums.sms.SmsSendStatusEnum;
+import xyz.migoo.framework.infra.dal.dataobject.IdEnhanceDO;
+import xyz.migoo.framework.infra.enums.sms.SmsReceiveStatusEnum;
+import xyz.migoo.framework.infra.enums.sms.SmsSendStatusEnum;
 
 import java.time.LocalDateTime;
 import java.util.Map;

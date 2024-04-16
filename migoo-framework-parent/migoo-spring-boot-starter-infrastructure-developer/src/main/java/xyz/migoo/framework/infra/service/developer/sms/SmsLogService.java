@@ -1,9 +1,9 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsLogDO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsLogDO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
 
 import java.time.LocalDateTime;
 import java.util.Map;

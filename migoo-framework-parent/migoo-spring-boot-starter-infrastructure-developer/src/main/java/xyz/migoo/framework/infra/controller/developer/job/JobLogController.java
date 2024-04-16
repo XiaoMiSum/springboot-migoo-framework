@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.job;
+package xyz.migoo.framework.infra.controller.developer.job;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobLogPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobLogRespVO;
-import xyz.migoo.franework.infra.convert.developer.job.JobLogConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobLogDO;
-import xyz.migoo.franework.infra.service.developer.job.JobLogService;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogRespVO;
+import xyz.migoo.framework.infra.convert.developer.job.JobLogConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobLogDO;
+import xyz.migoo.framework.infra.service.developer.job.JobLogService;
 
 
 @RestController

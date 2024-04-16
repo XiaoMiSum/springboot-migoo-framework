@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms;
+package xyz.migoo.framework.infra.controller.developer.sms;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.log.SmsLogRespVO;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsLogConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsLogDO;
-import xyz.migoo.franework.infra.service.developer.sms.SmsLogService;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogRespVO;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsLogConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsLogDO;
+import xyz.migoo.framework.infra.service.developer.sms.SmsLogService;
 
 @RestController
 @RequestMapping("/developer/sms/log")

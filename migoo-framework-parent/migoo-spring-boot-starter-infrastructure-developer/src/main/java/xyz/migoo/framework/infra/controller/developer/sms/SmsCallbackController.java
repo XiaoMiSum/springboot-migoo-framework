@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms;
+package xyz.migoo.framework.infra.controller.developer.sms;
 
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.service.developer.sms.SmsSendService;
+import xyz.migoo.framework.infra.service.developer.sms.SmsSendService;
 
 @RestController
 @RequestMapping("/developer/sms/callback")

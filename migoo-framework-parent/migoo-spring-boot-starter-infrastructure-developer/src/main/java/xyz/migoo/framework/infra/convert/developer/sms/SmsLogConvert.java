@@ -1,10 +1,10 @@
-package xyz.migoo.franework.infra.convert.developer.sms;
+package xyz.migoo.framework.infra.convert.developer.sms;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.log.SmsLogRespVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsLogDO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogRespVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsLogDO;
 
 import java.util.List;
 

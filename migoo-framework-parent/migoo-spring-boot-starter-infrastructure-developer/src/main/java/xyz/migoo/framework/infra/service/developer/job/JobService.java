@@ -1,13 +1,13 @@
-package xyz.migoo.franework.infra.service.developer.job;
+package xyz.migoo.framework.infra.service.developer.job;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.quartz.SchedulerException;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobCreateReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobUpdateReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobDO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobCreateReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobUpdateReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobDO;
 
 import java.util.Collection;
 import java.util.List;

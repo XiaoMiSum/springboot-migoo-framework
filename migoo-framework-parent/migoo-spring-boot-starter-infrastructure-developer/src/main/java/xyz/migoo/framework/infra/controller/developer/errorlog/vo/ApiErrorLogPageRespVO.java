@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.errorlog.vo;
+package xyz.migoo.framework.infra.controller.developer.errorlog.vo;
 
 import lombok.Data;
 

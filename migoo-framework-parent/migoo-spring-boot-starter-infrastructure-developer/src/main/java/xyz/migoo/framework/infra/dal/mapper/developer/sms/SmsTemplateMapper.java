@@ -1,11 +1,11 @@
-package xyz.migoo.franework.infra.dal.mapper.developer.sms;
+package xyz.migoo.framework.infra.dal.mapper.developer.sms;
 
 import org.apache.ibatis.annotations.Mapper;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.template.SmsTemplatePageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.template.SmsTemplatePageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
 
 @Mapper
 public interface SmsTemplateMapper extends BaseMapperX<SmsTemplateDO> {

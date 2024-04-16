@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.enums.sms;
+package xyz.migoo.framework.infra.enums.sms;
 
 import cn.hutool.core.util.ArrayUtil;
 import lombok.AllArgsConstructor;

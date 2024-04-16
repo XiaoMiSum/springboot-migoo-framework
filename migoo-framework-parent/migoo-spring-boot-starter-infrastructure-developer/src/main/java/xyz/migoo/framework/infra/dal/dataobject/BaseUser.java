@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.dal.dataobject;
+package xyz.migoo.framework.infra.dal.dataobject;
 
 import lombok.Getter;
 import lombok.Setter;

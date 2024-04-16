@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms;
+package xyz.migoo.framework.infra.controller.developer.sms;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -6,13 +6,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.CodeNameSimpleRespVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.template.*;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsChannelConvert;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsTemplateConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
-import xyz.migoo.franework.infra.service.developer.sms.SmsSendService;
-import xyz.migoo.franework.infra.service.developer.sms.SmsTemplateService;
+import xyz.migoo.framework.infra.controller.developer.CodeNameSimpleRespVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.template.*;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsTemplateConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.infra.service.developer.sms.SmsSendService;
+import xyz.migoo.framework.infra.service.developer.sms.SmsTemplateService;
 
 import java.util.Comparator;
 import java.util.List;

@@ -15,13 +15,17 @@ public class JsonLongSetTypeHandler extends AbstractJsonTypeHandler<Object> {
     private static final TypeReference<Set<Long>> TYPE_REFERENCE = new TypeReference<>() {
     };
 
+    public JsonLongSetTypeHandler(Class<?> type) {
+        super(type);
+    }
+
     @Override
-    protected Object parse(String json) {
+    public Object parse(String json) {
         return JsonUtils.parseObject(json, TYPE_REFERENCE);
     }
 
     @Override
-    protected String toJson(Object obj) {
+    public String toJson(Object obj) {
         return JsonUtils.toJsonString(obj);
     }
 }

@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms;
+package xyz.migoo.framework.infra.controller.developer.sms;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -6,10 +6,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.*;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsChannelConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsChannelDO;
-import xyz.migoo.franework.infra.service.developer.sms.SmsChannelService;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.*;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.infra.service.developer.sms.SmsChannelService;
 
 import java.util.Comparator;
 import java.util.List;

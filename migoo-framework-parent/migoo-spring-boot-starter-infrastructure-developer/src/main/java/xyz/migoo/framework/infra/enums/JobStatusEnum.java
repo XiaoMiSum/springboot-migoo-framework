@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.enums;
+package xyz.migoo.framework.infra.enums;
 
 import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;

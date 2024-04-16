@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer;
+package xyz.migoo.framework.infra.controller.developer;
 
 import lombok.Getter;
 

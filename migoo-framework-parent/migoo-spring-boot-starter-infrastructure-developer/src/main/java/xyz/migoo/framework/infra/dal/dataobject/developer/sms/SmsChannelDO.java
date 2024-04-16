@@ -1,10 +1,10 @@
-package xyz.migoo.franework.infra.dal.dataobject.developer.sms;
+package xyz.migoo.framework.infra.dal.dataobject.developer.sms;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
-import xyz.migoo.franework.infra.dal.dataobject.IdEnhanceDO;
+import xyz.migoo.framework.infra.dal.dataobject.IdEnhanceDO;
 
 
 @TableName(value = "infra_sms_channel")

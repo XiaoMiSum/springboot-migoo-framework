@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.dal.dataobject;
+package xyz.migoo.framework.infra.dal.dataobject;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Getter;

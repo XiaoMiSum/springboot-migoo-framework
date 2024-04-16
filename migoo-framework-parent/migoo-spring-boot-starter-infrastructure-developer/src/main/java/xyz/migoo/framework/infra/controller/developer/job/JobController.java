@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.job;
+package xyz.migoo.framework.infra.controller.developer.job;
 
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.quartz.core.util.CronUtils;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobCreateReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobRespVO;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobUpdateReqVO;
-import xyz.migoo.franework.infra.convert.developer.job.JobConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobDO;
-import xyz.migoo.franework.infra.service.developer.job.JobService;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobCreateReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobRespVO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobUpdateReqVO;
+import xyz.migoo.framework.infra.convert.developer.job.JobConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobDO;
+import xyz.migoo.framework.infra.service.developer.job.JobService;
 
 import java.util.Collections;
 import java.util.Date;

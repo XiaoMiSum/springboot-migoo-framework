@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -7,18 +7,18 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.sms.core.client.SmsClientFactory;
 import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelCreateReqVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsChannelConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsChannelDO;
-import xyz.migoo.franework.infra.dal.mapper.developer.sms.SmsChannelMapper;
-import xyz.migoo.franework.infra.dal.mapper.developer.sms.SmsTemplateMapper;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelCreateReqVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.infra.dal.mapper.developer.sms.SmsChannelMapper;
+import xyz.migoo.framework.infra.dal.mapper.developer.sms.SmsTemplateMapper;
 
 import java.util.List;
 
-import static xyz.migoo.franework.infra.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
-import static xyz.migoo.franework.infra.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
+import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.SMS_CHANNEL_HAS_CHILDREN;
+import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.SMS_CHANNEL_NOT_EXISTS;
 
 
 @Service

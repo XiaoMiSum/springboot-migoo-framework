@@ -1,8 +1,8 @@
-package xyz.migoo.franework.infra.dal.dataobject.developer.errorlog;
+package xyz.migoo.framework.infra.dal.dataobject.developer.errorlog;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import xyz.migoo.franework.infra.dal.dataobject.IdEnhanceDO;
+import xyz.migoo.framework.infra.dal.dataobject.IdEnhanceDO;
 
 import java.util.Date;
 

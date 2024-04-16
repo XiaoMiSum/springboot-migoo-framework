@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.dal.dataobject.developer.sms;
+package xyz.migoo.framework.infra.dal.dataobject.developer.sms;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;

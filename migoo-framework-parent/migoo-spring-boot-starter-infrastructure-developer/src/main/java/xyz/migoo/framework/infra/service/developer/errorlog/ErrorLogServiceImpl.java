@@ -1,14 +1,14 @@
-package xyz.migoo.franework.infra.service.developer.errorlog;
+package xyz.migoo.framework.infra.service.developer.errorlog;
 
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
-import xyz.migoo.franework.infra.convert.developer.errorlog.ErrorLogConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.errorlog.ApiErrorLogDO;
-import xyz.migoo.franework.infra.dal.mapper.developer.errorlog.ErrorLogMapper;
+import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
+import xyz.migoo.framework.infra.convert.developer.errorlog.ErrorLogConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.errorlog.ApiErrorLogDO;
+import xyz.migoo.framework.infra.dal.mapper.developer.errorlog.ErrorLogMapper;
 
 @Service
 public class ErrorLogServiceImpl implements ErrorLogService, ApiErrorLogFrameworkService {

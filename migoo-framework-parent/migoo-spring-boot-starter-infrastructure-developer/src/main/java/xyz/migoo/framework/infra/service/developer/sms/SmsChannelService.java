@@ -1,11 +1,11 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import jakarta.validation.Valid;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelCreateReqVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelCreateReqVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
 
 import java.util.List;
 

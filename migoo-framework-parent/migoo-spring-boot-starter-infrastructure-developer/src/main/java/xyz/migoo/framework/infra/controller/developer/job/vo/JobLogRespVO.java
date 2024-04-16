@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.job.vo;
+package xyz.migoo.framework.infra.controller.developer.job.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

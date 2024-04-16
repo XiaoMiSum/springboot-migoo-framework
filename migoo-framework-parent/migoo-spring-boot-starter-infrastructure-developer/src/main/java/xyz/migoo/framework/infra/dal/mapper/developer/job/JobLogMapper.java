@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.dal.mapper.developer.job;
+package xyz.migoo.framework.infra.dal.mapper.developer.job;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
@@ -6,8 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobLogPageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobLogDO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogPageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobLogDO;
 
 @Mapper
 public interface JobLogMapper extends BaseMapperX<JobLogDO> {

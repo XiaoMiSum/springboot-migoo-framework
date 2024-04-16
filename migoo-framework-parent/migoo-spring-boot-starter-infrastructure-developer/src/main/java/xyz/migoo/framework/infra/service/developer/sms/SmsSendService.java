@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import java.util.Map;
 

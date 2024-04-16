@@ -43,7 +43,7 @@
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <redisson.version>3.28.0</redisson.version>
         <durid.version>1.2.15</durid.version>
-        <mybatis-plus-join.version>1.4.12</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.4.8.1</mybatis-plus-join.version>
         <!-- 监控相关 -->
         <spring-boot-admin.version>3.2.3</spring-boot-admin.version>
         <!-- 工具类相关 -->

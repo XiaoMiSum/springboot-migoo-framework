@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -13,15 +13,15 @@ import xyz.migoo.framework.sms.core.client.SmsClient;
 import xyz.migoo.framework.sms.core.client.SmsClientFactory;
 import xyz.migoo.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
-import xyz.migoo.franework.infra.convert.developer.sms.SmsChannelConvert;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsChannelDO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static xyz.migoo.franework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
 
 
 @Service

@@ -1,15 +1,15 @@
-package xyz.migoo.franework.infra.controller.developer.errorlog;
+package xyz.migoo.framework.infra.controller.developer.errorlog;
 
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.errorlog.vo.ApiErrorLogPageRespVO;
-import xyz.migoo.franework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
-import xyz.migoo.franework.infra.controller.developer.errorlog.vo.ApiErrorLogUpdateVO;
-import xyz.migoo.franework.infra.convert.developer.errorlog.ErrorLogConvert;
-import xyz.migoo.franework.infra.service.developer.errorlog.ErrorLogService;
+import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogPageRespVO;
+import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
+import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogUpdateVO;
+import xyz.migoo.framework.infra.convert.developer.errorlog.ErrorLogConvert;
+import xyz.migoo.framework.infra.service.developer.errorlog.ErrorLogService;
 
 @RestController
 @RequestMapping("/developer/error-log")

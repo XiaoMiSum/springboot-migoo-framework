@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.job;
+package xyz.migoo.framework.infra.job;
 
 import org.springframework.stereotype.Component;
 import xyz.migoo.framework.quartz.core.handler.JobHandler;

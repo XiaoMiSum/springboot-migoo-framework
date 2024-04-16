@@ -1,16 +1,16 @@
-package xyz.migoo.franework.infra.service.developer.sms;
+package xyz.migoo.framework.infra.service.developer.sms;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.franework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsLogDO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
-import xyz.migoo.franework.infra.dal.mapper.developer.sms.SmsLogMapper;
-import xyz.migoo.franework.infra.enums.sms.SmsReceiveStatusEnum;
-import xyz.migoo.franework.infra.enums.sms.SmsSendStatusEnum;
+import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsLogDO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.infra.dal.mapper.developer.sms.SmsLogMapper;
+import xyz.migoo.framework.infra.enums.sms.SmsReceiveStatusEnum;
+import xyz.migoo.framework.infra.enums.sms.SmsSendStatusEnum;
 
 import java.time.LocalDateTime;
 import java.util.Map;

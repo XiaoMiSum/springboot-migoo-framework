@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.service.developer.job;
+package xyz.migoo.framework.infra.service.developer.job;
 
 import cn.hutool.core.date.DateUtil;
 import jakarta.annotation.Resource;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.util.thread.BizThreadPoolUtils;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobLogPageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobLogDO;
-import xyz.migoo.franework.infra.dal.mapper.developer.job.JobLogMapper;
-import xyz.migoo.franework.infra.enums.JobLogStatusEnum;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogPageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobLogDO;
+import xyz.migoo.framework.infra.dal.mapper.developer.job.JobLogMapper;
+import xyz.migoo.framework.infra.enums.JobLogStatusEnum;
 
 import java.util.Collection;
 import java.util.Date;

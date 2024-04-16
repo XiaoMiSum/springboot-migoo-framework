@@ -1,10 +1,10 @@
-package xyz.migoo.franework.infra.dal.dataobject.developer.job;
+package xyz.migoo.framework.infra.dal.dataobject.developer.job;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import xyz.migoo.framework.quartz.core.handler.JobHandler;
-import xyz.migoo.franework.infra.dal.dataobject.IdEnhanceDO;
-import xyz.migoo.franework.infra.enums.JobLogStatusEnum;
+import xyz.migoo.framework.infra.dal.dataobject.IdEnhanceDO;
+import xyz.migoo.framework.infra.enums.JobLogStatusEnum;
 
 import java.util.Date;
 

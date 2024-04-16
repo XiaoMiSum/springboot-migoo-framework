@@ -1,11 +1,11 @@
-package xyz.migoo.franework.infra.dal.mapper.developer.errorlog;
+package xyz.migoo.framework.infra.dal.mapper.developer.errorlog;
 
 import org.apache.ibatis.annotations.Mapper;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
-import xyz.migoo.franework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.errorlog.ApiErrorLogDO;
+import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.errorlog.ApiErrorLogDO;
 
 @Mapper
 public interface ErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {

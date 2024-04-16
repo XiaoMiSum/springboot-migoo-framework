@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.sms.vo.log;
+package xyz.migoo.framework.infra.controller.developer.sms.vo.log;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,11 +1,11 @@
-package xyz.migoo.franework.infra.dal.mapper.developer.job;
+package xyz.migoo.framework.infra.dal.mapper.developer.job;
 
 import org.apache.ibatis.annotations.Mapper;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
-import xyz.migoo.franework.infra.controller.developer.job.vo.JobPageReqVO;
-import xyz.migoo.franework.infra.dal.dataobject.developer.job.JobDO;
+import xyz.migoo.framework.infra.controller.developer.job.vo.JobPageReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobDO;
 
 @Mapper
 public interface JobMapper extends BaseMapperX<JobDO> {

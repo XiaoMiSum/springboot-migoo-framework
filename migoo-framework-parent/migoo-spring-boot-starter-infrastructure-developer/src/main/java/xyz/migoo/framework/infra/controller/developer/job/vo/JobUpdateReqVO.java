@@ -1,4 +1,4 @@
-package xyz.migoo.franework.infra.controller.developer.job.vo;
+package xyz.migoo.framework.infra.controller.developer.job.vo;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
