@@ -47,6 +47,8 @@
         <module>migoo-spring-boot-starter-monitor</module>
         <module>migoo-spring-boot-starter-cvs</module>
         <module>migoo-spring-boot-starter-sms</module>
+        <module>migoo-spring-boot-starter-infrastructure-developer</module>
+        <module>migoo-spring-boot-starter-infrastructure-sys</module>
     </modules>
 
     <properties>

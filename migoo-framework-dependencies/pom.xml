@@ -189,6 +189,20 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!-- 管理系统 - 系统管理 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-infrastructure-sys</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- 管理系统 - 开发者工具 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-infrastructure-developer</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 工具相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
