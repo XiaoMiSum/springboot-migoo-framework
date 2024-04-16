@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.infra.controller.login.vo.OnesLoginUser;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.LoginUser;
 
@@ -23,9 +24,9 @@ public class LoginUserRedis {
         return String.format(LOGIN_USER.getKeyTemplate(), sessionId);
     }
 
-    public LoginUser get(String sessionId, Class<? extends LoginUser> clazz) {
+    public OnesLoginUser get(String sessionId) {
         String redisKey = formatKey(sessionId);
-        return JsonUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), clazz);
+        return JsonUtils.parseObject(stringRedisTemplate.opsForValue().get(redisKey), OnesLoginUser.class);
     }
 
     public void set(String sessionId, LoginUser loginUser) {
