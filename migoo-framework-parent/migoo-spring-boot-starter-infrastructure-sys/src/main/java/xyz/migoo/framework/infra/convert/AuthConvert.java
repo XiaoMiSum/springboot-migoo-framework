@@ -1,17 +1,16 @@
 package xyz.migoo.framework.infra.convert;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import org.slf4j.LoggerFactory;
+import xyz.migoo.framework.common.util.collection.CollectionUtils;
 import xyz.migoo.framework.infra.controller.login.vo.AuthLoginReqVO;
 import xyz.migoo.framework.infra.controller.login.vo.AuthMenuRespVO;
 import xyz.migoo.framework.infra.controller.login.vo.AuthUserInfoRespVO;
 import xyz.migoo.framework.infra.controller.login.vo.OnesLoginUser;
 import xyz.migoo.framework.infra.dal.dataobject.BaseUser;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
-import xyz.migoo.framework.infra.dal.dataobject.taycan.user.TaycanUser;
 import xyz.migoo.framework.infra.enums.MenuIdEnum;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
-import org.slf4j.LoggerFactory;
-import xyz.migoo.framework.common.util.collection.CollectionUtils;
 
 import java.util.*;
 
@@ -41,9 +40,6 @@ public interface AuthConvert {
                 .setSecurityCode(user.getSecretKey())
                 .setRequiredVerifyAuthenticator(Objects.equals(ENABLE.getStatus(), user.getRequiredVerifyAuthenticator()))
                 .setClient(req.getClient());
-        if (user instanceof TaycanUser) {
-            loginUser.setMemberNo(((TaycanUser) user).getMemberNo());
-        }
         return loginUser;
     }
 
@@ -51,7 +47,6 @@ public interface AuthConvert {
         return new AuthUserInfoRespVO()
                 .setName(user.getName())
                 .setAvatar(user.getAvatar())
-                .setRoles(((TaycanUser) user).getRole().toString())
                 .setPermissions(permissions);
     }
 
