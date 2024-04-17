@@ -2,6 +2,7 @@ package xyz.migoo.framework.mybatis.core.dataobject;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
@@ -14,7 +15,10 @@ import java.util.Date;
  * @author xiaomi
  */
 @Data
-public class BaseDO implements Serializable {
+public class BaseDO<T> implements Serializable {
+
+    @TableId
+    private T id;
 
     /**
      * 创建时间

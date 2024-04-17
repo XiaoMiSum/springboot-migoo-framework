@@ -1,13 +1,14 @@
 package xyz.migoo.framework.security.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 登录用户信息，如果不够可以在自己项目中继承扩展该对象
@@ -38,11 +39,6 @@ public class LoginUser implements UserDetails {
     private String username;
 
     /**
-     * 登录客户端
-     */
-    private Client client;
-
-    /**
      * 密码
      */
     private String password;
@@ -54,6 +50,10 @@ public class LoginUser implements UserDetails {
     private String securityCode;
 
     private boolean requiredVerifyAuthenticator;
+
+    private boolean requiredBindAuthenticator;
+
+    private Map<String, Object> attrs = Maps.newHashMap();
 
     @Override
     @JsonIgnore
@@ -73,6 +73,11 @@ public class LoginUser implements UserDetails {
 
     public LoginUser setRequiredVerifyAuthenticator(boolean b) {
         this.requiredVerifyAuthenticator = b;
+        return this;
+    }
+
+    public LoginUser putAttr(String key, Object object) {
+        this.attrs.put(key, object);
         return this;
     }
 
@@ -103,22 +108,6 @@ public class LoginUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public boolean isRequiredVerifyAuthenticator() {
-        return requiredVerifyAuthenticator;
-    }
-
-    public enum Client {
-        /**
-         * 客户端类型
-         */
-        MEMBER_CLIENT,
-        MANAGER_CLIENT;
-
-        public static boolean isManagerClient(Client client) {
-            return Objects.equal(MANAGER_CLIENT, client);
-        }
     }
 }
 

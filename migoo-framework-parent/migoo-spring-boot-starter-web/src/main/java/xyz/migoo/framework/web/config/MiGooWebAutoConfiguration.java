@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,10 +22,6 @@ import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 
-import java.util.Objects;
-
-import static java.lang.Boolean.TRUE;
-
 @Configuration
 @EnableConfigurationProperties({WebProperties.class, XssProperties.class})
 public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
@@ -37,13 +34,20 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     @Value("${spring.application.name}")
     private String applicationName;
 
+    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
+        FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
+        bean.setOrder(order);
+        return bean;
+    }
+
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        // 设置 API 前缀，仅仅匹配 controller 包下的
-        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz -> Objects.equals(webProperties.getScanAll(), TRUE) ?
-                clazz.getPackage().getName().startsWith(webProperties.getControllerPackage()) :
+        AntPathMatcher antPathMatcher = new AntPathMatcher(".");
+        // 设置 API 前缀，仅仅匹配 controller 包下的 **.controller.**
+        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz -> webProperties.isOnlyRest() ?
                 clazz.isAnnotationPresent(RestController.class)
-                        && clazz.getPackage().getName().startsWith(webProperties.getControllerPackage())); // 仅仅匹配 controller 包
+                        && antPathMatcher.match(webProperties.getControllerPackage(), clazz.getPackage().getName()) :
+                antPathMatcher.match(webProperties.getControllerPackage(), clazz.getPackage().getName()));
     }
 
     @Bean
@@ -51,12 +55,12 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
         return new GlobalExceptionHandler(applicationName, apiErrorLogFrameworkService);
     }
 
+    // ========== Filter 相关 ==========
+
     @Bean
     public GlobalResponseBodyHandler globalResponseBodyHandler() {
         return new GlobalResponseBodyHandler();
     }
-
-    // ========== Filter 相关 ==========
 
     /**
      * 创建 CorsFilter Bean，解决跨域问题
@@ -89,13 +93,6 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
         return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
-    }
-
-
-    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
-        FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
-        bean.setOrder(order);
-        return bean;
     }
 
 }

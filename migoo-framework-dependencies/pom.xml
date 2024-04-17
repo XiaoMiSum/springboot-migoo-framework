@@ -53,6 +53,9 @@
         <zxing.version>3.5.3</zxing.version>
         <bcprov.version>1.78</bcprov.version>
         <lombok.version>1.18.32</lombok.version>
+        <minio.version>8.5.9</minio.version>
+        <tika.version>2.9.2</tika.version>
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <!-- 三方 SDK -->
         <aliyun.ecs.version>5.0.6</aliyun.ecs.version>
@@ -178,6 +181,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- OSS相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-oss</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
@@ -193,14 +203,14 @@
             <!-- 管理系统 - 系统管理 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-infrastructure-sys</artifactId>
+                <artifactId>migoo-webserver-infra-sys</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <!-- 管理系统 - 开发者工具 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-infrastructure-developer</artifactId>
+                <artifactId>migoo-webserver-infra-developer</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -299,6 +309,24 @@
                 <groupId>com.github.wechatpay-apiv3</groupId>
                 <artifactId>wechatpay-java</artifactId>
                 <version>${wechat-pay.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId> <!-- 文件客户端：文件类型的识别 -->
+                <version>${tika.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId> <!-- 解决 ThreadLocal 父子线程的传值问题 -->
+                <version>${transmittable-thread-local.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -21,7 +21,7 @@ public class WebProperties {
      * @see MiGooWebAutoConfiguration#configurePathMatch(PathMatchConfigurer)
      */
     @NotNull(message = "API 前缀不能为空")
-    private String apiPrefix;
+    private String apiPrefix = "**.controller.**";
 
     /**
      * Controller 所在包
@@ -34,5 +34,7 @@ public class WebProperties {
     private String controllerPackage;
 
     private Boolean scanAll;
+
+    private boolean onlyRest = false;
 
 }

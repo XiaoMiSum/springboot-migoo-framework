@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>xyz.migoo.springboot</groupId>
+    <artifactId>migoo-webserver-parent</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <description>migoo-webserver</description>
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
+
+    <modules>
+
+        <module>migoo-webserver-infra-developer</module>
+        <module>migoo-webserver-infra-file</module>
+        <module>migoo-webserver-infra-sys</module>
+    </modules>
+
+    <properties>
+        <revision>1.1.1-SNAPSHOT</revision>
+        <!-- Maven 相关 -->
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-framework-dependencies</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 解决 java8 下发布到 maven 中心库时，生成 doc 的异常 -->
+                    <additionalJOptions>
+                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                    </additionalJOptions>
+                    <encoding>UTF-8</encoding>
+                    <outputDirectory>${basedir}/doc</outputDirectory>
+                    <reportOutputDirectory>${basedir}/reports</reportOutputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <layout>default</layout>
+            <!-- 是否开启发布版构件下载 -->
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <!-- 是否开启快照版构件下载 -->
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+</project>
