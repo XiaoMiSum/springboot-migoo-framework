@@ -42,7 +42,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
         if (StrUtil.isNotEmpty(token)) {
             try {
                 // 验证 token 有效性

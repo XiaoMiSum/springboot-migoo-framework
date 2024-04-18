@@ -31,7 +31,7 @@ public class LoginUserRedis {
     public void set(String sessionId, LoginUser loginUser) {
         String redisKey = formatKey(sessionId);
         stringRedisTemplate.opsForValue().set(redisKey, JsonUtils.toJsonString(loginUser),
-                Duration.ofMillis(securityProperties.getSessionTimeout().toMillis()));
+                Duration.ofMillis(securityProperties.getToken().getTimeout().toMillis()));
     }
 
     public void remove(String sessionId) {

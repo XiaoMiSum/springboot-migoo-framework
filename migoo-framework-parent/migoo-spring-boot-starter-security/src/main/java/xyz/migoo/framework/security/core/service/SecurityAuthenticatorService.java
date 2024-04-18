@@ -27,7 +27,7 @@ public class SecurityAuthenticatorService {
 
     public void verify(HttpServletRequest request) {
         String code = request.getParameter("_code");
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
         // 兼容绑定身份验证器时，token 在请求参数中
         LoginUser loginUser = loginUserService.getLoginUser(!Strings.isNullOrEmpty(token) ? token :
                 request.getParameter("_token"));

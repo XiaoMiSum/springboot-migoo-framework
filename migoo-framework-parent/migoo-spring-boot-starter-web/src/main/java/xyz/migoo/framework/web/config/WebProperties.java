@@ -21,19 +21,17 @@ public class WebProperties {
      * @see MiGooWebAutoConfiguration#configurePathMatch(PathMatchConfigurer)
      */
     @NotNull(message = "API 前缀不能为空")
-    private String apiPrefix = "**.controller.**";
+    private String apiPrefix;
 
     /**
      * Controller 所在包
      * <p>
      * 主要目的是，给该 Controller 设置指定的 {@link #apiPrefix}
      * <p>
-     * 因为我们有多个 modules 包里会包含 Controller，所以只需要写到 cn.iocoder.yudao 这样的层级
+     * 因为我们有多个 modules 包里会包含 Controller，所以只需要写到 **.controller.** 这样的层级
      */
     @NotNull(message = "Controller 所在包不能为空")
-    private String controllerPackage;
-
-    private Boolean scanAll;
+    private String controllerPackage = "**.controller.**";
 
     private boolean onlyRest = false;
 

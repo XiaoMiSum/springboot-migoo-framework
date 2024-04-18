@@ -27,7 +27,7 @@ public class TokenMethodArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
-        Object token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
+        Object token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
         if (token != null) {
             return token;
         }

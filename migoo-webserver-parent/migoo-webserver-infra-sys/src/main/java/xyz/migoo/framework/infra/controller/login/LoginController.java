@@ -107,9 +107,9 @@ public class LoginController {
         if (Objects.equals(password.getNewPassword(), password.getOldPassword())) {
             throw ServiceExceptionUtil.get(USER_PASSWORD_OLD_NEW);
         }
-        password.setNewPassword(SecureUtil.aes(securityProperties.getTokenSecret().getBytes(StandardCharsets.UTF_8))
+        password.setNewPassword(SecureUtil.aes(securityProperties.getPasswordSecret().getBytes(StandardCharsets.UTF_8))
                 .decryptStr(password.getNewPassword()));
-        password.setOldPassword(SecureUtil.aes(securityProperties.getTokenSecret().getBytes(StandardCharsets.UTF_8))
+        password.setOldPassword(SecureUtil.aes(securityProperties.getPasswordSecret().getBytes(StandardCharsets.UTF_8))
                 .decryptStr(password.getOldPassword()));
         password.setId(user.getId());
         userService.update(password);

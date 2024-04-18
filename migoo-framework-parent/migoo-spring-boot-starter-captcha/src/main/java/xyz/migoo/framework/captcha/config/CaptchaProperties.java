@@ -22,15 +22,15 @@ public class CaptchaProperties {
      * 验证码的过期时间
      */
     @NotNull(message = "验证码的过期时间不为空")
-    private Duration timeout;
+    private Duration timeout = Duration.ofMinutes(5);
     /**
      * 验证码的高度
      */
     @NotNull(message = "验证码的高度不能为空")
-    private Integer height;
+    private int height = 60;
     /**
      * 验证码的宽度
      */
     @NotNull(message = "验证码的宽度不能为空")
-    private Integer width;
+    private Integer width = 160;
 }

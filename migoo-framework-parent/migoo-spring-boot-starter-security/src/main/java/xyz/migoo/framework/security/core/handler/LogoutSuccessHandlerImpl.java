@@ -28,7 +28,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 执行退出
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
         if (StrUtil.isNotBlank(token)) {
             securityFrameworkService.signOut(token);
         }

@@ -3,7 +3,9 @@ package xyz.migoo.framework.security.config;
 import com.google.common.collect.Lists;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,36 +18,55 @@ import java.util.List;
 public class SecurityProperties {
 
     /**
-     * HTTP 请求时，访问令牌的请求 Header
+     * token 验证用户登录状态
      */
-    @NotEmpty(message = "Token Header 不能为空")
-    private String tokenHeader;
-    /**
-     * Token 过期时间
-     */
-    @NotNull(message = "Token 过期时间不能为空")
-    private Duration tokenTimeout;
-    /**
-     * Token 秘钥
-     */
-    @NotEmpty(message = "Token 秘钥不能为空")
-    private String tokenSecret;
-    /**
-     * Session 过期时间
-     * <p>
-     * 当 User 用户超过当前时间未操作，则 Session 会过期
-     */
-    @NotNull(message = "Session 过期时间不能为空")
-    private Duration sessionTimeout;
+    @NotNull(message = "token Token不能为空")
+    private Token token = new Token();
 
     /**
      * 登出url
      */
+    @NotEmpty(message = "passwordSecret 密码加密密钥不能为空")
+    private String passwordSecret;
+
+    /**
+     * 登出url
+     */
+    @NotEmpty(message = "logoutUrl 登出url地址不能为空")
     private String logoutUrl;
 
     /**
      * 用户可以任意访问的url
      */
+
+    @NotNull(message = "permitAllUrls 允许任意访问的url不能为空")
     private List<String> permitAllUrls = Lists.newArrayList();
+
+    @Validated
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Token {
+
+        /**
+         * HTTP 请求时，访问令牌的请求 Header
+         */
+        @NotEmpty(message = "headerName token请求头名称不能为空")
+        private String headerName = "Authorization";
+
+        /**
+         * Session 过期时间
+         * <p>
+         * 当 User 用户超过当前时间未操作，则 Session 会过期
+         */
+        @NotNull(message = "timeout Session过期时间不能为空")
+        private Duration timeout = Duration.ofMinutes(30);
+
+        /**
+         * Token 秘钥
+         */
+        @NotEmpty(message = "Token 秘钥不能为空")
+        private String secret;
+    }
 
 }

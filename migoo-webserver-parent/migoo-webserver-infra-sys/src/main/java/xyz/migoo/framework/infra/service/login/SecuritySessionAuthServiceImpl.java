@@ -58,6 +58,6 @@ public class SecuritySessionAuthServiceImpl implements SecuritySessionAuthServic
 
     @Override
     public Long getSessionTimeoutMillis() {
-        return securityProperties.getSessionTimeout().toMillis();
+        return securityProperties.getToken().getTimeout().toMillis();
     }
 }

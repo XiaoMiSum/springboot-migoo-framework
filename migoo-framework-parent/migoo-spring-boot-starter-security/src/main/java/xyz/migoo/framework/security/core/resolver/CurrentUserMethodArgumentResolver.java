@@ -33,7 +33,7 @@ public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentR
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getTokenHeader());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
         Object user = loginUserService.getLoginUser(token);
         if (user != null) {
             return user;

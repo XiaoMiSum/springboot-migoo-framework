@@ -82,7 +82,7 @@ public class TokenServiceImpl implements TokenService {
         try {
             // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
-            password = SecureUtil.aes(securityProperties.getTokenSecret().getBytes(StandardCharsets.UTF_8))
+            password = SecureUtil.aes(securityProperties.getToken().getSecret().getBytes(StandardCharsets.UTF_8))
                     .decryptStr(password);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqJson, password));
             return (LoginUser) authentication.getPrincipal();
