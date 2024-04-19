@@ -14,10 +14,10 @@ import xyz.migoo.framework.infra.convert.AuthConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.dal.mapper.sys.UserMapper;
 import xyz.migoo.framework.infra.enums.ErrorCodeConstants;
-import xyz.migoo.framework.infra.util.PasswordUtils;
 import xyz.migoo.framework.security.core.BaseUser;
 import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
+import xyz.migoo.framework.security.utils.PasswordUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper mapper;
-    @Value("${migoo.security.token-secret}")
+    @Value("${migoo.security.token.secret}")
     private String secret;
 
     @Override

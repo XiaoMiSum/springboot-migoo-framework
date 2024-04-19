@@ -18,6 +18,8 @@ import java.time.Duration;
 @Data
 public class CaptchaProperties {
 
+    private Boolean enable;
+
     /**
      * 验证码的过期时间
      */
