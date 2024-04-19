@@ -36,5 +36,6 @@
     <modules>
         <module>migoo-framework-dependencies</module>
         <module>migoo-framework-parent</module>
+        <module>migoo-webserver-parent</module>
     </modules>
 </project>
