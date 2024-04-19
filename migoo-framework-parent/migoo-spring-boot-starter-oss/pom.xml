@@ -11,16 +11,11 @@
 
     <artifactId>migoo-spring-boot-starter-oss</artifactId>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- spring boot 配置所需依赖 -->

@@ -14,7 +14,8 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 @Configuration
 @Slf4j
-@AutoConfigureBefore(name = { "org.redisson.spring.starter.RedissonAutoConfiguration" })
+@AutoConfigureBefore(name = {"org.redisson.spring.starter.RedissonAutoConfiguration",
+        "org.redisson.spring.starter.RedissonAutoConfigurationV2"})
 public class RedisAutoConfiguration {
 
 

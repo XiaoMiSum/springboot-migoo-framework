@@ -17,6 +17,7 @@
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- DB 相关 -->
