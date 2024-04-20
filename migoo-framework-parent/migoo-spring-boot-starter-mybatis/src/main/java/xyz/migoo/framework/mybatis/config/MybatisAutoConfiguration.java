@@ -14,7 +14,8 @@ import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
  * Created on 2021/11/23 20:19
  */
 @Configuration
-@MapperScan(value = "${migoo.info.base-package}", annotationClass = Mapper.class,
+@MapperScan(value = {"${migoo.framework.package-name}", "${migoo.framework.biz-package-name}"}
+        , annotationClass = Mapper.class,
         lazyInitialization = "${mybatis.lazy-initialization:false}")
 public class MybatisAutoConfiguration {
 

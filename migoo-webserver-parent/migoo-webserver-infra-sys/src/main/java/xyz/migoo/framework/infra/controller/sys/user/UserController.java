@@ -65,7 +65,7 @@ public class UserController {
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:user:add')")
     public Result<?> addUser(@Valid @RequestBody UserAddReqVO user) {
-        userService.verify(user.getPhone());
+        userService.verify(user.getUsername());
         userService.add(UserConvert.INSTANCE.convert(user));
         return Result.getSuccessful();
     }

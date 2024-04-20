@@ -36,7 +36,6 @@
     </developers>
 
     <modules>
-
         <module>migoo-webserver-infra-developer</module>
         <module>migoo-webserver-infra-file</module>
         <module>migoo-webserver-infra-sys</module>

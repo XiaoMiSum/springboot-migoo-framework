@@ -14,7 +14,7 @@ public interface UserService extends IBaseUserService {
 
     List<User> get(Integer... status);
 
-    User get(String phone);
+    User get(String username);
 
     User get(Long id);
 

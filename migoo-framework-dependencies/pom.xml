@@ -93,6 +93,13 @@
             <!-- web 相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-info</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- web 相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-web</artifactId>
                 <version>${revision}</version>
             </dependency>
