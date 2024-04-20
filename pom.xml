@@ -37,6 +37,5 @@
         <module>migoo-framework-dependencies</module>
         <module>migoo-framework-parent</module>
         <module>migoo-webserver-parent</module>
-        <module>migoo-framework-parent/migoo-spring-boot-starter-info</module>
     </modules>
 </project>
