@@ -202,19 +202,19 @@ INSERT INTO `infra_sms_template` VALUES (1, 1, 'TEST', '云服务过期推送', 
 -- ----------------------------
 INSERT INTO `sys_menu` VALUES (2, '研发工具', 'developer', 1, 9999, 0, '/developer', 'fa:connectdevelop', NULL, NULL, 1, 1, 0, 1, 0, '', NULL, '超级管理员', '2023-09-27 22:51:30');
 INSERT INTO `sys_menu` VALUES (107, '任务管理', '', 1, 0, 2, 'job', 'fa-solid:tasks', '', '', 1, 1, 1, 1, 0, '超级管理员', '2023-10-01 14:50:25', '超级管理员', '2024-04-14 12:58:36');
-INSERT INTO `sys_menu` VALUES (108, '异常日志', 'developer:error-log:query', 2, 2, 2, 'error-log', 'fa-solid:bug', 'Bug', 'manager/developer/errorlog/index', 1, 1, 1, 1, 0, '超级管理员', '2022-07-10 13:54:45', '超级管理员', '2024-04-14 12:57:39');
+INSERT INTO `sys_menu` VALUES (108, '异常日志', 'developer:error-log:query', 2, 2, 2, 'error-log', 'fa-solid:bug', 'Bug', 'developer/errorlog/index', 1, 1, 1, 1, 0, '超级管理员', '2022-07-10 13:54:45', '超级管理员', '2024-04-14 12:57:39');
 INSERT INTO `sys_menu` VALUES (110, '短信管理', '', 1, 5, 2, 'message', 'ep:message', NULL, NULL, 1, 1, 0, 1, 0, '超级管理员', '2023-06-06 17:17:16', '超级管理员', '2024-04-14 12:57:34');
-INSERT INTO `sys_menu` VALUES (130, '定时任务', 'developer:job:query', 2, 0, 107, 'list', 'fa-solid:tasks', 'JobIndex', 'manager/developer/job/index', 1, 1, 1, 1, 0, '超级管理员', '2023-03-17 17:10:47', '超级管理员', '2024-04-14 13:00:20');
-INSERT INTO `sys_menu` VALUES (131, '调度日志', '', 2, 1, 107, 'log', 'ep:document', 'JobLog', 'manager/developer/job/logger/index', 1, 1, 1, 1, 0, '超级管理员', '2023-03-18 13:50:00', '超级管理员', '2024-04-14 13:00:17');
+INSERT INTO `sys_menu` VALUES (130, '定时任务', 'developer:job:query', 2, 0, 107, 'list', 'fa-solid:tasks', 'JobIndex', 'developer/job/index', 1, 1, 1, 1, 0, '超级管理员', '2023-03-17 17:10:47', '超级管理员', '2024-04-14 13:00:20');
+INSERT INTO `sys_menu` VALUES (131, '调度日志', '', 2, 1, 107, 'log', 'ep:document', 'JobLog', 'developer/job/logger/index', 1, 1, 1, 1, 0, '超级管理员', '2023-03-18 13:50:00', '超级管理员', '2024-04-14 13:00:17');
 INSERT INTO `sys_menu` VALUES (132, '新增', 'developer:job:add', 3, 0, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-03-17 17:12:23', '超级管理员', '2024-04-14 13:01:05');
 INSERT INTO `sys_menu` VALUES (133, '修改', 'developer:job:update', 3, 1, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-03-17 17:12:39', '超级管理员', '2024-04-14 13:01:07');
 INSERT INTO `sys_menu` VALUES (134, '删除', 'developer:job:remove', 3, 2, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-03-17 17:12:58', '超级管理员', '2024-04-14 13:01:11');
 INSERT INTO `sys_menu` VALUES (135, '执行', 'developer:job:trigger', 3, 3, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-03-17 17:13:23', '超级管理员', '2024-04-14 13:01:15');
 INSERT INTO `sys_menu` VALUES (136, '修改', 'developer:error-log:update', 3, 0, 108, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2022-07-10 13:55:37', '超级管理员', '2024-04-14 13:00:07');
 INSERT INTO `sys_menu` VALUES (137, '删除', 'developer:error-log:remove', 3, 1, 108, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2022-07-10 13:55:57', '超级管理员', '2024-04-14 13:00:05');
-INSERT INTO `sys_menu` VALUES (145, '短信渠道', 'developer:sms:channel:query', 2, 0, 110, 'channel', 'fa:at', 'SmsChannel', 'manager/developer/sms/channel/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:21:14', '超级管理员', '2024-04-14 13:02:42');
-INSERT INTO `sys_menu` VALUES (146, '短信模板', 'developer:sms:template:query', 2, 1, 110, 'template', 'fa-solid:align-justify', 'SmsTemplate', 'manager/developer/sms/template/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:30:09', '超级管理员', '2024-04-14 13:02:57');
-INSERT INTO `sys_menu` VALUES (147, '短信日志', 'developer:sms:log:query', 2, 2, 110, 'logger', 'ep:document', 'SmsLog', 'manager/developer/sms/log/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-09 16:39:31', '超级管理员', '2024-04-14 13:03:06');
+INSERT INTO `sys_menu` VALUES (145, '短信渠道', 'developer:sms:channel:query', 2, 0, 110, 'channel', 'fa:at', 'SmsChannel', 'developer/sms/channel/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:21:14', '超级管理员', '2024-04-14 13:02:42');
+INSERT INTO `sys_menu` VALUES (146, '短信模板', 'developer:sms:template:query', 2, 1, 110, 'template', 'fa-solid:align-justify', 'SmsTemplate', 'developer/sms/template/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:30:09', '超级管理员', '2024-04-14 13:02:57');
+INSERT INTO `sys_menu` VALUES (147, '短信日志', 'developer:sms:log:query', 2, 2, 110, 'logger', 'ep:document', 'SmsLog', 'developer/sms/log/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-09 16:39:31', '超级管理员', '2024-04-14 13:03:06');
 INSERT INTO `sys_menu` VALUES (148, '新增', 'developer:sms:channel:add', 3, 0, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-06-06 17:21:43', '超级管理员', '2024-04-14 13:04:38');
 INSERT INTO `sys_menu` VALUES (149, '修改', 'developer:sms:channel:update', 3, 1, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-06-06 17:22:44', '超级管理员', '2024-04-14 13:04:45');
 INSERT INTO `sys_menu` VALUES (150, '删除', 'developer:sms:channel:remove', 3, 2, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-06-06 17:23:02', '超级管理员', '2024-04-14 13:04:50');

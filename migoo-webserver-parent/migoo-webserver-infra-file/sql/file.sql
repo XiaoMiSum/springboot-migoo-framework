@@ -1,5 +1,17 @@
 
 -- ----------------------------
+-- Table structure for sys_menu
+-- ----------------------------
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (155, '文件管理', '', 1, 1, 2, 'file', 'ep:folder-opened', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:33:21', '超级管理员', '2024-04-22 14:45:31');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (156, '文件列表', 'developer:file:query', 2, 0, 155, '', 'ep:files', 'FileList', 'developer/file/index', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:41:51', '超级管理员', '2024-04-22 14:45:42');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (157, 'OSS配置', 'developer:file:config:query', 2, 1, 155, 'config', 'fa:crosshairs', 'FileConfig', 'developer/file/config/index', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:43:40', '超级管理员', '2024-04-22 14:45:48');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (158, '删除', 'developer:file:remove', 3, 0, 156, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:44:01', '超级管理员', '2024-04-22 14:46:12');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (159, '新增', 'developer:file:config:add', 3, 0, 157, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:44:21', '超级管理员', '2024-04-22 14:46:15');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (160, '修改', 'developer:file:config:update', 3, 1, 157, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:44:32', '超级管理员', '2024-04-22 14:46:18');
+INSERT INTO `sys_menu` (`id`, `name`, `permission`, `menu_type`, `sort`, `parent_id`, `path`, `icon`, `component_name`, `component`, `status`, `visible`, `always_show`, `keep_alive`, `deleted`, `creator`, `create_time`, `updater`, `update_time`) VALUES (161, '删除', 'developer:file:config:remove', 3, 2, 157, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:44:45', '超级管理员', '2024-04-22 14:46:19');
+
+
+-- ----------------------------
 -- Table structure for infra_file
 -- ----------------------------
 DROP TABLE IF EXISTS `infra_file`;

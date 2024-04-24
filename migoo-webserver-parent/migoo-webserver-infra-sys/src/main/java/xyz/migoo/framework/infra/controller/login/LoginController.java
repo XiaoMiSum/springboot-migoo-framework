@@ -71,6 +71,11 @@ public class LoginController {
         return Result.getSuccessful(AuthConvert.INSTANCE.convert(user, menuList));
     }
 
+    @GetMapping("kit")
+    public Result<?> getKet() {
+        return Result.getSuccessful(securityProperties.getPasswordSecret());
+    }
+
     @GetMapping("user-menus")
     public Result<List<AuthMenuRespVO>> getMenus(@CurrentUser LoginUser loginUser) {
         Set<Long> roleIds = permissionService.getUserRoleIds(loginUser.getId(), SetUtils.asSet(ENABLE.getStatus()));

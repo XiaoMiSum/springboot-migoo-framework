@@ -75,12 +75,12 @@ CREATE TABLE `sys_menu`  (
 -- Records of sys_menu
 -- ----------------------------
 INSERT INTO `sys_menu` VALUES (1, '系统管理', 'system:manager', 1, 9998, 0, '/system', 'ep:setting', NULL, '', 1, 1, 0, 1, 0, '', '2022-04-29 18:34:52', '超级管理员', '2023-09-27 22:48:18');
-INSERT INTO `sys_menu` VALUES (3, '工作台', 'dashboard', 2, 0, 0, '', 'ep:alarm-clock', 'Dashboard', 'manager/dashboard/index', 1, 1, 1, 1, 0, '', NULL, '超级管理员', '2023-09-27 22:37:53');
-INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:query', 2, 0, 1, 'user', 'ep:user', 'SystemUser', 'manager/system/user/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:48:39');
-INSERT INTO `sys_menu` VALUES (101, '角色管理', 'system:role:query', 2, 1, 1, 'role', 'fa-solid:user-plus', 'UserRole', 'manager/system/role/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:49:31');
-INSERT INTO `sys_menu` VALUES (102, '部门管理', 'system:dept:query', 2, 2, 1, 'dept', 'ep:basketball', 'SystemDept', 'manager/system/dept/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:05');
-INSERT INTO `sys_menu` VALUES (103, '岗位管理', 'system:post:query', 2, 3, 1, 'post', 'ep:postcard', 'SystemPost', 'manager/system/post/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:32');
-INSERT INTO `sys_menu` VALUES (104, '菜单管理', 'system:menu:query', 2, 4, 1, 'menu', 'ep:menu', 'SystemMenu', 'manager/system/menu/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:53');
+INSERT INTO `sys_menu` VALUES (3, '工作台', 'dashboard', 2, 0, 0, '', 'ep:alarm-clock', 'Dashboard', 'dashboard/index', 1, 1, 1, 1, 0, '', NULL, '超级管理员', '2023-09-27 22:37:53');
+INSERT INTO `sys_menu` VALUES (100, '用户管理', 'system:user:query', 2, 0, 1, 'user', 'ep:user', 'SystemUser', 'system/user/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:48:39');
+INSERT INTO `sys_menu` VALUES (101, '角色管理', 'system:role:query', 2, 1, 1, 'role', 'fa-solid:user-plus', 'UserRole', 'system/role/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:49:31');
+INSERT INTO `sys_menu` VALUES (102, '部门管理', 'system:dept:query', 2, 2, 1, 'dept', 'ep:basketball', 'SystemDept', 'system/dept/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:05');
+INSERT INTO `sys_menu` VALUES (103, '岗位管理', 'system:post:query', 2, 3, 1, 'post', 'ep:postcard', 'SystemPost', 'system/post/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:32');
+INSERT INTO `sys_menu` VALUES (104, '菜单管理', 'system:menu:query', 2, 4, 1, 'menu', 'ep:menu', 'SystemMenu', 'system/menu/index', 1, 1, 1, 1, 0, '', '2022-04-29 18:45:02', '超级管理员', '2023-09-27 22:50:53');
 INSERT INTO `sys_menu` VALUES (106, '主题设置', 'layout:setting', 3, 0, 3, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员', '2023-07-23 18:56:46', '超级管理员', '2024-04-14 12:58:34');
 INSERT INTO `sys_menu` VALUES (111, '新增', 'system:user:add', 3, 0, 100, '', '', NULL, '', 1, 1, 0, 1, 0, '奥丁1', '2022-05-01 13:55:34', '奥丁1', '2024-04-14 12:57:29');
 INSERT INTO `sys_menu` VALUES (112, '修改', 'system:user:update', 3, 1, 100, '', '', NULL, '', 1, 1, 0, 1, 0, '奥丁1', '2022-05-01 13:55:59', '超级管理员', '2024-04-14 12:57:28');

@@ -1,7 +1,6 @@
 package xyz.migoo.framework.infra.controller.file;
 
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
@@ -23,7 +22,7 @@ import xyz.migoo.framework.infra.dal.dataobject.file.FileDO;
 import xyz.migoo.framework.infra.service.file.FileService;
 
 @RestController
-@RequestMapping("/infra/file")
+@RequestMapping("/developer/file")
 @Validated
 @Slf4j
 public class FileController {
@@ -50,7 +49,7 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@ss.hasPermission('infra:file:remove')")
+    @PreAuthorize("@ss.hasPermission('developer:file:remove')")
     public Result<Boolean> deleteFile(@PathVariable("id") Long id) throws Exception {
         fileService.deleteFile(id);
         return Result.getSuccessful(true);
@@ -62,12 +61,8 @@ public class FileController {
                                HttpServletResponse response,
                                @PathVariable("configId") Long configId) throws Exception {
         // 获取请求的路径
-        String path = StrUtil.subAfter(request.getRequestURI(), "/get/", false);
-        if (StrUtil.isEmpty(path)) {
-            throw new IllegalArgumentException("结尾的 path 路径必须传递");
-        }
         // 解码，解决中文路径的问题 https://gitee.com/zhijiantianya/ruoyi-vue-pro/pulls/807/
-        path = URLUtil.decode(path);
+        String path = URLUtil.decode(request.getRequestURI().substring(request.getRequestURI().lastIndexOf("/") + 1));
 
         // 读取内容
         byte[] content = fileService.getFileContent(configId, path);
@@ -80,7 +75,7 @@ public class FileController {
     }
 
     @GetMapping
-    @PreAuthorize("@ss.hasPermission('infra:file:query')")
+    @PreAuthorize("@ss.hasPermission('developer:file:query')")
     public Result<PageResult<FileRespVO>> getFilePage(@Valid FilePageReqVO pageVO) {
         PageResult<FileDO> pageResult = fileService.getFilePage(pageVO);
         return Result.getSuccessful(FileContentConvert.INSTANCE.convert(pageResult));
