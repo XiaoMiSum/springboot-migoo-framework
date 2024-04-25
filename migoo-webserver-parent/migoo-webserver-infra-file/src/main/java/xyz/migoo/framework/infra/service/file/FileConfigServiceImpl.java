@@ -2,6 +2,7 @@ package xyz.migoo.framework.infra.service.file;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.json.JSONUtil;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import jakarta.annotation.Resource;
@@ -109,9 +110,8 @@ public class FileConfigServiceImpl implements FileConfigService {
 
     private FileClientConfig parseClientConfig(Integer storage, Map<String, Object> config) {
         // 获取配置类
-        Class<? extends FileClientConfig> configClass = FileStorageEnum.getByStorage(storage)
-                .getConfigClass();
-        FileClientConfig clientConfig = JsonUtils.parseObject(JsonUtils.toJsonString(config), configClass);
+        Class<? extends FileClientConfig> configClass = FileStorageEnum.getByStorage(storage).getConfigClass();
+        FileClientConfig clientConfig = JSONUtil.toBean(JsonUtils.toJsonString(config), configClass);
         // 参数校验
         ValidationUtils.validate(validator, clientConfig);
         // 设置参数

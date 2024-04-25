@@ -1,10 +1,10 @@
 package xyz.migoo.framework.infra.dal.dataobject.file;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.*;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
@@ -59,10 +59,11 @@ public class FileConfigDO extends BaseDO<Long> {
             super(type);
         }
 
+        @SneakyThrows
         @Override
         public Object parse(String json) {
-            return JsonUtils.parseObject(json, new TypeReference<>() {
-            });
+            String className = JsonUtils.parseObject(json, "@class", String.class);
+            return JSONUtil.toBean(json, Class.forName(className));
         }
 
         @Override

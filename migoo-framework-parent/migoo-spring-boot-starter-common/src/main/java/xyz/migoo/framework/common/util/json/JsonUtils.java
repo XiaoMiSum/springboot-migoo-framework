@@ -85,10 +85,23 @@ public class JsonUtils {
         }
     }
 
-    public static JsonNode readTree(String text){
+    public static JsonNode readTree(String text) {
         try {
             return objectMapper.readTree(text);
         } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(String text, String path, Class<T> clazz) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
+        try {
+            JsonNode treeNode = objectMapper.readTree(text);
+            JsonNode pathNode = treeNode.path(path);
+            return objectMapper.readValue(pathNode.toString(), clazz);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
