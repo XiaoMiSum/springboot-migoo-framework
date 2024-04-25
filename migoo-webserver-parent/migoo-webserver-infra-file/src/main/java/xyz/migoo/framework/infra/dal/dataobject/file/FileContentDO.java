@@ -16,11 +16,10 @@ import xyz.migoo.framework.oss.core.client.db.DBFileClient;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileContentDO extends BaseDO<Long> {
-    
+
     /**
      * 配置编号
      * <p>
@@ -35,7 +34,5 @@ public class FileContentDO extends BaseDO<Long> {
      * 文件内容
      */
     private byte[] content;
-
-    private String source;
 
 }

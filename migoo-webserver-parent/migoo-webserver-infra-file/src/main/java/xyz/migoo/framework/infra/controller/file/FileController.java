@@ -55,7 +55,7 @@ public class FileController {
         return Result.getSuccessful(true);
     }
 
-    @GetMapping("/{configId}/**")
+    @GetMapping("/f/{configId}/**")
     @PermitAll
     public void getFileContent(HttpServletRequest request,
                                HttpServletResponse response,

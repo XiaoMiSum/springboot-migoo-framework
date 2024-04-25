@@ -21,7 +21,6 @@ import xyz.migoo.framework.oss.core.enums.FileStorageEnum;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileConfigDO extends BaseDO<Long> {
