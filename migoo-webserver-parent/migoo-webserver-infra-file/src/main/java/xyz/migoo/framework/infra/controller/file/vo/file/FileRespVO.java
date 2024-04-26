@@ -2,7 +2,7 @@ package xyz.migoo.framework.infra.controller.file.vo.file;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class FileRespVO {
@@ -21,6 +21,6 @@ public class FileRespVO {
 
     private Integer size;
 
-    private LocalDateTime createTime;
+    private Date createTime;
 
 }

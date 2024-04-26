@@ -3,7 +3,7 @@ package xyz.migoo.framework.infra.controller.file.vo.config;
 import lombok.Data;
 import xyz.migoo.framework.oss.core.client.FileClientConfig;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class FileConfigRespVO {
@@ -20,6 +20,6 @@ public class FileConfigRespVO {
 
     private String remark;
 
-    private LocalDateTime createTime;
+    private Date createTime;
 
 }
