@@ -13,22 +13,22 @@
 
 ### 文件上传配置
 
-- 获取配置列表: GET {base}/infra/file/config
-- 新增配置: POST {base}/infra/file/config
-- 修改配置: PUT {base}/infra/file/config
-- 修改为默认配置: PUT {base}/infra/file/master
-- 获取配置详情: GET {base}/infra/file/config/{id}
-- 删除配置: DELETE {base}/infra/file/config/{id}
-- 测试上传: GET {base}/infra/file/config/test
+- 获取配置列表: GET {base}/developer/file/config
+- 新增配置: POST {base}/developer/file/config
+- 修改配置: PUT {base}/developer/file/config
+- 修改为默认配置: PUT {base}/developer/file/master
+- 获取配置详情: GET {base}/developer/file/config/{id}
+- 删除配置: DELETE {base}/developer/file/config/{id}
+- 测试上传: GET {base}/developer/file/config/test
 
 ### 文件管理
 
-- 上传文件: POST {base}/infra/file/upload
-- 生成文件预签名地址信息: GET {base}/infra/file/presigned-url
-- 创建文件: POST {base}/infra/file/create
-- 删除文件: DELETE {base}/infra/file/{id}
-- 获取文件: GET {base}/infra/file/{configId}/**
-- 获取文件列表: GET {base}/infra/file/
+- 上传文件: POST {base}/developer/file/upload
+- 生成文件预签名地址信息: GET {base}/developer/file/presigned-url
+- 创建文件: POST {base}/developer/file/create
+- 删除文件: DELETE {base}/developer/file/{id}
+- 获取文件: GET {base}/developer/file/{configId}/**
+- 获取文件列表: GET {base}/developer/file/
 
 # Spring Security
 

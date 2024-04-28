@@ -2,6 +2,7 @@ package xyz.migoo.framework.common.util.object;
 
 import cn.hutool.core.util.ObjectUtil;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -36,6 +37,11 @@ public class ObjectUtils {
             }
         }
         return null;
+    }
+    
+    @SafeVarargs
+    public static <T> boolean equalsAny(T obj, T... array) {
+        return Arrays.asList(array).contains(obj);
     }
 
 }

@@ -55,6 +55,7 @@
         <lombok.version>1.18.32</lombok.version>
         <minio.version>8.5.9</minio.version>
         <tika.version>2.9.2</tika.version>
+        <ip2region.version>2.7.0</ip2region.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <!-- 三方 SDK -->
@@ -228,6 +229,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 管理系统 - 区域工具 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-webserver-infra-area</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 工具相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
@@ -341,6 +349,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId> <!-- 解决 ThreadLocal 父子线程的传值问题 -->
                 <version>${transmittable-thread-local.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
