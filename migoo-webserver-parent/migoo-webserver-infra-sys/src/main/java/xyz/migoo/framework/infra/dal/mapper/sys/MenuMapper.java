@@ -7,7 +7,7 @@ import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -28,7 +28,7 @@ public interface MenuMapper extends BaseMapperX<Menu> {
                 .eqIfPresent(Menu::getStatus, status));
     }
 
-    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+    default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Menu>()
                 .gt(BaseDO::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
     }

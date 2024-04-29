@@ -1,10 +1,5 @@
 package xyz.migoo.framework.infra.service.sys.permission;
 
-import xyz.migoo.framework.infra.controller.sys.permission.menu.vo.MenuQueryReqVO;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
-import xyz.migoo.framework.infra.dal.mapper.sys.MenuMapper;
-import xyz.migoo.framework.infra.enums.MenuIdEnum;
-import xyz.migoo.framework.infra.enums.MenuTypeEnum;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -20,7 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
+import xyz.migoo.framework.infra.controller.sys.permission.menu.vo.MenuQueryReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
+import xyz.migoo.framework.infra.dal.mapper.sys.MenuMapper;
+import xyz.migoo.framework.infra.enums.MenuIdEnum;
+import xyz.migoo.framework.infra.enums.MenuTypeEnum;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private MenuMapper menuMapper;
@@ -83,7 +84,7 @@ public class MenuServiceImpl implements MenuService {
         });
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
-        assert menuList.size() > 0;
+        assert !menuList.isEmpty();
         maxUpdateTime = menuList.stream().max(Comparator.comparing(Menu::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
     }
@@ -100,7 +101,7 @@ public class MenuServiceImpl implements MenuService {
      * @param maxUpdateTime 当前菜单的最大更新时间
      * @return 菜单列表
      */
-    private List<Menu> loadMenuIfUpdate(Date maxUpdateTime) {
+    private List<Menu> loadMenuIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) {
             // 如果更新时间为空，说明 DB 一定有新数据

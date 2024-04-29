@@ -1,9 +1,5 @@
 package xyz.migoo.framework.infra.service.sys.dept;
 
-import xyz.migoo.framework.infra.controller.sys.dept.vo.DeptQueryReqVO;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
-import xyz.migoo.framework.infra.dal.mapper.sys.DeptMapper;
-import xyz.migoo.framework.infra.enums.DeptIdEnum;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
@@ -15,8 +11,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.infra.controller.sys.dept.vo.DeptQueryReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
+import xyz.migoo.framework.infra.dal.mapper.sys.DeptMapper;
+import xyz.migoo.framework.infra.enums.DeptIdEnum;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
@@ -30,7 +31,7 @@ public class DeptServiceImpl implements DeptService {
     @SuppressWarnings("FieldCanBeLocal")
     private volatile Map<Long, Dept> deptCache;
     private volatile Multimap<Long, Dept> parentDeptCache;
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private DeptMapper deptMapper;
@@ -53,7 +54,7 @@ public class DeptServiceImpl implements DeptService {
         // 设置缓存
         deptCache = builder.build();
         parentDeptCache = parentBuilder.build();
-        assert deptList.size() > 0;
+        assert !deptList.isEmpty();
         maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][初始化 Dept 数量为 {}]", deptList.size());
     }
@@ -63,7 +64,7 @@ public class DeptServiceImpl implements DeptService {
         initLocalCache();
     }
 
-    private List<Dept> loadDeptIfUpdate(Date maxUpdateTime) {
+    private List<Dept> loadDeptIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。 // 如果更新时间为空，说明 DB 一定有新数据
         if (maxUpdateTime == null) {
             log.info("[loadMenuIfUpdate][首次加载全量部门]");

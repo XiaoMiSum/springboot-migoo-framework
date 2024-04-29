@@ -6,7 +6,7 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -28,7 +28,7 @@ public interface DeptMapper extends BaseMapperX<Dept> {
         return selectCount(new LambdaQueryWrapperX<Dept>().eq(Dept::getParentId, parentId));
     }
 
-    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+    default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Dept>()
                 .gt(Dept::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
     }

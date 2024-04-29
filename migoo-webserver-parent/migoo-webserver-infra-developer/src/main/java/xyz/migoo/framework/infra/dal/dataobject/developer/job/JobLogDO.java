@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobLogDO extends BaseDO<Long> {

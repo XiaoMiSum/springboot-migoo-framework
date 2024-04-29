@@ -29,8 +29,9 @@ public class JobLogServiceImpl implements JobLogService {
 
     @Override
     public Long createJobLog(Long jobId, LocalDateTime beginTime, String jobHandlerName, String jobHandlerParam, Integer executeIndex) {
-        JobLogDO log = JobLogDO.builder().jobId(jobId).handlerName(jobHandlerName).handlerParam(jobHandlerParam).executeIndex(executeIndex)
-                .beginTime(beginTime).status(JobLogStatusEnum.RUNNING.getStatus()).build();
+        JobLogDO log = new JobLogDO().setJobId(jobId).setHandlerName(jobHandlerName)
+                .setHandlerParam(jobHandlerParam).setExecuteIndex(executeIndex)
+                .setBeginTime(beginTime).setStatus(JobLogStatusEnum.RUNNING.getStatus());
         jobLogMapper.insert(log);
         return log.getId();
     }
@@ -39,8 +40,9 @@ public class JobLogServiceImpl implements JobLogService {
     public void updateJobLogResultAsync(Long logId, LocalDateTime endTime, Integer duration, boolean success, String result) {
         BizThreadPoolUtils.submit(() -> {
             try {
-                JobLogDO updateObj = JobLogDO.builder().id(logId).endTime(endTime).duration(duration)
-                        .status(success ? JobLogStatusEnum.SUCCESS.getStatus() : JobLogStatusEnum.FAILURE.getStatus()).result(result).build();
+                JobLogDO updateObj = new JobLogDO().setId(logId).setEndTime(endTime).setDuration(duration)
+                        .setStatus(success ? JobLogStatusEnum.SUCCESS.getStatus() : JobLogStatusEnum.FAILURE.getStatus())
+                        .setResult(result);
                 jobLogMapper.updateById(updateObj);
             } catch (Exception ex) {
                 log.error("[updateJobLogResultAsync][logId({}) endTime({}) duration({}) success({}) result({})]",

@@ -10,7 +10,6 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobDO extends BaseDO<Long> {

@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.quartz.core.scheduler.SchedulerManager;
-import xyz.migoo.framework.quartz.core.util.CronUtils;
 import xyz.migoo.framework.infra.controller.developer.job.vo.JobCreateReqVO;
 import xyz.migoo.framework.infra.controller.developer.job.vo.JobPageReqVO;
 import xyz.migoo.framework.infra.controller.developer.job.vo.JobUpdateReqVO;
@@ -17,6 +15,8 @@ import xyz.migoo.framework.infra.convert.developer.job.JobConvert;
 import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobDO;
 import xyz.migoo.framework.infra.dal.mapper.developer.job.JobMapper;
 import xyz.migoo.framework.infra.enums.JobStatusEnum;
+import xyz.migoo.framework.quartz.core.scheduler.SchedulerManager;
+import xyz.migoo.framework.quartz.core.util.CronUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -59,7 +59,7 @@ public class JobServiceImpl implements JobService {
         schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
                 createReqVO.getRetryCount(), createReqVO.getRetryInterval());
         // 更新
-        JobDO updateObj = JobDO.builder().id(job.getId()).status(JobStatusEnum.NORMAL.getStatus()).build();
+        JobDO updateObj = new JobDO().setId(job.getId()).setStatus(JobStatusEnum.NORMAL.getStatus());
         jobMapper.updateById(updateObj);
 
         // 返回
@@ -97,7 +97,7 @@ public class JobServiceImpl implements JobService {
             throw ServiceExceptionUtil.get(JOB_CHANGE_STATUS_EQUALS);
         }
         // 更新 Job 状态
-        JobDO updateObj = JobDO.builder().id(id).status(status).build();
+        JobDO updateObj = new JobDO().setId(id).setStatus(status);
         jobMapper.updateById(updateObj);
 
         // 更新状态 Job 到 Quartz 中
@@ -172,12 +172,12 @@ public class JobServiceImpl implements JobService {
                     schedulerManager.pauseJob(job.getHandlerName());
                 } else {
                     // 任务为运行中\初始化状态，则更新任务的状态为运行中
-                    JobDO updateObj = JobDO.builder().id(job.getId()).status(JobStatusEnum.NORMAL.getStatus()).build();
+                    JobDO updateObj = new JobDO().setId(job.getId()).setStatus(JobStatusEnum.NORMAL.getStatus());
                     jobMapper.updateById(updateObj);
                 }
             } catch (Exception e) {
                 // 发生异常，更新任务状态为停止
-                JobDO updateObj = JobDO.builder().id(job.getId()).status(JobStatusEnum.STOP.getStatus()).build();
+                JobDO updateObj = new JobDO().setId(job.getId()).setStatus(JobStatusEnum.STOP.getStatus());
                 jobMapper.updateById(updateObj);
             }
         }

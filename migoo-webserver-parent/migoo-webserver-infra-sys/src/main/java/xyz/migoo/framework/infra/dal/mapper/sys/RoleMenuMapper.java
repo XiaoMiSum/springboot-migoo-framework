@@ -1,13 +1,13 @@
 package xyz.migoo.framework.infra.dal.mapper.sys;
 
-import xyz.migoo.framework.infra.dal.dataobject.sys.RoleMenu;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import xyz.migoo.framework.infra.dal.dataobject.sys.RoleMenu;
 import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -41,6 +41,6 @@ public interface RoleMenuMapper extends BaseMapperX<RoleMenu> {
     }
 
     @Select("SELECT id FROM sys_role_menu WHERE update_time > #{maxUpdateTime} LIMIT 1")
-    Long selectExistsByUpdateTimeAfter(Date maxUpdateTime);
+    Long selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime);
 
 }

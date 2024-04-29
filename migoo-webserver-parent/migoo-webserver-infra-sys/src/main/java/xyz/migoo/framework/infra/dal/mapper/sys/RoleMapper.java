@@ -9,8 +9,8 @@ import xyz.migoo.framework.mybatis.core.BaseMapperX;
 import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -28,7 +28,7 @@ public interface RoleMapper extends BaseMapperX<Role> {
         return selectList(new LambdaQueryWrapperX<Role>().in(Role::getStatus, statuses));
     }
 
-    default boolean selectExistsByUpdateTimeAfter(Date maxUpdateTime) {
+    default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Role>()
                 .gt(BaseDO::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
     }

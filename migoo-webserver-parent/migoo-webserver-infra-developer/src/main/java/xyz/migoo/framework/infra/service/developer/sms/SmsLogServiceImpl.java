@@ -26,23 +26,20 @@ public class SmsLogServiceImpl implements SmsLogService {
     @Override
     public Long createSmsLog(String mobile, Long userId, Integer userType, Boolean isSend,
                              SmsTemplateDO template, String templateContent, Map<String, Object> templateParams) {
-        SmsLogDO.SmsLogDOBuilder logBuilder = SmsLogDO.builder();
+        SmsLogDO logDO = new SmsLogDO();
         // 根据是否要发送，设置状态
-        logBuilder.sendStatus(Objects.equals(isSend, true) ? SmsSendStatusEnum.INIT.getStatus()
+        logDO.setSendStatus(Objects.equals(isSend, true) ? SmsSendStatusEnum.INIT.getStatus()
                 : SmsSendStatusEnum.IGNORE.getStatus());
         // 设置手机相关字段
-        logBuilder.mobile(mobile).userId(userId).userType(userType);
+        logDO.setMobile(mobile).setUserId(userId).setUserType(userType);
         // 设置模板相关字段
-        logBuilder.templateId(template.getId()).templateCode(template.getCode());
-        logBuilder.templateContent(templateContent).templateParams(templateParams)
-                .apiTemplateId(template.getApiTemplateId());
+        logDO.setTemplateId(template.getId()).setTemplateCode(template.getCode());
+        logDO.setTemplateContent(templateContent).setTemplateParams(templateParams)
+                .setApiTemplateId(template.getApiTemplateId());
         // 设置渠道相关字段
-        logBuilder.channelId(template.getChannelId()).channelCode(template.getChannelCode());
+        logDO.setChannelId(template.getChannelId()).setChannelCode(template.getChannelCode());
         // 设置接收相关字段
-        logBuilder.receiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
-
-        // 插入数据库
-        SmsLogDO logDO = logBuilder.build();
+        logDO.setReceiveStatus(SmsReceiveStatusEnum.INIT.getStatus());
         smsLogMapper.insert(logDO);
         return logDO.getId();
     }
@@ -53,10 +50,10 @@ public class SmsLogServiceImpl implements SmsLogService {
                                     String apiRequestId, String apiSerialNo) {
         SmsSendStatusEnum sendStatus = Result.isSuccessful(sendCode) ?
                 SmsSendStatusEnum.SUCCESS : SmsSendStatusEnum.FAILURE;
-        smsLogMapper.updateById((SmsLogDO) SmsLogDO.builder().sendStatus(sendStatus.getStatus())
-                .sendTime(LocalDateTime.now()).sendCode(sendCode).sendMsg(sendMsg)
-                .apiSendCode(apiSendCode).apiSendMsg(apiSendMsg)
-                .apiRequestId(apiRequestId).apiSerialNo(apiSerialNo).build().setId(id));
+        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setSendStatus(sendStatus.getStatus())
+                .setSendTime(LocalDateTime.now()).setSendCode(sendCode).setSendMsg(sendMsg)
+                .setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg)
+                .setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo).setId(id));
     }
 
     @Override
@@ -64,8 +61,8 @@ public class SmsLogServiceImpl implements SmsLogService {
                                        String apiReceiveCode, String apiReceiveMsg) {
         SmsReceiveStatusEnum receiveStatus = Objects.equals(success, true) ?
                 SmsReceiveStatusEnum.SUCCESS : SmsReceiveStatusEnum.FAILURE;
-        smsLogMapper.updateById((SmsLogDO) SmsLogDO.builder().receiveStatus(receiveStatus.getStatus())
-                .receiveTime(receiveTime).apiReceiveCode(apiReceiveCode).apiReceiveMsg(apiReceiveMsg).build().setId(id));
+        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setReceiveStatus(receiveStatus.getStatus())
+                .setReceiveTime(receiveTime).setApiReceiveCode(apiReceiveCode).setApiReceiveMsg(apiReceiveMsg).setId(id));
     }
 
     @Override

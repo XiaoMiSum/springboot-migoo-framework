@@ -1,11 +1,5 @@
 package xyz.migoo.framework.infra.service.sys.permission;
 
-import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
-import xyz.migoo.framework.infra.dal.dataobject.sys.RoleMenu;
-import xyz.migoo.framework.infra.dal.dataobject.sys.UserRole;
-import xyz.migoo.framework.infra.dal.mapper.sys.RoleMenuMapper;
-import xyz.migoo.framework.infra.dal.mapper.sys.UserRoleMapper;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -23,8 +17,15 @@ import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
 import xyz.migoo.framework.common.util.collection.MapUtils;
 import xyz.migoo.framework.common.util.collection.SetUtils;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
+import xyz.migoo.framework.infra.dal.dataobject.sys.RoleMenu;
+import xyz.migoo.framework.infra.dal.dataobject.sys.UserRole;
+import xyz.migoo.framework.infra.dal.mapper.sys.RoleMenuMapper;
+import xyz.migoo.framework.infra.dal.mapper.sys.UserRoleMapper;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service("ss")
@@ -56,7 +57,7 @@ public class PermissionServiceImpl implements PermissionService {
     /**
      * 缓存菜单的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
@@ -76,7 +77,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @PostConstruct
     public void initLocalCache() {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         // 获取角色与菜单的关联列表，如果有更新
         List<RoleMenu> roleMenuList = this.loadRoleMenuIfUpdate(maxUpdateTime);
         if (CollUtil.isEmpty(roleMenuList)) {
@@ -109,7 +110,7 @@ public class PermissionServiceImpl implements PermissionService {
      * @param maxUpdateTime 当前角色与菜单的关联的最大更新时间
      * @return 角色与菜单的关联列表
      */
-    private List<RoleMenu> loadRoleMenuIfUpdate(Date maxUpdateTime) {
+    private List<RoleMenu> loadRoleMenuIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新，如果更新时间为空，说明 DB 一定有新数据
         if (maxUpdateTime == null) {
             log.info("[loadRoleMenuIfUpdate][首次加载全量角色与菜单的关联]");

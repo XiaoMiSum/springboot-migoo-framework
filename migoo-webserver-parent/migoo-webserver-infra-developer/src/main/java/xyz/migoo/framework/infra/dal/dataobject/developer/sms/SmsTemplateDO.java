@@ -13,7 +13,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SmsTemplateDO extends BaseDO<Long> {

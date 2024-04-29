@@ -1,10 +1,5 @@
 package xyz.migoo.framework.infra.service.sys.permission;
 
-import xyz.migoo.framework.infra.controller.sys.permission.role.vo.RoleQueryReqVO;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
-import xyz.migoo.framework.infra.dal.mapper.sys.RoleMapper;
-import xyz.migoo.framework.infra.enums.RoleCodeEnum;
-import xyz.migoo.framework.infra.enums.RoleTypeEnum;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.collect.ImmutableMap;
@@ -19,7 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
+import xyz.migoo.framework.infra.controller.sys.permission.role.vo.RoleQueryReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
+import xyz.migoo.framework.infra.dal.mapper.sys.RoleMapper;
+import xyz.migoo.framework.infra.enums.RoleCodeEnum;
+import xyz.migoo.framework.infra.enums.RoleTypeEnum;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 缓存角色的最大更新时间，用于后续的增量轮询，判断是否有更新
      */
-    private volatile Date maxUpdateTime;
+    private volatile LocalDateTime maxUpdateTime;
 
     @Resource
     @Lazy
@@ -70,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
         ImmutableMap.Builder<Long, Role> builder = ImmutableMap.builder();
         roleList.forEach(sysRoleDO -> builder.put(sysRoleDO.getId(), sysRoleDO));
         roleCache = builder.build();
-        assert roleList.size() > 0; // 断言，避免告警
+        assert !roleList.isEmpty(); // 断言，避免告警
         maxUpdateTime = roleList.stream().max(Comparator.comparing(Role::getUpdateTime)).get().getUpdateTime();
         log.info("[initLocalCache][初始化 Role 数量为 {}]", roleList.size());
     }
@@ -87,7 +88,7 @@ public class RoleServiceImpl implements RoleService {
      * @param maxUpdateTime 当前角色的最大更新时间
      * @return 角色列表
      */
-    private List<Role> loadRoleIfUpdate(Date maxUpdateTime) {
+    private List<Role> loadRoleIfUpdate(LocalDateTime maxUpdateTime) {
         // 第一步，判断是否要更新。
         if (maxUpdateTime == null) { // 如果更新时间为空，说明 DB 一定有新数据
             log.info("[loadRoleIfUpdate][首次加载全量角色]");

@@ -11,7 +11,6 @@ import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SmsChannelDO extends BaseDO<Long> {
