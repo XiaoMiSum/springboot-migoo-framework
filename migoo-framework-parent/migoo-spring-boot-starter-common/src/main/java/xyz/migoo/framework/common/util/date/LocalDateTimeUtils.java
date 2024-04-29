@@ -1,6 +1,7 @@
 package xyz.migoo.framework.common.util.date;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.TemporalUtil;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -128,6 +129,15 @@ public class LocalDateTimeUtils {
      */
     public static Long between(LocalDateTime dateTime) {
         return LocalDateTimeUtil.between(dateTime, LocalDateTime.now(), ChronoUnit.DAYS);
+    }
+
+
+    public static Duration between(LocalDateTime startTimeInclude, LocalDateTime endTimeExclude) {
+        return TemporalUtil.between(startTimeInclude, endTimeExclude);
+    }
+
+    public static long between(LocalDateTime startTimeInclude, LocalDateTime endTimeExclude, ChronoUnit unit) {
+        return TemporalUtil.between(startTimeInclude, endTimeExclude, unit);
     }
 
     /**

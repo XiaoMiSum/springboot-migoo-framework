@@ -111,6 +111,10 @@ public interface BaseMapperX<T> extends MPJBaseMapper<T> {
         Db.saveBatch(entities, size);
     }
 
+    default int updateBatch(T update) {
+        return update(update, new QueryWrapper<>());
+    }
+
     default Boolean updateBatch(Collection<T> entities) {
         return Db.updateBatchById(entities);
     }
