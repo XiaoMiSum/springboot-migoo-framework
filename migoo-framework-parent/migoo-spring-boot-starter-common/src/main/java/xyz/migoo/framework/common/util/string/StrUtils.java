@@ -91,4 +91,9 @@ public class StrUtils {
         long[] longs = StrUtil.splitToLong(value, separator);
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
     }
+
+    public static List<Integer> splitToInt(String value, CharSequence separator) {
+        int[] longs = StrUtil.splitToInt(value, separator);
+        return Arrays.stream(longs).boxed().collect(Collectors.toList());
+    }
 }
