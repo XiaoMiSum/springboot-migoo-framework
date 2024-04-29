@@ -1,15 +1,15 @@
 package xyz.migoo.framework.common.util.date;
 
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 
-import java.time.Duration;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * 时间工具类
  *
- * @author xiaomi
+ * @author 芋道源码
  */
 public class DateUtils {
 
@@ -27,16 +27,47 @@ public class DateUtils {
 
     public static final String FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * 将 LocalDateTime 转换成 Date
+     *
+     * @param date LocalDateTime
+     * @return LocalDateTime
+     */
+    public static Date of(LocalDateTime date) {
+        if (date == null) {
+            return null;
+        }
+        // 将此日期时间与时区相结合以创建 ZonedDateTime
+        ZonedDateTime zonedDateTime = date.atZone(ZoneId.systemDefault());
+        // 本地时间线 LocalDateTime 到即时时间线 Instant 时间戳
+        Instant instant = zonedDateTime.toInstant();
+        // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
+        return Date.from(instant);
+    }
+
+    /**
+     * 将 Date 转换成 LocalDateTime
+     *
+     * @param date Date
+     * @return LocalDateTime
+     */
+    public static LocalDateTime of(Date date) {
+        if (date == null) {
+            return null;
+        }
+        // 转为时间戳
+        Instant instant = date.toInstant();
+        // UTC时间(世界协调时间,UTC + 00:00)转北京(北京,UTC + 8:00)时间
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+
     public static Date addTime(Duration duration) {
         return new Date(System.currentTimeMillis() + duration.toMillis());
     }
 
-    public static boolean isExpired(Date time) {
-        return System.currentTimeMillis() > time.getTime();
-    }
-
-    public static long diff(Date endTime, Date startTime) {
-        return endTime.getTime() - startTime.getTime();
+    public static boolean isExpired(LocalDateTime time) {
+        LocalDateTime now = LocalDateTime.now();
+        return now.isAfter(time);
     }
 
     /**
@@ -85,46 +116,35 @@ public class DateUtils {
         return a.compareTo(b) > 0 ? a : b;
     }
 
-    public static boolean beforeNow(Date date) {
-        return date.getTime() < System.currentTimeMillis();
-    }
-
-    public static boolean afterNow(Date date) {
-        return date.getTime() >= System.currentTimeMillis();
+    public static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        return a.isAfter(b) ? a : b;
     }
 
     /**
-     * 计算当期时间相差的日期
+     * 是否今天
      *
-     * @param field  日历字段.<br/>eg:Calendar.MONTH,Calendar.DAY_OF_MONTH,<br/>Calendar.HOUR_OF_DAY等.
-     * @param amount 相差的数值
-     * @return 计算后的日志
+     * @param date 日期
+     * @return 是否
      */
-    public static Date addDate(int field, int amount) {
-        return addDate(null, field, amount);
+    public static boolean isToday(LocalDateTime date) {
+        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
     }
 
     /**
-     * 计算当期时间相差的日期
+     * 是否昨天
      *
-     * @param date   设置时间
-     * @param field  日历字段 例如说，{@link Calendar#DAY_OF_MONTH} 等
-     * @param amount 相差的数值
-     * @return 计算后的日志
+     * @param date 日期
+     * @return 是否
      */
-    public static Date addDate(Date date, int field, int amount) {
-        if (amount == 0) {
-            return date;
-        }
-        Calendar c = Calendar.getInstance();
-        if (date != null) {
-            c.setTime(date);
-        }
-        c.add(field, amount);
-        return c.getTime();
+    public static boolean isYesterday(LocalDateTime date) {
+        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now().minusDays(1));
     }
 
-    public static String format(String dateStr, String format) {
-        return DateUtil.format(DateUtil.parse(dateStr), format);
-    }
+
 }
