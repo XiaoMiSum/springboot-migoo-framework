@@ -24,4 +24,12 @@ public enum CommonStatusEnum {
      */
     private final String name;
 
+    public static boolean isEnabled(Integer status) {
+        return ENABLE.getStatus().equals(status);
+    }
+
+    public static boolean isDisabled(Integer status) {
+        return DISABLE.getStatus().equals(status);
+    }
+
 }
