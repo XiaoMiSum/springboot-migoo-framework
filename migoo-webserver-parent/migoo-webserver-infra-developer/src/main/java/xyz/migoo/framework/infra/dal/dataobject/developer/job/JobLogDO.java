@@ -6,7 +6,7 @@ import xyz.migoo.framework.infra.enums.JobLogStatusEnum;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.quartz.core.handler.JobHandler;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @TableName("infra_job_log")
 @Data
@@ -49,11 +49,11 @@ public class JobLogDO extends BaseDO<Long> {
     /**
      * 开始执行时间
      */
-    private Date beginTime;
+    private LocalDateTime beginTime;
     /**
      * 结束执行时间
      */
-    private Date endTime;
+    private LocalDateTime endTime;
     /**
      * 执行时长，单位：毫秒
      */
