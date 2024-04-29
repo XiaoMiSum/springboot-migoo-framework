@@ -5,6 +5,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -20,11 +21,9 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
-            BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
-
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?> baseDO) {
             // 创建时间为空，则以当前时间为插入时间
-            baseDO.setCreateTime(Objects.isNull(baseDO.getCreateTime()) ? new Date() : baseDO.getCreateTime());
+            baseDO.setCreateTime(Objects.isNull(baseDO.getCreateTime()) ? LocalDateTime.now() : baseDO.getCreateTime());
             // 更新时间为空，则以当前时间为更新时间
             baseDO.setUpdateTime(Objects.isNull(baseDO.getUpdateTime()) ? baseDO.getCreateTime() : baseDO.getUpdateTime());
             // 状态标识为空，则默认为已启用状态
