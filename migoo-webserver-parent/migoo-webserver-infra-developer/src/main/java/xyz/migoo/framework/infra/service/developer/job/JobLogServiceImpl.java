@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.common.util.thread.BizThreadPoolUtils;
+import xyz.migoo.framework.common.util.thread.VirtualThreadUtils;
 import xyz.migoo.framework.infra.controller.developer.job.vo.JobLogPageReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.job.JobLogDO;
 import xyz.migoo.framework.infra.dal.mapper.developer.job.JobLogMapper;
@@ -38,7 +38,7 @@ public class JobLogServiceImpl implements JobLogService {
 
     @Override
     public void updateJobLogResultAsync(Long logId, LocalDateTime endTime, Integer duration, boolean success, String result) {
-        BizThreadPoolUtils.submit(() -> {
+        VirtualThreadUtils.submit(() -> {
             try {
                 JobLogDO updateObj = new JobLogDO().setId(logId).setEndTime(endTime).setDuration(duration)
                         .setStatus(success ? JobLogStatusEnum.SUCCESS.getStatus() : JobLogStatusEnum.FAILURE.getStatus())
