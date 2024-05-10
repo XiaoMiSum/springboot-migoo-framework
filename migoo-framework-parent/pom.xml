@@ -49,6 +49,7 @@
         <module>migoo-spring-boot-starter-security</module>
         <module>migoo-spring-boot-starter-sms</module>
         <module>migoo-spring-boot-starter-web</module>
+        <module>migoo-spring-boot-starter-tomcat</module>
     </modules>
 
     <properties>

@@ -6,11 +6,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class VirtualThreadUtils {
-    
+
     private static final ExecutorService executor;
 
     static {
-        var factory = Thread.ofVirtual().name("BizVirtualThread", 1).factory();
+        var factory = Thread.ofVirtual().name("biz-virtual-thread-", 1).factory();
         executor = Executors.newThreadPerTaskExecutor(factory);
     }
 

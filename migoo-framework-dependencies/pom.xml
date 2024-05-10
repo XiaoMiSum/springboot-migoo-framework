@@ -105,6 +105,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- web 相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-tomcat</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-security</artifactId>
