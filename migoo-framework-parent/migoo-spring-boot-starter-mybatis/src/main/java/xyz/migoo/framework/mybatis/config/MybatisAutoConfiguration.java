@@ -1,10 +1,12 @@
 package xyz.migoo.framework.mybatis.config;
 
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
@@ -14,6 +16,7 @@ import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
  * Created on 2021/11/23 20:19
  */
 @Configuration
+@AutoConfiguration(before = MybatisPlusAutoConfiguration.class)
 @MapperScan(value = {"${migoo.framework.package-name}", "${migoo.framework.biz-package-name}"}
         , annotationClass = Mapper.class,
         lazyInitialization = "${mybatis.lazy-initialization:false}")

@@ -6,7 +6,6 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -39,7 +38,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         // 默认以当前时间为更新时间
-        setFieldValByName("updateTime", new Date(), metaObject);
+        setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         // 默认以当前登录用户为更新人
         BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
         String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName()
