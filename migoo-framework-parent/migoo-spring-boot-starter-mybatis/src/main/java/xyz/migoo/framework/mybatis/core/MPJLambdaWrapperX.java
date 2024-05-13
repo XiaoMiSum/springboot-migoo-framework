@@ -4,7 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.wrapper.MPJAbstractLambdaWrapper;
+import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.WrapperFunction;
 import org.springframework.util.StringUtils;
@@ -18,12 +18,12 @@ import java.util.function.Consumer;
  * Created at 2023/10/16 21:16
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
-    
-    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, WrapperFunction<MPJAbstractLambdaWrapper<T, ?>> function) {
+
+    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
         return (MPJLambdaWrapperX<T>) super.leftJoin(clazz, function);
     }
 
-    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, String alias, WrapperFunction<MPJAbstractLambdaWrapper<T, ?>> function) {
+    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, String alias, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
         return (MPJLambdaWrapperX<T>) super.leftJoin(clazz, alias, function);
     }
 
