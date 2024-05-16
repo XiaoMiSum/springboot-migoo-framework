@@ -3,6 +3,7 @@ package xyz.migoo.framework.common.util.string;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.collect.Maps;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -95,5 +96,15 @@ public class StrUtils {
     public static List<Integer> splitToInt(String value, CharSequence separator) {
         int[] longs = StrUtil.splitToInt(value, separator);
         return Arrays.stream(longs).boxed().collect(Collectors.toList());
+    }
+
+    public static Map<String, String> splitToMap(String value, CharSequence separator1, CharSequence separator2) {
+        List<String> strings = StrUtil.split(value, separator1);
+        Map<String, String> map = Maps.newHashMap();
+        strings.forEach(item -> {
+            List<String> array = StrUtil.split(item, separator2);
+            map.put(array.getFirst(), array.getLast());
+        });
+        return map;
     }
 }

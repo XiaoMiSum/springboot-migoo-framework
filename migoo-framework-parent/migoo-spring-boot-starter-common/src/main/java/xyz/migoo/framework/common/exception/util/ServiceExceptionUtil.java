@@ -79,6 +79,11 @@ public class ServiceExceptionUtil {
         return new ServiceException(code, message);
     }
 
+
+    public static ServiceException get(Integer code, String message) {
+        return new ServiceException(code, message);
+    }
+
     // ========== 格式化方法 ==========
 
     /**
