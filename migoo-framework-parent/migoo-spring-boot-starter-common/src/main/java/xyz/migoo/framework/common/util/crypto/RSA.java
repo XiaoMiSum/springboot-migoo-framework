@@ -39,11 +39,11 @@ public class RSA {
     public static final String SHA512_WITH_RSA = "SHA512withRSA";
     public static final String SHA1_WITH_DSA = "SHA1withDSA";
 
-    public static String sign(String content, String privateKey) throws Exception {
+    public static String sign(String content, String privateKey) {
         return sign(content, privateKey, NONE_WITH_RSA);
     }
 
-    public static String sign(String content, PrivateKey privateKey) throws Exception {
+    public static String sign(String content, PrivateKey privateKey) {
         return sign(content, privateKey, NONE_WITH_RSA);
     }
 
@@ -67,11 +67,11 @@ public class RSA {
         }
     }
 
-    public static void verify(String content, String sign, String publicKey) throws Exception {
+    public static void verify(String content, String sign, String publicKey) {
         verify(content, sign, publicKey, NONE_WITH_RSA);
     }
 
-    public static void verify(String content, String sign, PublicKey publicKey) throws Exception {
+    public static void verify(String content, String sign, PublicKey publicKey) {
         verify(content, sign, publicKey, NONE_WITH_RSA);
     }
 
@@ -103,15 +103,15 @@ public class RSA {
      * @param publicKey 公钥
      * @return 密文
      */
-    public static String encrypt(String content, String publicKey) throws Exception {
+    public static String encrypt(String content, String publicKey) {
         return encrypt(content, publicKey, "RSA/ECB/PKCS1Padding");
     }
 
-    public static String encrypt(String content, PublicKey publicKey) throws Exception {
+    public static String encrypt(String content, PublicKey publicKey) {
         return encrypt(content, publicKey, "RSA/ECB/PKCS1Padding");
     }
 
-    public static String encrypt(String content, String publicKey, String algorithm) throws Exception {
+    public static String encrypt(String content, String publicKey, String algorithm) {
         try {
             return encrypt(content, getPublicKey(publicKey), algorithm);
         } catch (Exception e) {
