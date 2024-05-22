@@ -101,10 +101,13 @@ public class StrUtils {
     public static Map<String, String> splitToMap(String value, CharSequence separator1, CharSequence separator2) {
         List<String> strings = StrUtil.split(value, separator1);
         Map<String, String> map = Maps.newHashMap();
+        String sep = separator2.toString();
         strings.forEach(item -> {
-            List<String> array = StrUtil.split(item, separator2);
-            map.put(array.getFirst(), array.getLast());
+            int index = item.indexOf(sep);
+            map.put(StrUtil.sub(item, 0, index), (index + 1) == item.length() ? "" :
+                    StrUtil.sub(item, index + 1, item.length()));
         });
         return map;
     }
+
 }
