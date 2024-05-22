@@ -6,7 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.infra.controller.developer.CodeNameSimpleRespVO;
+import xyz.migoo.framework.common.pojo.SimpleData;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.template.*;
 import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
 import xyz.migoo.framework.infra.convert.developer.sms.SmsTemplateConvert;
@@ -68,7 +68,7 @@ public class SmsTemplateController {
     }
 
     @GetMapping("/simple")
-    public Result<List<CodeNameSimpleRespVO>> getSimpleSmsChannelList() {
+    public Result<List<SimpleData<String>>> getSimpleSmsChannelList() {
         List<SmsTemplateDO> list = smsTemplateService.getSmsTemplates();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(SmsTemplateDO::getId));

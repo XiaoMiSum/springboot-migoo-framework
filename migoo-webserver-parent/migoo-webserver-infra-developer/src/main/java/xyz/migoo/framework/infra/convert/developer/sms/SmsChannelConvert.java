@@ -3,14 +3,14 @@ package xyz.migoo.framework.infra.convert.developer.sms;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
-import xyz.migoo.framework.infra.controller.developer.CodeNameSimpleRespVO;
+import xyz.migoo.framework.common.pojo.SimpleData;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelCreateReqVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelRespVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelSimpleRespVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
 
 import java.util.List;
 
@@ -35,6 +35,6 @@ public interface SmsChannelConvert {
 
     List<SmsChannelSimpleRespVO> convertList03(List<SmsChannelDO> list);
 
-    List<CodeNameSimpleRespVO> convertList04(List<SmsTemplateDO> list);
+    List<SimpleData<String>> convertList04(List<SmsTemplateDO> list);
 
 }
