@@ -16,7 +16,7 @@ public interface DictionaryService {
 
     void update(DictionaryDO bean);
 
-    void verify(String key, Long id);
+    void verify(String code, Long id);
 
     void remove(Long id);
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 /**
  * Cache 工具类
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 public class CacheUtils {
 

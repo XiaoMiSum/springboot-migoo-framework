@@ -10,7 +10,7 @@ import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 /**
  * 文件操作 Mapper
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Mapper
 public interface FileMapper extends BaseMapperX<FileDO> {

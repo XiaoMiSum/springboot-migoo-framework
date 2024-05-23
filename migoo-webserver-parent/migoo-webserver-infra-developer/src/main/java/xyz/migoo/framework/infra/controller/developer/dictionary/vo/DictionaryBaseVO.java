@@ -13,8 +13,10 @@ public class DictionaryBaseVO {
     @NotEmpty(message = "字典名称不能为空")
     private String name;
 
-    @NotEmpty(message = "字典Key不能为空")
-    private String key;
+    @NotEmpty(message = "字典编码不能为空")
+    private String code;
 
     private Integer status;
+
+    private String source;
 }

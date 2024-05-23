@@ -40,8 +40,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public void verify(String key, Long id) {
-        DictionaryDO d = mapper.selectByKey(key);
+    public void verify(String code, Long id) {
+        DictionaryDO d = mapper.selectByCode(code);
         if (Objects.nonNull(d) & Objects.nonNull(id) && !Objects.equals(id, d.getId())) {
             throw ServiceExceptionUtil.get(DICTIONARY_KEY_EXISTS);
         }

@@ -10,7 +10,7 @@ import xyz.migoo.framework.oss.core.client.FileClient;
 /**
  * 文件配置 Service 接口
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 public interface FileConfigService {
 

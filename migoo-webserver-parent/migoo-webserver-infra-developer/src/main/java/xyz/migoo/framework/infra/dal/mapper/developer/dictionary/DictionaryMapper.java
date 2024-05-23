@@ -12,12 +12,12 @@ public interface DictionaryMapper extends BaseMapperX<DictionaryDO> {
 
     default PageResult<DictionaryDO> selectPage(DictionaryPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DictionaryDO>()
-                .eqIfPresent(DictionaryDO::getKey, reqVO.getKey())
+                .eqIfPresent(DictionaryDO::getCode, reqVO.getCode())
                 .eqIfPresent(DictionaryDO::getName, reqVO.getName())
                 .orderByDesc(DictionaryDO::getId));
     }
 
-    default DictionaryDO selectByKey(String key) {
-        return selectOne(DictionaryDO::getKey, key);
+    default DictionaryDO selectByCode(String code) {
+        return selectOne(DictionaryDO::getCode, code);
     }
 }

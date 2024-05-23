@@ -20,9 +20,9 @@ public class DictionaryValueBaseVO {
     @Size(max = 100, message = "字典键值长度不能超过100个字符")
     private String value;
 
-    @NotBlank(message = "字典Key不能为空")
-    @Size(max = 100, message = "字典类型长度不能超过100个字符")
-    private String dictKey;
+    @NotBlank(message = "字典编码不能为空")
+    @Size(max = 100, message = "字典编码长度不能超过100个字符")
+    private String dictCode;
 
     private Integer status;
 

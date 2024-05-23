@@ -10,7 +10,7 @@ public class DictionaryPageReqVO extends PageParam {
 
     private String name;
 
-    private String key;
+    private String code;
 
     private Integer status;
 

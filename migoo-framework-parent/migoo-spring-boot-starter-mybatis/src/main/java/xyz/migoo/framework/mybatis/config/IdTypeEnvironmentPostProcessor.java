@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * 当 IdType 为 {@link IdType#NONE} 时，根据 PRIMARY 数据源所使用的数据库，自动设置
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Slf4j
 public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor {
@@ -29,6 +29,18 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
 
     private static final Set<DbType> INPUT_ID_TYPES = SetUtils.asSet(DbType.ORACLE, DbType.ORACLE_12C,
             DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2);
+
+    public static DbType getDbType(ConfigurableEnvironment environment) {
+        String primary = environment.getProperty(DATASOURCE_DYNAMIC_KEY + "." + "primary");
+        if (StrUtil.isEmpty(primary)) {
+            return null;
+        }
+        String url = environment.getProperty(DATASOURCE_DYNAMIC_KEY + ".datasource." + primary + ".url");
+        if (StrUtil.isEmpty(url)) {
+            return null;
+        }
+        return JdbcUtils.getDbType(url);
+    }
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -82,18 +94,6 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
         if (StrUtil.isNotEmpty(driverClass)) {
             environment.getSystemProperties().put(QUARTZ_JOB_STORE_DRIVER_KEY, driverClass);
         }
-    }
-
-    public static DbType getDbType(ConfigurableEnvironment environment) {
-        String primary = environment.getProperty(DATASOURCE_DYNAMIC_KEY + "." + "primary");
-        if (StrUtil.isEmpty(primary)) {
-            return null;
-        }
-        String url = environment.getProperty(DATASOURCE_DYNAMIC_KEY + ".datasource." + primary + ".url");
-        if (StrUtil.isEmpty(url)) {
-            return null;
-        }
-        return JdbcUtils.getDbType(url);
     }
 
 }

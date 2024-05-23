@@ -10,7 +10,7 @@ import xyz.migoo.framework.oss.core.client.db.DBFileClient;
  * <p>
  * 专门用于存储 {@link DBFileClient} 的文件内容
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @TableName("infra_file_content")
 @Data

@@ -10,6 +10,6 @@ public class DictionaryValuePageReqVO extends PageParam {
 
     private String label;
 
-    private String dataKey;
+    private String dictCode;
 
 }

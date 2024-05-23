@@ -11,7 +11,7 @@ import xyz.migoo.framework.infra.dal.dataobject.file.FileConfigDO;
 /**
  * 文件配置 Convert
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Mapper
 public interface FileConfigConvert {
@@ -25,5 +25,5 @@ public interface FileConfigConvert {
 
     FileConfigRespVO convert(FileConfigDO bean);
 
-    
+
 }

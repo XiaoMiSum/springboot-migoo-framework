@@ -37,7 +37,7 @@ public class DictionaryController {
     @PostMapping
     @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
     public Result<?> add(@RequestBody DictionaryAddReqVO req) {
-        dictionaryService.verify(req.getKey(), null);
+        dictionaryService.verify(req.getCode(), null);
         dictionaryService.add(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
     }
@@ -45,7 +45,7 @@ public class DictionaryController {
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
     public Result<?> update(@RequestBody DictionaryUpdateReqVO req) {
-        dictionaryService.verify(req.getKey(), req.getId());
+        dictionaryService.verify(req.getCode(), req.getId());
         dictionaryService.update(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
     }
@@ -60,7 +60,7 @@ public class DictionaryController {
     @GetMapping("/simple")
     public Result<List<?>> getSimple() {
         List<SimpleData<String>> results = Lists.newArrayList();
-        dictionaryService.get().forEach(item -> results.add(new SimpleData<>(item.getKey(), item.getName(), isEnabled(item.getStatus()))));
+        dictionaryService.get().forEach(item -> results.add(new SimpleData<>(item.getCode(), item.getName(), isEnabled(item.getStatus()))));
         return Result.getSuccessful(results);
     }
 
@@ -91,12 +91,13 @@ public class DictionaryController {
         return Result.getSuccessful();
     }
 
-    @GetMapping("/{dataKey}")
-    public Result<List<?>> getSimple(@PathVariable("dataKey") String dataKey) {
+    @GetMapping("/value/simple")
+    public Result<List<?>> getValueSimple() {
         List<Map<String, Object>> results = Lists.newArrayList();
         valueService.get().forEach(item -> {
             Map<String, Object> map = Maps.newHashMap();
             results.add(map);
+            map.put("dictCode", item.getDictCode());
             map.put("label", item.getLabel());
             map.put("value", item.getValue());
             map.put("disable", !isEnabled(item.getStatus()));

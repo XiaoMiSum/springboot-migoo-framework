@@ -22,7 +22,7 @@ import static xyz.migoo.framework.common.util.collection.CollectionUtils.convert
 /**
  * 区域工具类
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @Slf4j
 public class AreaUtils {

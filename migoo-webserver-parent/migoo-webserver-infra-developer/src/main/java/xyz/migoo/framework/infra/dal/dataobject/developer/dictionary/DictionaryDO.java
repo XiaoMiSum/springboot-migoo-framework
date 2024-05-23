@@ -12,9 +12,11 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @TableName(value = "infra_dictionary", autoResultMap = true)
 public class DictionaryDO extends BaseDO<Long> {
 
-    private String key;
+    private String code;
 
     private String name;
+
+    private String source;
 
     private Integer status;
 }

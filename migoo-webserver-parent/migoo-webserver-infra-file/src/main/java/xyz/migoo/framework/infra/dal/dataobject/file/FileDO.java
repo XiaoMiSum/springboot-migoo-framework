@@ -9,7 +9,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
  * 文件表
  * 每次文件上传，都会记录一条记录到该表中
  *
- * @author 芋道源码
+ * @author xiaomi
  */
 @TableName("infra_file")
 @Data

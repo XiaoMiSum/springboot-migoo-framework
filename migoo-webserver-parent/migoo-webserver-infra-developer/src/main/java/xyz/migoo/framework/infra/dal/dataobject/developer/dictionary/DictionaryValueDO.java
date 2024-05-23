@@ -16,7 +16,7 @@ public class DictionaryValueDO extends BaseDO<Long> {
 
     private String value;
 
-    private String dictKey;
+    private String dictCode;
 
     private Integer status;
 
