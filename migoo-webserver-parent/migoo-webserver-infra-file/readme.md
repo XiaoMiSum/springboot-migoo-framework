@@ -27,7 +27,7 @@
 - 生成文件预签名地址信息: GET {base}/developer/file/presigned-url
 - 创建文件: POST {base}/developer/file/create
 - 删除文件: DELETE {base}/developer/file/{id}
-- 获取文件: GET {base}/developer/file/{configId}/**
+- 获取文件: GET {base}/d/f/{configId}/**
 - 获取文件列表: GET {base}/developer/file/
 
 # Spring Security
