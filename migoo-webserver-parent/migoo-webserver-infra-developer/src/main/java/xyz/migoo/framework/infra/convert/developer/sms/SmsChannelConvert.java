@@ -14,6 +14,8 @@ import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
 
 import java.util.List;
 
+import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
+
 @Mapper
 public interface SmsChannelConvert {
 
@@ -37,4 +39,7 @@ public interface SmsChannelConvert {
 
     List<SimpleData<String>> convertList04(List<SmsTemplateDO> list);
 
+    default SimpleData<String> convert(SmsTemplateDO bean) {
+        return new SimpleData<>(bean.getCode(), bean.getName(), isDisabled(bean.getStatus()));
+    }
 }
