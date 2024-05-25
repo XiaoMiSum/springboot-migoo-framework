@@ -13,7 +13,7 @@ public interface DictionaryValueMapper extends BaseMapperX<DictionaryValueDO> {
     default PageResult<DictionaryValueDO> selectPage(DictionaryValuePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DictionaryValueDO>()
                 .eq(DictionaryValueDO::getDictCode, reqVO.getDictCode())
-                .eqIfPresent(DictionaryValueDO::getLabel, reqVO.getLabel())
+                .likeIfPresent(DictionaryValueDO::getLabel, reqVO.getLabel())
                 .orderByAsc(DictionaryValueDO::getSort));
     }
 }

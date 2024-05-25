@@ -12,8 +12,8 @@ public interface DictionaryMapper extends BaseMapperX<DictionaryDO> {
 
     default PageResult<DictionaryDO> selectPage(DictionaryPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<DictionaryDO>()
-                .eqIfPresent(DictionaryDO::getCode, reqVO.getCode())
-                .eqIfPresent(DictionaryDO::getName, reqVO.getName())
+                .likeIfPresent(DictionaryDO::getCode, reqVO.getCode())
+                .likeIfPresent(DictionaryDO::getName, reqVO.getName())
                 .orderByDesc(DictionaryDO::getId));
     }
 
