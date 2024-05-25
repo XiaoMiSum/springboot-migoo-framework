@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.infra.controller.file.vo.file.FilePageReqVO;
-import xyz.migoo.framework.infra.controller.file.vo.file.FilePresignedUrlRespVO;
-import xyz.migoo.framework.infra.controller.file.vo.file.FileRespVO;
-import xyz.migoo.framework.infra.controller.file.vo.file.FileUploadReqVO;
+import xyz.migoo.framework.infra.controller.file.vo.file.*;
 import xyz.migoo.framework.infra.convert.file.FileContentConvert;
 import xyz.migoo.framework.infra.dal.dataobject.file.FileDO;
 import xyz.migoo.framework.infra.service.file.FileService;
@@ -33,6 +30,11 @@ public class FileController {
         String path = uploadReqVO.getPath();
         return Result.getSuccessful(fileService.createFile(file.getOriginalFilename(), path,
                 IoUtil.readBytes(file.getInputStream()), uploadReqVO.getSource()));
+    }
+    
+    @PostMapping("/create")
+    public Result<Long> createFile(@Valid @RequestBody FileCreateReqVO createReqVO) {
+        return Result.getSuccessful(fileService.createFile(createReqVO));
     }
 
     @GetMapping("/presigned-url")

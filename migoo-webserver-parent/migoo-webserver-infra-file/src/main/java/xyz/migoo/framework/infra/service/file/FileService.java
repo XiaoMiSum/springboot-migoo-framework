@@ -2,6 +2,7 @@ package xyz.migoo.framework.infra.service.file;
 
 
 import xyz.migoo.framework.common.pojo.PageResult;
+import xyz.migoo.framework.infra.controller.file.vo.file.FileCreateReqVO;
 import xyz.migoo.framework.infra.controller.file.vo.file.FilePageReqVO;
 import xyz.migoo.framework.infra.controller.file.vo.file.FilePresignedUrlRespVO;
 import xyz.migoo.framework.infra.dal.dataobject.file.FileDO;
@@ -31,6 +32,15 @@ public interface FileService {
      * @return 文件路径
      */
     String createFile(String name, String path, byte[] content, String source);
+
+    /**
+     * 创建文件
+     *
+     * @param createReqVO 创建信息
+     * @return 编号
+     */
+    Long createFile(FileCreateReqVO createReqVO);
+
 
     /**
      * 删除文件

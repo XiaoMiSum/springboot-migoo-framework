@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.util.io.FileUtils;
+import xyz.migoo.framework.infra.controller.file.vo.file.FileCreateReqVO;
 import xyz.migoo.framework.infra.controller.file.vo.file.FilePageReqVO;
 import xyz.migoo.framework.infra.controller.file.vo.file.FilePresignedUrlRespVO;
 import xyz.migoo.framework.infra.dal.dataobject.file.FileDO;
@@ -67,6 +68,13 @@ public class FileServiceImpl implements FileService {
         file.setSize(content.length);
         fileMapper.insert(file);
         return url;
+    }
+
+    @Override
+    public Long createFile(FileCreateReqVO createReqVO) {
+        FileDO file = BeanUtil.toBean(createReqVO, FileDO.class);
+        fileMapper.insert(file);
+        return file.getId();
     }
 
     @Override
