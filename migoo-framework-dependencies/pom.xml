@@ -59,12 +59,17 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <!-- 三方 SDK -->
-        <aliyun.ecs.version>5.0.6</aliyun.ecs.version>
-        <aliyun.rds.version>3.0.3</aliyun.rds.version>
-        <alipay.sdk.version>4.39.40.ALL</alipay.sdk.version>
+        <aliyun-core.version>4.6.4</aliyun-core.version>
+        <aliyun.ecs.version>5.0.12</aliyun.ecs.version>
+        <aliyun.rds.version>4.0.1</aliyun.rds.version>
+        <aliyun-sms.version>2.2.1</aliyun-sms.version>
+
+        <alipay.sdk.version>4.39.79.ALL</alipay.sdk.version>
         <wechat-pay.version>0.2.12</wechat-pay.version>
-        <tencent-cvm.version>3.1.994</tencent-cvm.version>
-        <tencent-cbd.version>3.1.987</tencent-cbd.version>
+
+        <tencent-cvm.version>3.1.1022</tencent-cvm.version>
+        <tencent-cdb.version>3.1.1018</tencent-cdb.version>
+        <tencent-sms.version>3.1.1024</tencent-sms.version>
     </properties>
 
     <dependencyManagement>
@@ -243,6 +248,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- 管理系统 - 云服务器 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-webserver-infra-cvs</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- 工具相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
@@ -311,7 +323,7 @@
             <dependency>
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java-cdb</artifactId>
-                <version>${tencent-cbd.version}</version>
+                <version>${tencent-cdb.version}</version>
             </dependency>
 
             <!-- 支付宝SDK -->
@@ -363,6 +375,35 @@
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
             </dependency>
+
+            <!-- SMS SDK begin -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>${aliyun-core.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>opentracing-api</artifactId>
+                        <groupId>io.opentracing</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>opentracing-util</artifactId>
+                        <groupId>io.opentracing</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+                <version>${aliyun-sms.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java-sms</artifactId>
+                <version>${tencent-sms.version}</version>
+            </dependency>
+            <!-- SMS SDK end -->
         </dependencies>
     </dependencyManagement>
 

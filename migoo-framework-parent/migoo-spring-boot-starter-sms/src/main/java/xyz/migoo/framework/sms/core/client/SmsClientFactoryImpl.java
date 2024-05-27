@@ -1,22 +1,23 @@
-package xyz.migoo.framework.sms.core.client.imp;
+package xyz.migoo.framework.sms.core.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
-import xyz.migoo.framework.sms.core.client.SmsClient;
-import xyz.migoo.framework.sms.core.client.SmsClientFactory;
-import xyz.migoo.framework.sms.core.client.imp.bark.BarkClient;
+import xyz.migoo.framework.sms.core.client.aliyun.AliyunSmsClient;
+import xyz.migoo.framework.sms.core.client.bark.BarkClient;
+import xyz.migoo.framework.sms.core.client.tencent.TencentSmsClient;
 import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
  * 短信客户端工厂接口
  *
- * @author zzf
+ * @author xiaomi
  */
 @Validated
 @Slf4j
@@ -72,15 +73,14 @@ public class SmsClientFactoryImpl implements SmsClientFactory {
     }
 
     private AbstractSmsClient createSmsClient(SmsChannelProperties properties) {
-        SmsChannelEnum channelEnum = SmsChannelEnum.getByCode(properties.getCode());
+        SmsChannelEnum channelEnum = SmsChannelEnum.valueOf(properties.getCode().toUpperCase(Locale.ROOT));
         Assert.notNull(channelEnum, String.format("渠道类型(%s) 为空", channelEnum));
         // 创建客户端
-        if (channelEnum == SmsChannelEnum.BARK) {
-            return new BarkClient(properties);
-        }
-        // 创建失败，错误日志 + 抛出异常
-        log.error("[createSmsClient][配置({}) 找不到合适的客户端实现]", properties);
-        throw new IllegalArgumentException(String.format("配置(%s) 找不到合适的客户端实现", properties));
+        return switch (channelEnum) {
+            case ALI_CLOUD -> new AliyunSmsClient(properties);
+            case BARK -> new BarkClient(properties);
+            case TENCENT -> new TencentSmsClient(properties);
+        };
     }
 
 }

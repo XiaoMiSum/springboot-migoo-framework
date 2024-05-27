@@ -6,15 +6,12 @@ import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelC
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelUpdateReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.sms.core.client.SmsClient;
 
 import java.util.List;
 
 public interface SmsChannelService {
 
-    /**
-     * 初始化短信客户端
-     */
-    void initLocalCache();
 
     /**
      * 创建短信渠道
@@ -61,4 +58,19 @@ public interface SmsChannelService {
      */
     PageResult<SmsChannelDO> getSmsChannelPage(SmsChannelPageReqVO pageReqVO);
 
+    /**
+     * 获得短信客户端
+     *
+     * @param id 编号
+     * @return 短信客户端
+     */
+    SmsClient getSmsClient(Long id);
+    
+    /**
+     * 获得短信客户端
+     *
+     * @param code 编码
+     * @return 短信客户端
+     */
+    SmsClient getSmsClient(String code);
 }

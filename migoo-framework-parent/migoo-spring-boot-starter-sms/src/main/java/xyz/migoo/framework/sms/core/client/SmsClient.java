@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 短信客户端，用于对接各短信平台的 SDK，实现短信发送等功能
  *
- * @author zzf
+ * @author xiaomi
  * @since 2021/1/25 14:14
  */
 public interface SmsClient {
@@ -31,15 +31,14 @@ public interface SmsClient {
      * @param templateParams 短信模板参数。通过 List 数组，保证参数的顺序
      * @return 短信发送结果
      */
-    SmsResult<SmsSendRespDTO> sendSms(Long logId, String mobile, String apiTemplateId,
-                                      List<KeyValue<String, Object>> templateParams);
+    SmsSendRespDTO sendSms(Long logId, String mobile, String apiTemplateId,
+                           List<KeyValue<String, Object>> templateParams) throws Throwable;
 
     /**
      * 解析接收短信的接收结果
      *
      * @param text 结果
      * @return 结果内容
-     * @throws Throwable 当解析 text 发生异常时，则会抛出异常
      */
     List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) throws Throwable;
 
@@ -49,6 +48,6 @@ public interface SmsClient {
      * @param apiTemplateId 短信 API 的模板编号
      * @return 短信模板
      */
-    SmsResult<SmsTemplateRespDTO> getSmsTemplate(String apiTemplateId) throws Throwable;
+    SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) throws Throwable;
 
 }

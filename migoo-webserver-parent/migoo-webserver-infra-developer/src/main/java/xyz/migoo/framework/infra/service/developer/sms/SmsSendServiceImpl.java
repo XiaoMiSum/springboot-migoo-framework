@@ -1,21 +1,22 @@
 package xyz.migoo.framework.infra.service.developer.sms;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.core.KeyValue;
 import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
 import xyz.migoo.framework.sms.core.client.SmsClient;
 import xyz.migoo.framework.sms.core.client.SmsClientFactory;
 import xyz.migoo.framework.sms.core.client.dto.SmsReceiveRespDTO;
-import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
-import xyz.migoo.framework.infra.convert.developer.sms.SmsChannelConvert;
-import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
-import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
+import xyz.migoo.framework.sms.core.client.dto.SmsSendRespDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,8 @@ import java.util.stream.Collectors;
 
 import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
 
-
 @Service
+@Slf4j
 public class SmsSendServiceImpl implements SmsSendService {
 
     @Resource
@@ -55,11 +56,20 @@ public class SmsSendServiceImpl implements SmsSendService {
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 
-        // 发送 MQ 消息，异步执行发送短信
+
         if (isSend) {
-            SmsChannelProperties properties = SmsChannelConvert.INSTANCE.convert01(smsChannel);
-            smsClientFactory.createOrUpdateSmsClient(properties);
-            smsClientFactory.getSmsClient(smsChannel.getCode()).sendSms(sendLogId, mobile, content, newTemplateParams);
+            SmsClient smsClient = smsChannelService.getSmsClient(smsChannel.getCode());
+            Assert.notNull(smsClient, "短信客户端({}) 不存在", smsChannel.getCode());
+            // 发送短信
+            try {
+                SmsSendRespDTO sendResponse = smsClient.sendSms(sendLogId, mobile, templateCode, newTemplateParams);
+                smsLogService.updateSmsSendResult(sendLogId, sendResponse.getSuccess(), sendResponse.getApiCode(),
+                        sendResponse.getApiMsg(), sendResponse.getApiRequestId(), sendResponse.getSerialNo());
+            } catch (Throwable ex) {
+                log.error("[doSendSms][发送短信异常，日志编号({})]", sendLogId, ex);
+                smsLogService.updateSmsSendResult(sendLogId, false,
+                        "EXCEPTION", ExceptionUtil.getRootCauseMessage(ex), null, null);
+            }
         }
         return sendLogId;
     }

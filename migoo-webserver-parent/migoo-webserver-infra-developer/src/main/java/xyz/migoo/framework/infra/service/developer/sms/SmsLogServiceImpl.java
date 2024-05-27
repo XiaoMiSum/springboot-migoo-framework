@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.log.SmsLogPageReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsLogDO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
@@ -45,13 +44,11 @@ public class SmsLogServiceImpl implements SmsLogService {
     }
 
     @Override
-    public void updateSmsSendResult(Long id, Integer sendCode, String sendMsg,
+    public void updateSmsSendResult(Long id, Boolean success,
                                     String apiSendCode, String apiSendMsg,
                                     String apiRequestId, String apiSerialNo) {
-        SmsSendStatusEnum sendStatus = Result.isSuccessful(sendCode) ?
-                SmsSendStatusEnum.SUCCESS : SmsSendStatusEnum.FAILURE;
-        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setSendStatus(sendStatus.getStatus())
-                .setSendTime(LocalDateTime.now()).setSendCode(sendCode).setSendMsg(sendMsg)
+        SmsSendStatusEnum sendStatus = success ? SmsSendStatusEnum.SUCCESS : SmsSendStatusEnum.FAILURE;
+        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setSendStatus(sendStatus.getStatus()).setSendTime(LocalDateTime.now())
                 .setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg)
                 .setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo).setId(id));
     }

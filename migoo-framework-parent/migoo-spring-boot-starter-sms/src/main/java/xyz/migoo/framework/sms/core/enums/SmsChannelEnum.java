@@ -14,7 +14,8 @@ import lombok.Getter;
 public enum SmsChannelEnum {
 
     BARK("BARK", "BARK"),
-//    HUA_WEI("HUA_WEI", "华为云"),
+    ALI_CLOUD("ALI_CLOUD", "阿里云"),
+    TENCENT("TENCENT", "腾讯云"),
     ;
 
     /**
@@ -27,7 +28,7 @@ public enum SmsChannelEnum {
     private final String name;
 
     public static SmsChannelEnum getByCode(String code) {
-        return ArrayUtil.firstMatch(o -> o.getCode().equals(code), values());
+        return ArrayUtil.firstMatch(o -> o.getCode().equalsIgnoreCase(code), values());
     }
 
 }

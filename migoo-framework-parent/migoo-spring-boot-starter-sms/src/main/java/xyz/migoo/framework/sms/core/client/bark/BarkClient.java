@@ -1,16 +1,14 @@
-package xyz.migoo.framework.sms.core.client.imp.bark;
+package xyz.migoo.framework.sms.core.client.bark;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.google.common.collect.Lists;
 import xyz.migoo.framework.common.core.KeyValue;
 import xyz.migoo.framework.common.util.collection.MapUtils;
 import xyz.migoo.framework.common.util.json.JsonUtils;
-import xyz.migoo.framework.sms.core.client.SmsResult;
+import xyz.migoo.framework.sms.core.client.AbstractSmsClient;
 import xyz.migoo.framework.sms.core.client.dto.SmsReceiveRespDTO;
 import xyz.migoo.framework.sms.core.client.dto.SmsSendRespDTO;
 import xyz.migoo.framework.sms.core.client.dto.SmsTemplateRespDTO;
-import xyz.migoo.framework.sms.core.client.imp.AbstractSmsClient;
 import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.Map;
 public class BarkClient extends AbstractSmsClient {
 
     public BarkClient(SmsChannelProperties properties) {
-        super(properties, new BarkCodeMapping());
+        super(properties);
     }
 
     @Override
@@ -31,8 +29,16 @@ public class BarkClient extends AbstractSmsClient {
 
     }
 
+    /**
+     * @param sendLogId      发送日志id
+     * @param mobile         接收方手机号（此处为BarkApp中的设备编码 kpi*****）
+     * @param apiTemplateId  短信服务商中添加的模板编号（此处为发送的消息内容）
+     * @param templateParams 短信模板中的参数
+     * @return 发送结果
+     * @throws Throwable 发送失败
+     */
     @Override
-    protected SmsResult<SmsSendRespDTO> doSendSms(Long sendLogId, String mobile, String apiTemplateId, List<KeyValue<String, Object>> templateParams) throws Throwable {
+    public SmsSendRespDTO sendSms(Long sendLogId, String mobile, String apiTemplateId, List<KeyValue<String, Object>> templateParams) {
         // 构建请求
         Map<String, Object> params = MapUtils.convertMap(templateParams);
         params.put("body", apiTemplateId);
@@ -43,18 +49,18 @@ public class BarkClient extends AbstractSmsClient {
                 .header("Content-Type", "application/json; charset=utf-8")
                 .execute().getStatus();
         // 解析结果
-        return SmsResult.build(String.valueOf(status), status == 200 ? "SUCCESS" : ("ERROR:" + status),
-                null, new SmsSendRespDTO().setSerialNo(StrUtil.uuid()), codeMapping);
+        return new SmsSendRespDTO().setSuccess(status == 200).setApiCode(String.valueOf(status))
+                .setApiMsg(status == 200 ? "SUCCESS" : ("ERROR:" + status));
 
     }
 
     @Override
-    protected List<SmsReceiveRespDTO> doParseSmsReceiveStatus(String text) throws Throwable {
+    public List<SmsReceiveRespDTO> parseSmsReceiveStatus(String text) {
         return Lists.newArrayList();
     }
 
     @Override
-    protected SmsResult<SmsTemplateRespDTO> doGetSmsTemplate(String apiTemplateId) throws Throwable {
-        return null;
+    public SmsTemplateRespDTO getSmsTemplate(String apiTemplateId) {
+        return new SmsTemplateRespDTO();
     }
 }

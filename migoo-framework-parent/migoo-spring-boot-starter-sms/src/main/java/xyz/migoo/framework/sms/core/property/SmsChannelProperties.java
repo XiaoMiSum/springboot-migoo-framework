@@ -9,7 +9,7 @@ import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 /**
  * 短信渠道配置类
  *
- * @author zzf
+ * @author xiaomi
  * @since 2021/1/25 17:01
  */
 @Data
