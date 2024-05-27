@@ -1,4 +1,4 @@
-package xyz.migoo.framework.cvs.core.client.impl.tencent;
+package xyz.migoo.framework.cvs.core.client.tencent;
 
 import com.google.common.collect.Lists;
 import com.tencentcloudapi.cdb.v20170320.CdbClient;
@@ -6,54 +6,54 @@ import com.tencentcloudapi.cdb.v20170320.models.*;
 import com.tencentcloudapi.common.Credential;
 import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.cvs.core.client.AbstractCloudServerClient;
-import xyz.migoo.framework.cvs.core.client.dto.CloudServerInstanceRespDTO;
+import xyz.migoo.framework.cvs.core.client.AbstractCVSClient;
+import xyz.migoo.framework.cvs.core.client.dto.CVMachineInstanceRespDTO;
 import xyz.migoo.framework.cvs.core.client.dto.InstanceStatus;
-import xyz.migoo.framework.cvs.core.enums.CloudServerType;
-import xyz.migoo.framework.cvs.core.property.CloudServiceProperties;
+import xyz.migoo.framework.cvs.core.enums.CVSMachineType;
+import xyz.migoo.framework.cvs.core.property.CVSClientProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class RDSClient extends AbstractCloudServerClient {
+public class RDSClient extends AbstractCVSClient {
 
     private CdbClient client;
 
-    public RDSClient(CloudServiceProperties properties) {
+    public RDSClient(CVSClientProperties properties) {
         super(properties);
     }
 
     @Override
-    protected void initialization(CloudServiceProperties properties) {
+    protected void doInitialization() {
         Credential cred = new Credential(properties.getAccessKeyId(), properties.getAccessKeySecret());
         client = new CdbClient(cred, properties.getRegion());
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId) {
         return getInstances(regionId, null);
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
         DescribeDBInstancesRequest request = new DescribeDBInstancesRequest();
         request.setLimit(2000L);
         if (Objects.nonNull(instanceIds)) {
             request.setInstanceIds(instanceIds.toArray(new String[0]));
         }
-        List<CloudServerInstanceRespDTO> instances = Lists.newArrayList();
+        List<CVMachineInstanceRespDTO> instances = Lists.newArrayList();
         try {
             DescribeDBInstancesResponse resp = client.DescribeDBInstances(request);
             for (InstanceInfo item : resp.getItems()) {
-                CloudServerInstanceRespDTO.CloudServerInstanceRespDTOBuilder builder = CloudServerInstanceRespDTO.builder()
+                CVMachineInstanceRespDTO.CVMachineInstanceRespDTOBuilder builder = CVMachineInstanceRespDTO.builder()
                         .instanceId(item.getInstanceId())
                         .hostname(item.getInstanceName())
                         .status(InstanceStatus.valOf(item.getStatus().intValue()))
                         .operateSystem("MySql " + item.getEngineVersion())
                         .publicIpAddress(item.getWanDomain() + ":" + item.getWanPort())
-                        .type(CloudServerType.RDS)
+                        .machineType(CVSMachineType.RDS)
                         .createdTime(item.getCreateTime())
                         .expiredTime(item.getDeadlineTime());
                 if (!Objects.equals(InstanceStatus.valOf(item.getStatus().intValue()), InstanceStatus.Released)) {

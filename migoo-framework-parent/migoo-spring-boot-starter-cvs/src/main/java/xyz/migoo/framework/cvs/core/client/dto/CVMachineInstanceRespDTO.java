@@ -2,13 +2,13 @@ package xyz.migoo.framework.cvs.core.client.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import xyz.migoo.framework.cvs.core.enums.CloudServerType;
+import xyz.migoo.framework.cvs.core.enums.CVSMachineType;
 
 import java.math.BigDecimal;
 
 @Data
 @Builder
-public class CloudServerInstanceRespDTO {
+public class CVMachineInstanceRespDTO {
 
     private String instanceId;
 
@@ -28,6 +28,6 @@ public class CloudServerInstanceRespDTO {
 
     private BigDecimal price;
 
-    private CloudServerType type;
+    private CVSMachineType machineType;
 
 }

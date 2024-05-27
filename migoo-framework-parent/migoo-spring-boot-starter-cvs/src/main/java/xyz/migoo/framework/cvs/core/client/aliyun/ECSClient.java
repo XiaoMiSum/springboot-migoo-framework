@@ -1,4 +1,4 @@
-package xyz.migoo.framework.cvs.core.client.impl.aliyun;
+package xyz.migoo.framework.cvs.core.client.aliyun;
 
 import cn.hutool.core.date.DateUtil;
 import com.aliyun.auth.credentials.Credential;
@@ -10,27 +10,27 @@ import darabonba.core.client.ClientOverrideConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.json.JsonUtils;
-import xyz.migoo.framework.cvs.core.client.AbstractCloudServerClient;
-import xyz.migoo.framework.cvs.core.client.dto.CloudServerInstanceRespDTO;
+import xyz.migoo.framework.cvs.core.client.AbstractCVSClient;
+import xyz.migoo.framework.cvs.core.client.dto.CVMachineInstanceRespDTO;
 import xyz.migoo.framework.cvs.core.client.dto.InstanceStatus;
-import xyz.migoo.framework.cvs.core.enums.CloudServerType;
-import xyz.migoo.framework.cvs.core.property.CloudServiceProperties;
+import xyz.migoo.framework.cvs.core.enums.CVSMachineType;
+import xyz.migoo.framework.cvs.core.property.CVSClientProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class ECSClient extends AbstractCloudServerClient {
+public class ECSClient extends AbstractCVSClient {
 
     private AsyncClient client;
 
-    public ECSClient(CloudServiceProperties properties) {
+    public ECSClient(CVSClientProperties properties) {
         super(properties);
     }
 
     @Override
-    protected void initialization(CloudServiceProperties properties) {
+    protected void doInitialization() {
         try (StaticCredentialProvider provider = StaticCredentialProvider.create(Credential.builder()
                 .accessKeyId(properties.getAccessKeyId())
                 .accessKeySecret(properties.getAccessKeySecret())
@@ -45,45 +45,46 @@ public class ECSClient extends AbstractCloudServerClient {
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId) {
         return getInstances(regionId, null);
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
         DescribeInstancesRequest describeInstancesRequest = DescribeInstancesRequest.builder()
                 .regionId(regionId)
                 .instanceIds(Objects.isNull(instanceIds) ? null : JsonUtils.toJsonString(instanceIds))
                 .pageNumber(1)
                 .pageSize(100)
                 .build();
-        List<CloudServerInstanceRespDTO> instances = Lists.newArrayList();
+        List<CVMachineInstanceRespDTO> instances = Lists.newArrayList();
         try {
             DescribeInstancesResponse response = client.describeInstances(describeInstancesRequest).get();
             for (DescribeInstancesResponseBody.Instance instance : response.getBody().getInstances().getInstance()) {
-                DescribeRenewalPriceRequest describeRenewalPriceRequest = DescribeRenewalPriceRequest.builder()
-                        .regionId(regionId)
-                        .resourceType("instance")
-                        .resourceId(instance.getInstanceId())
-                        .build();
-                DescribeRenewalPriceResponse price = client.describeRenewalPrice(describeRenewalPriceRequest).get();
-                instances.add(CloudServerInstanceRespDTO.builder()
+                CVMachineInstanceRespDTO.CVMachineInstanceRespDTOBuilder builder = CVMachineInstanceRespDTO.builder()
                         .instanceId(instance.getInstanceId())
                         .hostname(instance.getHostName())
                         .status(InstanceStatus.valueOf(instance.getStatus()))
                         .operateSystem(instance.getOSName())
                         .publicIpAddress(Objects.isNull(instance.getPublicIpAddress()) ||
                                 Objects.isNull(instance.getPublicIpAddress().getIpAddress()) ? null :
-                                instance.getPublicIpAddress().getIpAddress().get(0)
-                        )
+                                instance.getPublicIpAddress().getIpAddress().getFirst())
                         .privateIpAddress(Objects.isNull(instance.getInnerIpAddress()) ||
                                 Objects.isNull(instance.getInnerIpAddress().getIpAddress()) ? null :
-                                instance.getInnerIpAddress().getIpAddress().get(0))
-                        .type(CloudServerType.ECS)
+                                instance.getInnerIpAddress().getIpAddress().getFirst())
+                        .machineType(CVSMachineType.ECS)
                         .createdTime(DateUtil.format(DateUtil.parse(instance.getCreationTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"))
-                        .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpiredTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"))
-                        .price(new BigDecimal(price.getBody().getPriceInfo().getPrice().getTradePrice().toString()))
-                        .build());
+                        .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpiredTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"));
+                if (!Objects.equals(InstanceStatus.valOf(instance.getStatus()), InstanceStatus.Released)) {
+                    DescribeRenewalPriceRequest describeRenewalPriceRequest = DescribeRenewalPriceRequest.builder()
+                            .regionId(regionId)
+                            .resourceType("instance")
+                            .resourceId(instance.getInstanceId())
+                            .build();
+                    DescribeRenewalPriceResponse price = client.describeRenewalPrice(describeRenewalPriceRequest).get();
+                    builder.price(new BigDecimal(price.getBody().getPriceInfo().getPrice().getTradePrice().toString()));
+                }
+                instances.add(builder.build());
             }
             return Result.getSuccessful(instances);
         } catch (Exception e) {

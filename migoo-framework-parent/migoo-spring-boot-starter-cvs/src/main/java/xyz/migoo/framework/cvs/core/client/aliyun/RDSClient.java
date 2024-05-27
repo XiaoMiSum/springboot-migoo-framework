@@ -1,4 +1,4 @@
-package xyz.migoo.framework.cvs.core.client.impl.aliyun;
+package xyz.migoo.framework.cvs.core.client.aliyun;
 
 import cn.hutool.core.date.DateUtil;
 import com.aliyun.auth.credentials.Credential;
@@ -9,27 +9,27 @@ import com.google.common.collect.Lists;
 import darabonba.core.client.ClientOverrideConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.cvs.core.client.AbstractCloudServerClient;
-import xyz.migoo.framework.cvs.core.client.dto.CloudServerInstanceRespDTO;
+import xyz.migoo.framework.cvs.core.client.AbstractCVSClient;
+import xyz.migoo.framework.cvs.core.client.dto.CVMachineInstanceRespDTO;
 import xyz.migoo.framework.cvs.core.client.dto.InstanceStatus;
-import xyz.migoo.framework.cvs.core.enums.CloudServerType;
-import xyz.migoo.framework.cvs.core.property.CloudServiceProperties;
+import xyz.migoo.framework.cvs.core.enums.CVSMachineType;
+import xyz.migoo.framework.cvs.core.property.CVSClientProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class RDSClient extends AbstractCloudServerClient {
+public class RDSClient extends AbstractCVSClient {
 
     private AsyncClient client;
 
-    public RDSClient(CloudServiceProperties properties) {
+    public RDSClient(CVSClientProperties properties) {
         super(properties);
     }
 
     @Override
-    protected void initialization(CloudServiceProperties properties) {
+    protected void doInitialization() {
         try (StaticCredentialProvider provider = StaticCredentialProvider.create(Credential.builder()
                 .accessKeyId(properties.getAccessKeyId())
                 .accessKeySecret(properties.getAccessKeySecret())
@@ -44,13 +44,13 @@ public class RDSClient extends AbstractCloudServerClient {
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId) {
         return Result.getSuccessful(_instances(regionId, null));
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
-        List<CloudServerInstanceRespDTO> instances = Lists.newArrayList();
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
+        List<CVMachineInstanceRespDTO> instances = Lists.newArrayList();
         instanceIds.forEach(item -> instances.addAll(_instances(regionId, item)));
         return Result.getSuccessful(instances);
     }
@@ -97,24 +97,24 @@ public class RDSClient extends AbstractCloudServerClient {
         }
     }
 
-    private List<CloudServerInstanceRespDTO> _instances(String regionId, String instanceId) {
+    private List<CVMachineInstanceRespDTO> _instances(String regionId, String instanceId) {
         DescribeDBInstancesRequest describeInstancesRequest = DescribeDBInstancesRequest.builder()
                 .regionId(regionId)
                 .DBInstanceId(instanceId)
                 .pageNumber(1)
                 .pageSize(100)
                 .build();
-        List<CloudServerInstanceRespDTO> instances = Lists.newArrayList();
+        List<CVMachineInstanceRespDTO> instances = Lists.newArrayList();
         try {
             DescribeDBInstancesResponse response = client.describeDBInstances(describeInstancesRequest).get();
             for (DescribeDBInstancesResponseBody.DBInstance instance : response.getBody().getItems().getDBInstance()) {
-                CloudServerInstanceRespDTO.CloudServerInstanceRespDTOBuilder builder = CloudServerInstanceRespDTO.builder()
+                CVMachineInstanceRespDTO.CVMachineInstanceRespDTOBuilder builder = CVMachineInstanceRespDTO.builder()
                         .instanceId(instance.getDBInstanceId())
                         .hostname(instance.getEngine())
                         .status(InstanceStatus.valueOf(instance.getDBInstanceStatus()))
                         .operateSystem(instance.getEngine() + " " + instance.getEngineVersion())
                         .publicIpAddress(instance.getConnectionString())
-                        .type(CloudServerType.RDS)
+                        .machineType(CVSMachineType.RDS)
                         .createdTime(DateUtil.format(DateUtil.parse(instance.getCreateTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"))
                         .expiredTime(DateUtil.format(DateUtil.parse(instance.getExpireTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"));
                 if (!Objects.equals(InstanceStatus.valueOf(instance.getDBInstanceStatus()), InstanceStatus.Released)) {

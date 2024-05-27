@@ -40,6 +40,7 @@
         <module>migoo-webserver-infra-file</module>
         <module>migoo-webserver-infra-sys</module>
         <module>migoo-webserver-infra-area</module>
+        <module>migoo-webserver-infra-cvs</module>
     </modules>
 
     <properties>

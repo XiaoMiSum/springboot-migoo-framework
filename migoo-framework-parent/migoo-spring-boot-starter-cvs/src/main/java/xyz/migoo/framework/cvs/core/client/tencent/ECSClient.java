@@ -1,4 +1,4 @@
-package xyz.migoo.framework.cvs.core.client.impl.tencent;
+package xyz.migoo.framework.cvs.core.client.tencent;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -8,59 +8,55 @@ import com.tencentcloudapi.cvm.v20170312.CvmClient;
 import com.tencentcloudapi.cvm.v20170312.models.*;
 import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.cvs.core.client.AbstractCloudServerClient;
-import xyz.migoo.framework.cvs.core.client.dto.CloudServerInstanceRespDTO;
+import xyz.migoo.framework.cvs.core.client.AbstractCVSClient;
+import xyz.migoo.framework.cvs.core.client.dto.CVMachineInstanceRespDTO;
 import xyz.migoo.framework.cvs.core.client.dto.InstanceStatus;
-import xyz.migoo.framework.cvs.core.enums.CloudServerType;
-import xyz.migoo.framework.cvs.core.property.CloudServiceProperties;
+import xyz.migoo.framework.cvs.core.enums.CVSMachineType;
+import xyz.migoo.framework.cvs.core.property.CVSClientProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class ECSClient extends AbstractCloudServerClient {
+public class ECSClient extends AbstractCVSClient {
 
     private CvmClient client;
 
-    public ECSClient(CloudServiceProperties properties) {
+    public ECSClient(CVSClientProperties properties) {
         super(properties);
     }
 
     @Override
-    protected void initialization(CloudServiceProperties properties) {
+    protected void doInitialization() {
         Credential cred = new Credential(properties.getAccessKeyId(), properties.getAccessKeySecret());
         client = new CvmClient(cred, properties.getRegion());
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId) {
         return getInstances(regionId, null);
     }
 
     @Override
-    public Result<List<CloudServerInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
+    public Result<List<CVMachineInstanceRespDTO>> getInstances(String regionId, List<String> instanceIds) {
         DescribeInstancesRequest request = new DescribeInstancesRequest();
         request.setLimit(2000L);
         if (Objects.nonNull(instanceIds)) {
             request.setInstanceIds(instanceIds.toArray(new String[0]));
         }
-        List<CloudServerInstanceRespDTO> instances = Lists.newArrayList();
+        List<CVMachineInstanceRespDTO> instances = Lists.newArrayList();
         try {
             DescribeInstancesResponse resp = client.DescribeInstances(request);
             for (Instance item : resp.getInstanceSet()) {
-                CloudServerInstanceRespDTO.CloudServerInstanceRespDTOBuilder builder = CloudServerInstanceRespDTO.builder()
+                CVMachineInstanceRespDTO.CVMachineInstanceRespDTOBuilder builder = CVMachineInstanceRespDTO.builder()
                         .instanceId(item.getInstanceId())
                         .hostname(item.getInstanceName())
                         .status(InstanceStatus.valOf(item.getInstanceState()))
                         .operateSystem(item.getOsName())
-                        .publicIpAddress(
-                                ArrayUtil.isEmpty(item.getPublicIpAddresses()) ? "" : item.getPublicIpAddresses()[0]
-                        )
-                        .privateIpAddress(
-                                ArrayUtil.isEmpty(item.getPrivateIpAddresses()) ? "" : item.getPrivateIpAddresses()[0]
-                        )
-                        .type(CloudServerType.ECS)
+                        .publicIpAddress(ArrayUtil.isEmpty(item.getPublicIpAddresses()) ? "" : item.getPublicIpAddresses()[0])
+                        .privateIpAddress(ArrayUtil.isEmpty(item.getPrivateIpAddresses()) ? "" : item.getPrivateIpAddresses()[0])
+                        .machineType(CVSMachineType.ECS)
                         .createdTime(DateUtil.format(DateUtil.parse(item.getCreatedTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"))
                         .expiredTime(DateUtil.format(DateUtil.parse(item.getExpiredTime(), "yyyy-MM-ddTHH:mmZ"), "yyyy-MM-dd HH:mm:ss"));
                 if (!Objects.equals(InstanceStatus.valOf(item.getInstanceState()), InstanceStatus.Released)) {
