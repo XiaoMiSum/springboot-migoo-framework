@@ -2,10 +2,10 @@ package xyz.migoo.framework.infra.dal.mapper.developer.sms;
 
 import org.apache.ibatis.annotations.Mapper;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.mybatis.core.BaseMapperX;
-import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.channel.SmsChannelPageReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
+import xyz.migoo.framework.mybatis.core.BaseMapperX;
+import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 
 @Mapper
 public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
@@ -16,5 +16,9 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
                 .eqIfPresent(SmsChannelDO::getStatus, reqVO.getStatus())
                 .betweenIfPresent(SmsChannelDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(SmsChannelDO::getId));
+    }
+
+    default SmsChannelDO selectByCode(String code) {
+        return selectOne(SmsChannelDO::getCode, code);
     }
 }
