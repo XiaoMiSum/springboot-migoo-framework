@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
 
 @Data
 @AllArgsConstructor
@@ -17,16 +17,11 @@ public class SimpleData<T> {
 
     private boolean disable;
 
-    private List<SimpleData<T>> children;
-
     public SimpleData(T value, String label) {
-        this.value = value;
-        this.label = label;
+        this(value, label, false);
     }
 
-    public SimpleData(T value, String label, boolean disable) {
-        this.value = value;
-        this.label = label;
-        this.disable = disable;
+    public SimpleData(T value, String label, Integer status) {
+        this(value, label, isDisabled(status));
     }
 }
