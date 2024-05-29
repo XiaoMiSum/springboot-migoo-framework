@@ -19,6 +19,7 @@
 
 - 登录接口: POST {base}/login
 - 获取验证码接口: GET {base}/captcha
+- 获取前端配置接口: GET {base}/configurer
 - 获取登录用户信息: GET {base}/user-info
 - 获取登录用户菜单: GET {base}/user-menus
 - 用户获取谷歌验证器信息: GET {base}/authenticator
@@ -83,3 +84,4 @@
 
 - {base}/login
 - {base}/captcha
+- {base}/configurer

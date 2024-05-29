@@ -10,11 +10,13 @@ import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.collection.SetUtils;
 import xyz.migoo.framework.infra.controller.login.vo.*;
 import xyz.migoo.framework.infra.convert.AuthConvert;
+import xyz.migoo.framework.infra.dal.dataobject.sys.ConfigurerDO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.enums.MenuTypeEnum;
 import xyz.migoo.framework.infra.service.login.CaptchaService;
 import xyz.migoo.framework.infra.service.login.TokenService;
+import xyz.migoo.framework.infra.service.sys.configurer.ConfigurerService;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
 import xyz.migoo.framework.security.config.SecurityProperties;
@@ -25,6 +27,7 @@ import xyz.migoo.framework.security.core.annotation.CurrentUser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static xyz.migoo.framework.common.enums.CommonStatusEnum.ENABLE;
 import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.AUTH_LOGIN_CAPTCHA_CODE_ERROR;
@@ -45,6 +48,8 @@ public class LoginController {
     private CaptchaService captchaService;
     @Resource
     private SecurityProperties securityProperties;
+    @Resource
+    private ConfigurerService configurerService;
 
     @PostMapping("/login")
     public Result<AuthLoginRespVO> login(@RequestBody AuthLoginReqVO req) {
@@ -71,9 +76,14 @@ public class LoginController {
         return Result.getSuccessful(AuthConvert.INSTANCE.convert(user, menuList));
     }
 
-    @GetMapping("kit")
-    public Result<?> getKet() {
-        return Result.getSuccessful(securityProperties.getPasswordSecret());
+    @GetMapping("/configurer")
+    public Result<?> getConfig() {
+        Map<String, String> result = configurerService.getList().stream()
+                .collect(Collectors.toMap(ConfigurerDO::getName, ConfigurerDO::getValue));
+        this.enableCaptcha = Boolean.parseBoolean(result.get("required_captcha"));
+        this.title = result.get("title");
+        result.put("kit", securityProperties.getPasswordSecret());
+        return Result.getSuccessful(result);
     }
 
     @GetMapping("user-menus")
