@@ -2,7 +2,7 @@ package xyz.migoo.framework.infra.enums;
 
 import xyz.migoo.framework.common.exception.ErrorCode;
 
-public interface ErrorCodeConstants {
+public interface SysErrorCodeConstants {
 
     // ========== AUTH 模块 1002000000 ==========
 

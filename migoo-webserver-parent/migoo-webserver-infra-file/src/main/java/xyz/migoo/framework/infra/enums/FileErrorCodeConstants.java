@@ -7,7 +7,7 @@ import xyz.migoo.framework.common.exception.ErrorCode;
  * <p>
  * infra 系统，使用 1-001-000-000 段
  */
-public interface ErrorCodeConstants {
+public interface FileErrorCodeConstants {
 
 
     // ========= 文件相关 1-001-003-000 =================

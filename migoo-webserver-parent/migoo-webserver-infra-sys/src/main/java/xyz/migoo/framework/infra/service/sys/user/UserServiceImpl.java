@@ -13,7 +13,7 @@ import xyz.migoo.framework.infra.controller.sys.user.vo.UserQueryReqVO;
 import xyz.migoo.framework.infra.convert.AuthConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.dal.mapper.sys.UserMapper;
-import xyz.migoo.framework.infra.enums.ErrorCodeConstants;
+import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
 import xyz.migoo.framework.security.core.BaseUser;
 import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
@@ -24,7 +24,7 @@ import java.util.Objects;
 
 import static xyz.migoo.framework.common.enums.NumberConstants.N_0;
 import static xyz.migoo.framework.infra.enums.BindAuthenticatorEnum.INIT;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.USER_ORIGINAL_PASSWORD_UNCONFORMITY;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.USER_ORIGINAL_PASSWORD_UNCONFORMITY;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -74,21 +74,21 @@ public class UserServiceImpl implements UserService {
             user.setPassword(PasswordUtils.encode(user.getPassword()));
         }
         if (mapper.updateById(user) == N_0) {
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.USER_NOT_EXISTS);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.USER_NOT_EXISTS);
         }
     }
 
     @Override
     public void remove(Long id) {
         if (mapper.deleteById(id) == N_0) {
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.USER_NOT_EXISTS);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.USER_NOT_EXISTS);
         }
     }
 
     @Override
     public void verify(String username) {
         if (Objects.nonNull(mapper.selectByUsername(username))) {
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.USER_IS_EXISTS);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.USER_IS_EXISTS);
         }
     }
 

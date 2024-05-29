@@ -2,7 +2,7 @@ package xyz.migoo.framework.infra.enums;
 
 import xyz.migoo.framework.common.exception.ErrorCode;
 
-public interface ErrorCodeConstants {
+public interface DeveloperErrorCodeConstants {
 
     // ========== 定时任务 1004001000 ==========
     ErrorCode JOB_NOT_EXISTS = new ErrorCode(1004001000, "定时任务不存在");

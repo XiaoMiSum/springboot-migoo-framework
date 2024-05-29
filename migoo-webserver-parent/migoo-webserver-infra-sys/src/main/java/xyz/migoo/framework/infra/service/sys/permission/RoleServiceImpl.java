@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.*;
 
 @Service
 @Slf4j

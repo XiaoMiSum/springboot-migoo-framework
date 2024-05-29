@@ -18,7 +18,7 @@ import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.infra.controller.login.vo.AuthLoginReqVO;
 import xyz.migoo.framework.infra.controller.login.vo.AuthLoginRespVO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
-import xyz.migoo.framework.infra.enums.ErrorCodeConstants;
+import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.LoginUser;
@@ -87,12 +87,12 @@ public class TokenServiceImpl implements TokenService {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqJson, password));
             return (LoginUser) authentication.getPrincipal();
         } catch (BadCredentialsException badCredentialsException) {
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.AUTH_LOGIN_BAD_CREDENTIALS);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_LOGIN_BAD_CREDENTIALS);
         } catch (DisabledException disabledException) {
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.AUTH_LOGIN_USER_DISABLED);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_LOGIN_USER_DISABLED);
         } catch (AuthenticationException authenticationException) {
             log.error("[login0][user({}) 发生未知异常]", reqJson, authenticationException);
-            throw ServiceExceptionUtil.get(ErrorCodeConstants.AUTH_LOGIN_FAIL_UNKNOWN);
+            throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_LOGIN_FAIL_UNKNOWN);
         }
     }
 
@@ -102,7 +102,7 @@ public class TokenServiceImpl implements TokenService {
             // 获取用户为null 或者 被禁用 认为 token 过期，方便前端跳转到登录界面
             User user = userService.get(loginUser.getUsername());
             if (Objects.isNull(user) || Objects.equals(user.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
-                throw ServiceExceptionUtil.get(ErrorCodeConstants.AUTH_TOKEN_EXPIRED);
+                throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_TOKEN_EXPIRED);
             }
             // 刷新 LoginUser 缓存
             securitySessionAuthService.refreshUserSession(token, loginUser);

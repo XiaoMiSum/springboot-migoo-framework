@@ -18,7 +18,7 @@ import xyz.migoo.framework.oss.core.client.FileClient;
 import xyz.migoo.framework.oss.core.client.s3.FilePresignedUrlRespDTO;
 import xyz.migoo.framework.oss.core.utils.FileTypeUtils;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.FILE_NOT_EXISTS;
+import static xyz.migoo.framework.infra.enums.FileErrorCodeConstants.FILE_NOT_EXISTS;
 
 /**
  * 文件 Service 实现类

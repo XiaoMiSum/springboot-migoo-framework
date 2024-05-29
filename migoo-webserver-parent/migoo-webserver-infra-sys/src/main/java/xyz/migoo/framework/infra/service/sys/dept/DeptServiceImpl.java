@@ -20,7 +20,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.*;
 
 @Service
 @Slf4j

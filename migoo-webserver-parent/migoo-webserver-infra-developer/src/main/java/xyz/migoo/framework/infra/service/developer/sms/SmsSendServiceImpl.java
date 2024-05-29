@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.*;
 
 @Service
 @Slf4j

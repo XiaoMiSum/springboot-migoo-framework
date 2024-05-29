@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static xyz.migoo.framework.common.util.collection.CollectionUtils.containsAny;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.*;
 
 @Service
 @Validated

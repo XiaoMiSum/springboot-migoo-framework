@@ -30,8 +30,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static xyz.migoo.framework.common.enums.CommonStatusEnum.ENABLE;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.AUTH_LOGIN_CAPTCHA_CODE_ERROR;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.USER_PASSWORD_OLD_NEW;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.AUTH_LOGIN_CAPTCHA_CODE_ERROR;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.USER_PASSWORD_OLD_NEW;
 
 @RestController
 public class LoginController {

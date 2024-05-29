@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.POST_CODE_DUPLICATE;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.POST_NOT_FOUND;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.POST_CODE_DUPLICATE;
+import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.POST_NOT_FOUND;
 
 @Service
 public class PostServiceImpl implements PostService {

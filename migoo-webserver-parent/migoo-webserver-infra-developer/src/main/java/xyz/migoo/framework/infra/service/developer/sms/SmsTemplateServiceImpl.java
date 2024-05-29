@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.*;
+import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.*;
 
 @Service
 @Slf4j

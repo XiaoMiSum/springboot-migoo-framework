@@ -32,8 +32,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.FILE_CONFIG_DELETE_FAIL_MASTER;
-import static xyz.migoo.framework.infra.enums.ErrorCodeConstants.FILE_CONFIG_NOT_EXISTS;
+import static xyz.migoo.framework.infra.enums.FileErrorCodeConstants.FILE_CONFIG_DELETE_FAIL_MASTER;
+import static xyz.migoo.framework.infra.enums.FileErrorCodeConstants.FILE_CONFIG_NOT_EXISTS;
 
 /**
  * 文件配置 Service 实现类
