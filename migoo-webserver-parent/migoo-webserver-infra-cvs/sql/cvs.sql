@@ -48,7 +48,7 @@ INSERT INTO `sys_menu`
 VALUES (109, '云服务器', '', 1, 4, 2, 'cvs', 'fa:cloud', NULL, NULL, 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 21:32:29', '超级管理员', '2024-04-14 12:57:36');
 INSERT INTO `sys_menu`
-VALUES (138, '实例列表', 'developer:cvs:provider:query', 2, 0, 109, 'server', 'fa:medium', 'CVSMachine',
+VALUES (138, '实例列表', 'developer:cvs:machine:query', 2, 0, 109, 'server', 'fa:medium', 'CVSMachine',
         'manager/developer/cvs/machine/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-04 22:15:16',
         '超级管理员', '2024-04-14 13:00:04');
 INSERT INTO `sys_menu`

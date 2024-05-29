@@ -5,15 +5,15 @@ import lombok.Data;
 @Data
 public class CVSProviderBaseVO {
 
-    private String provide;
+    private String code;
 
     private String account;
 
-    private String token;
+    private String accessKeyId;
 
-    private String secret;
+    private String accessKeySecret;
 
-    private String regionId;
+    private String region;
 
     private Integer status;
 }

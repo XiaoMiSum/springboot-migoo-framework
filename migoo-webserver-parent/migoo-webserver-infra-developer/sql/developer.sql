@@ -392,10 +392,6 @@ CREATE TABLE `infra_sms_template`
 -- ----------------------------
 -- Records of infra_sms_template
 -- ----------------------------
-INSERT INTO `infra_sms_template`
-VALUES (1, 1, 'TEST', '云服务过期推送', '账号: {account}, 有 {total} 台服务器即将过期, 续费总额 {amount} 元!',
-        '[\"account\",\"total\",\"amount\"]', 'TEST', 1, 'BARK', NULL, '超级管理员', '2023-09-23 15:33:03',
-        '超级管理员', '2023-09-23 15:42:13', b'0');
 
 -- ----------------------------
 -- Records of sys_menu

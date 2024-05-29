@@ -8,7 +8,7 @@ public class CVSMachinePageRespVO {
 
     private Long id;
 
-    private CVSMachineType serverType;
+    private CVSMachineType machineType;
 
     private String hostname;
 
