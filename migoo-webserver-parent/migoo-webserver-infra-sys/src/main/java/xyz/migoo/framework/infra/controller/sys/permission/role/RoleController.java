@@ -50,13 +50,6 @@ public class RoleController {
         return Result.getSuccessful();
     }
 
-    @PutMapping("/status")
-    @PreAuthorize("@ss.hasPermission('system:role:update')")
-    public Result<?> updateRole(@RequestBody RoleStatusUpdateReqVO reqVO) {
-        roleService.update(RoleConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful();
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:role:update')")
     public Result<?> getRole(@PathVariable("id") Long id) {
