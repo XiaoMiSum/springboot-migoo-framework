@@ -16,6 +16,7 @@ import xyz.migoo.framework.infra.service.developer.dictionary.DictionaryValueSer
 import java.util.List;
 import java.util.Map;
 
+import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
 import static xyz.migoo.framework.common.enums.CommonStatusEnum.isEnabled;
 
 @RestController
@@ -100,7 +101,7 @@ public class DictionaryController {
             map.put("dictCode", item.getDictCode());
             map.put("label", item.getLabel());
             map.put("value", item.getValue());
-            map.put("disable", !isEnabled(item.getStatus()));
+            map.put("disabled", isDisabled(item.getStatus()));
             map.put("colorType", item.getColorType());
         });
         return Result.getSuccessful(results);
