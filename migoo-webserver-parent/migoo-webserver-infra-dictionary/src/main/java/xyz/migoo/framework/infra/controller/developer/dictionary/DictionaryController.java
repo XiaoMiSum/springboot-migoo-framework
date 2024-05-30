@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.isEnabled;
 
 @RestController
 @RequestMapping("/developer/dictionary")
@@ -61,7 +60,7 @@ public class DictionaryController {
     @GetMapping("/simple")
     public Result<List<?>> getSimple() {
         List<SimpleData> results = Lists.newArrayList();
-        dictionaryService.get().forEach(item -> results.add(new SimpleData(item.getCode(), item.getName(), isEnabled(item.getStatus()))));
+        dictionaryService.get().forEach(item -> results.add(new SimpleData(item.getCode(), item.getName(), item.getStatus())));
         return Result.getSuccessful(results);
     }
 
