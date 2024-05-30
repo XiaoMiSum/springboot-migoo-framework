@@ -35,7 +35,7 @@ public class DictionaryController {
     }
 
     @PostMapping
-    @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
+    @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
     public Result<?> add(@RequestBody DictionaryAddReqVO req) {
         dictionaryService.verify(req.getCode(), null);
         dictionaryService.add(DictionaryConvert.INSTANCE.convert(req));
@@ -43,7 +43,7 @@ public class DictionaryController {
     }
 
     @PutMapping
-    @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
+    @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
     public Result<?> update(@RequestBody DictionaryUpdateReqVO req) {
         dictionaryService.verify(req.getCode(), req.getId());
         dictionaryService.update(DictionaryConvert.INSTANCE.convert(req));
@@ -59,8 +59,8 @@ public class DictionaryController {
 
     @GetMapping("/simple")
     public Result<List<?>> getSimple() {
-        List<SimpleData<String>> results = Lists.newArrayList();
-        dictionaryService.get().forEach(item -> results.add(new SimpleData<>(item.getCode(), item.getName(), isEnabled(item.getStatus()))));
+        List<SimpleData> results = Lists.newArrayList();
+        dictionaryService.get().forEach(item -> results.add(new SimpleData(item.getCode(), item.getName(), isEnabled(item.getStatus()))));
         return Result.getSuccessful(results);
     }
 

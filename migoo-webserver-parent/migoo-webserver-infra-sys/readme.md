@@ -85,3 +85,4 @@
 - {base}/login
 - {base}/captcha
 - {base}/configurer
+- {base}/authenticator

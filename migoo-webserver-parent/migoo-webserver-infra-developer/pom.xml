@@ -16,37 +16,31 @@
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-web</artifactId>
-            <optional>true</optional> <!-- 设置为可选，由具体项目决定依赖版本  -->
         </dependency>
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-security</artifactId>
-            <optional>true</optional> <!-- 设置为可选，由具体项目决定依赖版本  -->
         </dependency>
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-mybatis</artifactId>
-            <optional>true</optional> <!-- 设置为可选，由具体项目决定依赖版本  -->
         </dependency>
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-sms</artifactId>
-            <optional>true</optional> <!-- 设置为可选，由具体项目决定依赖版本  -->
         </dependency>
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-job</artifactId>
-            <optional>true</optional> <!-- 设置为可选，由具体项目决定依赖版本  -->
         </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 

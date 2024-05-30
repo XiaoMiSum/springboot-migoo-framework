@@ -39,10 +39,6 @@ public interface DeveloperErrorCodeConstants {
     ErrorCode OPTION_ERROR = new ErrorCode(9999, "操作失败，请检查");
 
 
-    // ========== 字典模块 1006010000 ==========
-    ErrorCode DICTIONARY_KEY_NOT_EXISTS = new ErrorCode(1006010000, "字典不存在");
-    ErrorCode DICTIONARY_KEY_EXISTS = new ErrorCode(1006010001, "字典已存在");
-
     // ========== 模块 99999999 ==========
     ErrorCode ERROR = new ErrorCode(99999999, "异常操作");
 }

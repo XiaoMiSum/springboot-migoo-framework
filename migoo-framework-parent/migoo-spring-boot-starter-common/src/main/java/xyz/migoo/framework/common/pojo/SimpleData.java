@@ -3,25 +3,24 @@ package xyz.migoo.framework.common.pojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
+import xyz.migoo.framework.common.enums.CommonStatusEnum;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimpleData<T> {
+public class SimpleData {
 
-    private T value;
+    private Object value;
 
     private String label;
 
-    private boolean disable;
+    private boolean disabled;
 
-    public SimpleData(T value, String label) {
+    public SimpleData(Object value, String label) {
         this(value, label, false);
     }
 
-    public SimpleData(T value, String label, Integer status) {
-        this(value, label, isDisabled(status));
+    public SimpleData(Object value, String label, Integer status) {
+        this(value, label, CommonStatusEnum.isDisabled(status));
     }
 }

@@ -68,7 +68,7 @@ public class SmsTemplateController {
     }
 
     @GetMapping("/simple")
-    public Result<List<SimpleData<String>>> getSimpleSmsChannelList() {
+    public Result<List<SimpleData>> getSimpleSmsChannelList() {
         List<SmsTemplateDO> list = smsTemplateService.getSmsTemplates();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(SmsTemplateDO::getId));

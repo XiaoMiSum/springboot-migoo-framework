@@ -11,7 +11,7 @@ import xyz.migoo.framework.infra.dal.mapper.developer.dictionary.DictionaryMappe
 import java.util.List;
 import java.util.Objects;
 
-import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.DICTIONARY_KEY_EXISTS;
+import static xyz.migoo.framework.infra.enums.DictionaryErrorCodeConstants.DICTIONARY_KEY_EXISTS;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {

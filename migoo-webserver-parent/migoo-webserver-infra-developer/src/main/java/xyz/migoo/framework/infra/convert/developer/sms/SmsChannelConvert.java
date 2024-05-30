@@ -37,9 +37,9 @@ public interface SmsChannelConvert {
 
     List<SmsChannelSimpleRespVO> convertList03(List<SmsChannelDO> list);
 
-    List<SimpleData<String>> convertList04(List<SmsTemplateDO> list);
+    List<SimpleData> convertList04(List<SmsTemplateDO> list);
 
-    default SimpleData<String> convert(SmsTemplateDO bean) {
-        return new SimpleData<>(bean.getCode(), bean.getName(), isDisabled(bean.getStatus()));
+    default SimpleData convert(SmsTemplateDO bean) {
+        return new SimpleData(bean.getCode(), bean.getName(), isDisabled(bean.getStatus()));
     }
 }
