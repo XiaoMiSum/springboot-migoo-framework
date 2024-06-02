@@ -55,6 +55,7 @@
         <lombok.version>1.18.32</lombok.version>
         <minio.version>8.5.9</minio.version>
         <tika.version>2.9.2</tika.version>
+        <fastjson.version>2.0.50</fastjson.version>
         <ip2region.version>2.7.0</ip2region.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
@@ -309,6 +310,12 @@
                 <version>${zxing.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
             <!-- 阿里云SDK -->
             <dependency>
                 <groupId>com.aliyun</groupId>
@@ -338,18 +345,22 @@
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java</artifactId>
                 <version>${alipay.sdk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>fastjson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>bcprov-jdk15on</artifactId>
+                        <groupId>org.bouncycastle</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcprov-jdk15on</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- 微信支付 -->
