@@ -3,7 +3,7 @@ package xyz.migoo.framework.common.pojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
+import xyz.migoo.framework.common.enums.CommonStatus;
 
 @Data
 @AllArgsConstructor
@@ -21,6 +21,6 @@ public class SimpleData {
     }
 
     public SimpleData(Object value, String label, Integer status) {
-        this(value, label, CommonStatusEnum.isDisabled(status));
+        this(value, label, CommonStatus.isDisabled(status));
     }
 }

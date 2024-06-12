@@ -57,26 +57,15 @@ public class CVSProviderController {
     }
 
     @GetMapping("/tree")
-    public Result<List<Tree<String>>> getTree(CVSProviderQueryReqVO req) {
+    public Result<List<Tree>> getTree(CVSProviderQueryReqVO req) {
         // 获得用户分页列表
         req.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        List<Tree<String>> results = Lists.newArrayList();
+        List<Tree> results = Lists.newArrayList();
         service.getList(req).stream().collect(Collectors.groupingBy(CVSProviderDO::getCode))
                 .forEach((key, value) -> {
-                    Tree<String> tree = new Tree<String>()
-                            .setStatus(CommonStatusEnum.ENABLE.getStatus())
-                            .setId(key)
-                            .setName(key)
-                            .setChildren(Lists.newArrayList());
-                    for (CVSProviderDO item : value) {
-                        tree.getChildren().add(new Tree<String>()
-                                .setStatus(item.getStatus())
-                                .setId(item.getAccount())
-                                .setName(item.getAccount())
-                                .setParentId(key)
-                        );
-                    }
-                    results.add(tree);
+                    Tree root = Tree.rootNode(key, key);
+                    value.forEach(item -> root.addChildren(item.getAccount(), item.getAccount(), item.getStatus()));
+                    results.add(root);
                 });
         return Result.getSuccessful(results);
     }
