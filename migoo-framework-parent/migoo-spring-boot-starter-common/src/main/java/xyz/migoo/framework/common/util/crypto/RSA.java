@@ -7,7 +7,6 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 
 import javax.crypto.Cipher;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyStore;
@@ -48,11 +47,7 @@ public class RSA {
     }
 
     public static String sign(String content, String privateKey, String algorithm) {
-        try {
-            return sign(content, getPrivateKey(privateKey), algorithm);
-        } catch (Exception e) {
-            throw ServiceExceptionUtil.get(SIGN_INVALID);
-        }
+        return sign(content, toPrivateKey(privateKey), algorithm);
     }
 
     public static String sign(String content, PrivateKey privateKey, String algorithm) {
@@ -60,8 +55,7 @@ public class RSA {
             java.security.Signature signature = java.security.Signature.getInstance(algorithm);
             signature.initSign(privateKey);
             signature.update(content.getBytes(StandardCharsets.UTF_8));
-            byte[] signed = signature.sign();
-            return Base64.encode(signed);
+            return Base64.encode(signature.sign());
         } catch (Exception e) {
             throw ServiceExceptionUtil.get(SIGN_INVALID);
         }
@@ -76,23 +70,21 @@ public class RSA {
     }
 
     public static void verify(String content, String sign, String publicKey, String algorithm) {
-        try {
-            verify(content, sign, getPublicKey(publicKey), algorithm);
-        } catch (Exception e) {
-            throw ServiceExceptionUtil.get(-1, "签名验证异常");
-        }
+        verify(content, sign, toPublicKey(publicKey), algorithm);
     }
 
     public static void verify(String content, String sign, PublicKey publicKey, String algorithm) {
+        boolean result;
         try {
             java.security.Signature signature = java.security.Signature.getInstance(algorithm);
             signature.initVerify(publicKey);
             signature.update(content.getBytes(StandardCharsets.UTF_8));
-            if (!signature.verify(Base64.decode(sign))) {
-                throw ServiceExceptionUtil.get(-1, "签名验证失败");
-            }
+            result = signature.verify(Base64.decode(sign));
         } catch (Exception e) {
             throw ServiceExceptionUtil.get(-1, "签名验证异常");
+        }
+        if (!result) {
+            throw ServiceExceptionUtil.get(-1, "签名验证失败");
         }
     }
 
@@ -112,11 +104,7 @@ public class RSA {
     }
 
     public static String encrypt(String content, String publicKey, String algorithm) {
-        try {
-            return encrypt(content, getPublicKey(publicKey), algorithm);
-        } catch (Exception e) {
-            throw ServiceExceptionUtil.get(-1, "数据加密失败，请检查公钥配置是否正确");
-        }
+        return encrypt(content, toPublicKey(publicKey), algorithm);
     }
 
     public static String encrypt(String content, PublicKey publicKey, String algorithm) {
@@ -142,11 +130,7 @@ public class RSA {
     }
 
     public static String decrypt(String content, String privateKey, String algorithm) {
-        try {
-            return decrypt(content, getPrivateKey(privateKey), algorithm);
-        } catch (Exception e) {
-            throw ServiceExceptionUtil.get(DATA_DECRYPT_INVALID);
-        }
+        return decrypt(content, toPrivateKey(privateKey), algorithm);
     }
 
     public static String decrypt(String content, PrivateKey privateKey) {
@@ -164,58 +148,44 @@ public class RSA {
         }
     }
 
-    public static String toBase64String(InputStream publicKey) {
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate) cf.generateCertificate(publicKey);
-            return Base64.encode(cert.getPublicKey().getEncoded());
-        } catch (Exception e) {
-            return "密钥转换失败";
-        }
-    }
-
     public static String toBase64String(String publicKey) {
         try {
-            return toBase64String(new FileInputStream(publicKey));
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509Certificate cert = (X509Certificate) cf.generateCertificate(new FileInputStream(publicKey));
+            return Base64.encode(cert.getPublicKey().getEncoded());
         } catch (Exception e) {
-            return "密钥转换失败，文件不存在或文件已损坏";
+            throw ServiceExceptionUtil.get(-1, "密钥转换失败，文件不存在或文件已损坏");
         }
     }
 
     public static String toBase64String(String privateKey, String pwd) {
         try {
-            return toBase64String(new FileInputStream(privateKey), pwd);
-        } catch (Exception e) {
-            return "密钥转换失败，文件不存在或文件已损坏";
-        }
-    }
-
-    public static String toBase64String(InputStream privateKey, String pwd) {
-        try {
             KeyStore keyStore = KeyStore.getInstance("PKCS12");
             char[] password = StrUtil.isEmpty(pwd) ? null : pwd.toCharArray();
-            keyStore.load(privateKey, password);
+            keyStore.load(new FileInputStream(privateKey), password);
             return Base64.encode(keyStore.getKey(keyStore.aliases().nextElement(), password).getEncoded());
         } catch (Exception e) {
-            return "密钥转换失败";
+            throw ServiceExceptionUtil.get(-1, "密钥转换失败，文件不存在或文件已损坏");
         }
     }
 
-    public static PrivateKey getPrivateKey(String privateKey) throws Exception {
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decode(privateKey));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePrivate(keySpec);
+    public static PrivateKey toPrivateKey(String privateKey) {
+        try {
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decode(privateKey));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
+            throw ServiceExceptionUtil.get(-1, "密钥转换失败，请检查密钥配置是否正确");
+        }
     }
 
-    public static PublicKey getPublicKey(String publicKey) throws Exception {
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(publicKey));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        return keyFactory.generatePublic(keySpec);
+    public static PublicKey toPublicKey(String publicKey) {
+        try {
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(publicKey));
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(keySpec);
+        } catch (Exception e) {
+            throw ServiceExceptionUtil.get(-1, "密钥转换失败，请检查密钥配置是否正确");
+        }
     }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println(toBase64String("/Users/xiaomi/yilian.pfx", "11111111"));
-    }
-
-
 }

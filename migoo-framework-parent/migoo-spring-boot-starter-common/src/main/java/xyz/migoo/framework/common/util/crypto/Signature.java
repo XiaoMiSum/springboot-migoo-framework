@@ -53,6 +53,7 @@ public class Signature {
         List<String> keyValList = new ArrayList<>();
         List<String> ignoreKeyList = Lists.newArrayList(ignoreFields);
         ignoreKeyList.add("sign");
+        ignoreKeyList.add("signature");
         for (Map.Entry<String, ?> entry : data.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
