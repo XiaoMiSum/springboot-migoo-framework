@@ -17,4 +17,7 @@ public class KeyValue<K, V> {
     private K key;
     private V value;
 
+    public static <K, V> KeyValue<K, V> of(K k, V v) {
+        return new KeyValue<>(k, v);
+    }
 }

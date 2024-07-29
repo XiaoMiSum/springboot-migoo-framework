@@ -6,6 +6,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.base.Strings;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,6 +68,15 @@ public class ServletUtils {
     }
 
     /**
+     * @param request 请求
+     * @return locale
+     */
+    public static String getLocale(HttpServletRequest request) {
+        String locale = request.getHeader("Locale");
+        return Strings.isNullOrEmpty(locale) ? "zh-CN" : locale;
+    }
+
+    /**
      * 获得请求
      *
      * @return HttpServletRequest
@@ -77,6 +87,11 @@ public class ServletUtils {
             return null;
         }
         return ((ServletRequestAttributes) requestAttributes).getRequest();
+    }
+
+    public static String getLocale() {
+        HttpServletRequest request = getRequest();
+        return Objects.isNull(request) ? "zh-CN" : getUserAgent(request);
     }
 
     public static String getUserAgent() {

@@ -2,69 +2,76 @@ package xyz.migoo.framework.infra.enums;
 
 import xyz.migoo.framework.common.exception.ErrorCode;
 
-public interface SysErrorCodeConstants {
+import static xyz.migoo.framework.common.core.KeyValue.of;
 
-    // ========== AUTH 模块 1002000000 ==========
+public class SysErrorCodeConstants {
 
-    ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1002000000, "登录失败，用户名或密码不正确");
-    ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1002000001, "登录失败，用户已停用");
-    ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = new ErrorCode(1002000002, "登录失败");
-    ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = new ErrorCode(1002000003, "验证码不正确");
+    // ========== AUTH 模块 100200000 ==========
 
-    // ========== TOKEN 模块 1002001000 ==========
+    public static final ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = ErrorCode.of(100200000,
+            of("zh-CN", "登录失败，用户名或密码错误"), of("zh-TW", "登录失败，用户名或密码错误"),
+            of("en-US", "Login failed, login name or password error"));
+    public static final ErrorCode AUTH_LOGIN_USER_DISABLED = ErrorCode.of(100200001,
+            of("zh-CN", "登录失败，用户已停用"), of("zh-TW", "登录失败，用户已停用"),
+            of("en-US", "Login failed, User disabled"));
+    public static final ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = ErrorCode.of(100200002,
+            of("zh-CN", "登录失败"), of("zh-TW", "登录失败"),
+            of("en-US", "Login failed"));
+    public static final ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = ErrorCode.of(100200003,
+            of("zh-CN", "验证码错误"), of("zh-TW", "验证码错误"),
+            of("en-US", "Captcha error"));
 
-    ErrorCode AUTH_TOKEN_EXPIRED = new ErrorCode(1002001000, "Token 已经过期");
-    ErrorCode TOKEN_PARSE_FAIL = new ErrorCode(1002001001, "Token 解析失败");
+    // ========== TOKEN 模块 100200100 ==========
 
-    // ========== 菜单模块 1002002000 ==========
+    public static final ErrorCode AUTH_TOKEN_EXPIRED = ErrorCode.of(100200100, "Token 已经过期");
+    public static final ErrorCode TOKEN_PARSE_FAIL = ErrorCode.of(100200101, "Token 解析失败");
 
-    ErrorCode MENU_NAME_DUPLICATE = new ErrorCode(1002002000, "已经存在该名字的菜单");
-    ErrorCode MENU_PARENT_NOT_EXISTS = new ErrorCode(1002002001, "父菜单不存在");
-    ErrorCode MENU_PARENT_ERROR = new ErrorCode(1002002002, "不能设置自己为父菜单");
-    ErrorCode MENU_NOT_EXISTS = new ErrorCode(1002002003, "菜单不存在");
-    ErrorCode MENU_EXISTS_CHILDREN = new ErrorCode(1002002004, "存在子菜单，无法删除");
-    ErrorCode MENU_PARENT_NOT_DIR_OR_MENU = new ErrorCode(1002002005, "父菜单的类型必须是目录或者菜单");
+    // ========== 菜单模块 100200200 ==========
 
-    // ========== 角色模块 1002003000 ==========
+    public static final ErrorCode MENU_NAME_DUPLICATE = ErrorCode.of(100200200, "已经存在该名字的菜单");
+    public static final ErrorCode MENU_PARENT_NOT_EXISTS = ErrorCode.of(100200201, "父菜单不存在");
+    public static final ErrorCode MENU_PARENT_ERROR = ErrorCode.of(100200202, "不能设置自己为父菜单");
+    public static final ErrorCode MENU_NOT_EXISTS = ErrorCode.of(100200203, "菜单不存在");
+    public static final ErrorCode MENU_EXISTS_CHILDREN = ErrorCode.of(100200204, "存在子菜单，无法删除");
+    public static final ErrorCode MENU_PARENT_NOT_DIR_OR_MENU = ErrorCode.of(100200205, "父菜单的类型必须是目录或者菜单");
 
-    ErrorCode ROLE_NOT_EXISTS = new ErrorCode(1002003000, "角色不存在");
-    ErrorCode ROLE_NAME_DUPLICATE = new ErrorCode(1002003001, "已经存在名为【{}】的角色");
-    ErrorCode ROLE_CODE_DUPLICATE = new ErrorCode(1002003002, "已经存在编码为【{}】的角色");
-    ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = new ErrorCode(1002003004, "不能操作类型为系统内置的角色");
+    // ========== 角色模块 100200300 ==========
+
+    public static final ErrorCode ROLE_NOT_EXISTS = ErrorCode.of(100200300, "角色不存在");
+    public static final ErrorCode ROLE_NAME_DUPLICATE = ErrorCode.of(100200301, "已经存在名为【{}】的角色");
+    public static final ErrorCode ROLE_CODE_DUPLICATE = ErrorCode.of(100200302, "已经存在编码为【{}】的角色");
+    public static final ErrorCode ROLE_CAN_NOT_UPDATE_SYSTEM_TYPE_ROLE = ErrorCode.of(100200304, "不能操作类型为系统内置的角色");
 
 
-    // ========== 用户模块 1002004000 ==========
+    // ========== 用户模块 100200400 ==========
 
-    ErrorCode USER_IS_EXISTS = new ErrorCode(1002004000, "用户账号已经存在");
-    ErrorCode USER_MOBILE_EXISTS = new ErrorCode(1002004001, "手机号已经存在");
-    ErrorCode USER_EMAIL_EXISTS = new ErrorCode(1002004002, "邮箱已经存在");
-    ErrorCode USER_NOT_EXISTS = new ErrorCode(1002004003, "用户不存在");
-    ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1002004004, "用户密码校验失败");
-    ErrorCode USER_PASSWORD_OLD_NEW = new ErrorCode(1002004005, "操作失败，新密码与原密码一致");
-    ErrorCode USER_ORIGINAL_PASSWORD_UNCONFORMITY = new ErrorCode(1002004006, "操作失败，原密码错误");
+    public static final ErrorCode USER_IS_EXISTS = ErrorCode.of(100200400, "用户账号已经存在");
+    public static final ErrorCode USER_MOBILE_EXISTS = ErrorCode.of(100200401, "手机号已经存在");
+    public static final ErrorCode USER_EMAIL_EXISTS = ErrorCode.of(100200402, "邮箱已经存在");
+    public static final ErrorCode USER_NOT_EXISTS = ErrorCode.of(100200403, "用户不存在");
+    public static final ErrorCode USER_PASSWORD_FAILED = ErrorCode.of(100200404, "用户密码校验失败");
+    public static final ErrorCode USER_PASSWORD_OLD_NEW = ErrorCode.of(100200405, "操作失败，新密码与原密码一致");
+    public static final ErrorCode USER_ORIGINAL_PASSWORD_UNCONFORMITY = ErrorCode.of(100200406, "操作失败，原密码错误");
 
-    // ========== 部门模块 1002004000 ==========
+    // ========== 部门模块 100200400 ==========
 
-    ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1002004001, "已经存在该名字的部门");
-    ErrorCode DEPT_PARENT_NOT_EXITS = new ErrorCode(1002004002, "父级部门不存在");
-    ErrorCode DEPT_NOT_FOUND = new ErrorCode(1002004003, "当前部门不存在");
-    ErrorCode DEPT_EXITS_CHILDREN = new ErrorCode(1002004004, "存在子部门，无法删除");
-    ErrorCode DEPT_PARENT_ERROR = new ErrorCode(1002004005, "不能设置自己为父部门");
-    ErrorCode DEPT_EXISTS_USER = new ErrorCode(1002004006, "部门中存在员工，无法删除");
-    ErrorCode DEPT_NOT_ENABLE = new ErrorCode(1002004007, "部门不处于开启状态，不允许选择");
-    ErrorCode DEPT_PARENT_IS_CHILD = new ErrorCode(1002004008, "不能设置自己的子部门为父部门");
+    public static final ErrorCode DEPT_NAME_DUPLICATE = ErrorCode.of(100200401, "已经存在该名字的部门");
+    public static final ErrorCode DEPT_PARENT_NOT_EXITS = ErrorCode.of(100200402, "父级部门不存在");
+    public static final ErrorCode DEPT_NOT_FOUND = ErrorCode.of(100200403, "当前部门不存在");
+    public static final ErrorCode DEPT_EXITS_CHILDREN = ErrorCode.of(100200404, "存在子部门，无法删除");
+    public static final ErrorCode DEPT_PARENT_ERROR = ErrorCode.of(100200405, "不能设置自己为父部门");
+    public static final ErrorCode DEPT_EXISTS_USER = ErrorCode.of(100200406, "部门中存在员工，无法删除");
+    public static final ErrorCode DEPT_NOT_ENABLE = ErrorCode.of(100200407, "部门不处于开启状态，不允许选择");
+    public static final ErrorCode DEPT_PARENT_IS_CHILD = ErrorCode.of(100200408, "不能设置自己的子部门为父部门");
 
-    // ========== 岗位模块 1002005000 ==========
+    // ========== 岗位模块 100200500 ==========
 
-    ErrorCode POST_NOT_FOUND = new ErrorCode(1002005001, "当前岗位不存在");
-    ErrorCode POST_NOT_ENABLE = new ErrorCode(1002005002, "岗位({}) 不处于开启状态，不允许选择");
-    ErrorCode POST_NAME_DUPLICATE = new ErrorCode(1002005001, "已经存在该名字的岗位");
-    ErrorCode POST_CODE_DUPLICATE = new ErrorCode(1002005001, "已经存在该标识的岗位");
+    public static final ErrorCode POST_NOT_FOUND = ErrorCode.of(1002005001, "岗位不存在");
+    public static final ErrorCode POST_NOT_ENABLE = ErrorCode.of(1002005002, "岗位已禁用");
+    public static final ErrorCode POST_NAME_DUPLICATE = ErrorCode.of(1002005001, "已经存在该名字的岗位");
+    public static final ErrorCode POST_CODE_DUPLICATE = ErrorCode.of(1002005001, "已经存在该标识的岗位");
 
-    // ========== SETTING模块 2003001000 ==========
-    ErrorCode SETTING_IS_EXISTS = new ErrorCode(2003001000, "Key已存在");
-
-    // ========== 模块 99999999 ==========
-    ErrorCode ERROR = new ErrorCode(99999999, "异常操作");
-    ErrorCode REGISTER_ERROR = new ErrorCode(99999999, "应用注册失败");
+    static {
+        ErrorCode.put(SysErrorCodeConstants.class);
+    }
 }

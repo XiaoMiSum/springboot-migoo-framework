@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.exception.ErrorCode;
+import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
@@ -116,18 +117,11 @@ public class CVSMachineServiceImpl implements CVSMachineService {
         CVSMachineDO cvs = machineMapper.selectById(id);
         CVSProviderDO provider = providerMapper.selectOne(cvs.getAccount());
         CVSClient client = clientCache.getUnchecked(provider.getId() + "_" + cvs.getMachineType());
-        switch (option) {
-            case stop -> {
-                return client.stop(cvs.getInstanceId());
-            }
-            case start -> {
-                return client.start(cvs.getInstanceId());
-            }
-            case restart -> {
-                return client.reboot(cvs.getInstanceId());
-            }
-            default -> throw ServiceExceptionUtil.get(new ErrorCode(-1, "未知操作"));
-        }
+        return switch (option) {
+            case stop -> client.stop(cvs.getInstanceId());
+            case start -> client.start(cvs.getInstanceId());
+            case restart -> client.reboot(cvs.getInstanceId());
+        };
     }
 
 }

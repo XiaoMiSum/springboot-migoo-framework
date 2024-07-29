@@ -23,6 +23,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
+import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.json.JsonUtils;
@@ -53,41 +54,41 @@ public class GlobalExceptionHandler {
      * 因为 Filter 不走 SpringMVC 的流程，但是我们又需要兜底处理异常，所以这里提供一个全量的异常处理过程，保持逻辑统一。
      *
      * @param request 请求
-     * @param ex      异常
+     * @param t       异常
      * @return 通用返回
      */
-    public Result<?> allExceptionHandler(HttpServletRequest request, Throwable ex) {
-        if (ex instanceof HttpMediaTypeNotSupportedException) {
-            return httpMediaTypeNotSupportedException((HttpMediaTypeNotSupportedException) ex);
+    public Result<?> allExceptionHandler(HttpServletRequest request, Throwable t) {
+        if (t instanceof HttpMediaTypeNotSupportedException th) {
+            return httpMediaTypeNotSupportedException(request, th);
         }
-        if (ex instanceof MissingServletRequestParameterException) {
-            return missingServletRequestParameterExceptionHandler((MissingServletRequestParameterException) ex);
+        if (t instanceof MissingServletRequestParameterException th) {
+            return missingServletRequestParameterExceptionHandler(request, th);
         }
-        if (ex instanceof MethodArgumentTypeMismatchException) {
-            return methodArgumentTypeMismatchExceptionHandler((MethodArgumentTypeMismatchException) ex);
+        if (t instanceof MethodArgumentTypeMismatchException th) {
+            return methodArgumentTypeMismatchExceptionHandler(request, th);
         }
-        if (ex instanceof MethodArgumentNotValidException) {
-            return methodArgumentNotValidExceptionExceptionHandler((MethodArgumentNotValidException) ex);
+        if (t instanceof MethodArgumentNotValidException th) {
+            return methodArgumentNotValidExceptionExceptionHandler(request, th);
         }
-        if (ex instanceof BindException) {
-            return bindExceptionHandler((BindException) ex);
+        if (t instanceof BindException th) {
+            return bindExceptionHandler(request, th);
         }
-        if (ex instanceof ConstraintViolationException) {
-            return constraintViolationExceptionHandler((ConstraintViolationException) ex);
+        if (t instanceof ConstraintViolationException th) {
+            return constraintViolationExceptionHandler(request, th);
         }
-        if (ex instanceof ValidationException) {
-            return validationException((ValidationException) ex);
+        if (t instanceof ValidationException th) {
+            return validationException(request, th);
         }
-        if (ex instanceof NoHandlerFoundException) {
-            return noHandlerFoundExceptionHandler((NoHandlerFoundException) ex);
+        if (t instanceof NoHandlerFoundException th) {
+            return noHandlerFoundExceptionHandler(request, th);
         }
-        if (ex instanceof HttpRequestMethodNotSupportedException) {
-            return httpRequestMethodNotSupportedExceptionHandler((HttpRequestMethodNotSupportedException) ex);
+        if (t instanceof HttpRequestMethodNotSupportedException th) {
+            return httpRequestMethodNotSupportedExceptionHandler(request, th);
         }
-        if (ex instanceof ServiceException) {
-            return serviceExceptionHandler((ServiceException) ex);
+        if (t instanceof ServiceException th) {
+            return serviceExceptionHandler(request, th);
         }
-        return defaultExceptionHandler(request, ex);
+        return defaultExceptionHandler(request, t);
     }
 
     /**
@@ -97,9 +98,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     @ResponseBody
-    public Result<?> httpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
-        log.warn("[httpMediaTypeNotSupportedException]", ex);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("Content-Type不支持:%s", ex.getContentType()));
+    public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, t.getContentType()));
     }
 
     /**
@@ -108,9 +109,9 @@ public class GlobalExceptionHandler {
      * 例如说，接口上设置了 @RequestParam("xx") 参数，结果并未传递 xx 参数
      */
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
-    public Result<?> missingServletRequestParameterExceptionHandler(MissingServletRequestParameterException ex) {
-        log.warn("[missingServletRequestParameterExceptionHandler]", ex);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("请求参数缺失:%s", ex.getParameterName()));
+    public Result<?> missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getParameterName()));
     }
 
     /**
@@ -119,51 +120,50 @@ public class GlobalExceptionHandler {
      * 例如说，接口上设置了 @RequestParam("xx") 参数为 Integer，结果传递 xx 参数类型为 String
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public Result<?> methodArgumentTypeMismatchExceptionHandler(MethodArgumentTypeMismatchException ex) {
-        log.warn("[missingServletRequestParameterExceptionHandler]", ex);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("请求参数类型错误:%s", ex.getMessage()));
+    public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getMessage()));
     }
 
     /**
      * 处理 SpringMVC 参数校验不正确
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<?> methodArgumentNotValidExceptionExceptionHandler(MethodArgumentNotValidException ex) {
-        log.warn("[methodArgumentNotValidExceptionExceptionHandler]", ex);
+    public Result<?> methodArgumentNotValidExceptionExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
         assert fieldError != null; // 断言，避免告警
-        return Result.getError(BAD_REQUEST.getCode(), String.format("请求参数不正确:%s", fieldError.getDefaultMessage()));
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
     }
 
     /**
      * 处理 SpringMVC 参数绑定不正确，本质上也是通过 Validator 校验
      */
     @ExceptionHandler(BindException.class)
-    public Result<?> bindExceptionHandler(BindException ex) {
-        log.warn("[handleBindException]", ex);
+    public Result<?> bindExceptionHandler(HttpServletRequest request, BindException ex) {
         FieldError fieldError = ex.getFieldError();
         assert fieldError != null; // 断言，避免告警
-        return Result.getError(BAD_REQUEST.getCode(), String.format("请求参数不正确:%s", fieldError.getDefaultMessage()));
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
     }
 
     /**
      * 处理 Validator 校验不通过产生的异常
      */
     @ExceptionHandler(value = ConstraintViolationException.class)
-    public Result<?> constraintViolationExceptionHandler(ConstraintViolationException ex) {
-        log.warn("[constraintViolationExceptionHandler]", ex);
+    public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        return Result.getError(BAD_REQUEST.getCode(), String.format("请求参数不正确:%s", constraintViolation.getMessage()));
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, constraintViolation.getMessage()));
     }
 
     /**
      * 处理 Dubbo Consumer 本地参数校验时，抛出的 ValidationException 异常
      */
     @ExceptionHandler(value = ValidationException.class)
-    public Result<?> validationException(ValidationException ex) {
-        log.warn("[constraintViolationExceptionHandler]", ex);
+    public Result<?> validationException(HttpServletRequest request, ValidationException ex) {
         // 无法拼接明细的错误信息，因为 Dubbo Consumer 抛出 ValidationException 异常时，是直接的字符串信息，且人类不可读
-        return Result.getError(BAD_REQUEST);
+        return Result.getError(BAD_REQUEST.getCode(), BAD_REQUEST.getMessage(request));
     }
 
     /**
@@ -174,9 +174,9 @@ public class GlobalExceptionHandler {
      * 2. spring.mvc.static-path-pattern 为 /statics/**
      */
     @ExceptionHandler(NoHandlerFoundException.class)
-    public Result<?> noHandlerFoundExceptionHandler(NoHandlerFoundException ex) {
-        log.warn("[noHandlerFoundExceptionHandler]", ex);
-        return Result.getError(NOT_FOUND.getCode(), String.format("请求地址不存在:%s", ex.getRequestURL()));
+    public Result<?> noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
+        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", msg, ex.getRequestURL()));
     }
 
     /**
@@ -185,9 +185,9 @@ public class GlobalExceptionHandler {
      * 例如说，A 接口的方法为 GET 方式，结果请求方法为 POST 方式，导致不匹配
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
-        log.warn("[httpRequestMethodNotSupportedExceptionHandler]", ex);
-        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("请求方法不正确:%s", ex.getMessage()));
+    public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
+        String msg = ErrorCode.getLocalMessage(METHOD_NOT_ALLOWED.getCode(), request);
+        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", msg, ex.getMethod()));
     }
 
     /**
@@ -196,9 +196,8 @@ public class GlobalExceptionHandler {
      * 例如说，请求连接超时、响应数据读取超时。
      */
     @ExceptionHandler(value = SocketRuntimeException.class)
-    public Result<?> socketRuntimeExceptionHandler(SocketRuntimeException ex) {
-        log.info("[socketRuntimeExceptionHandler]", ex);
-        return Result.getError(SOCKET_TIME_OUT.getCode(), SOCKET_TIME_OUT.getMsg());
+    public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
+        return Result.getError(SOCKET_TIME_OUT.getCode(), SOCKET_TIME_OUT.getMessage(request));
     }
 
     /**
@@ -207,9 +206,8 @@ public class GlobalExceptionHandler {
      * 例如说，商品库存不足，用户手机号已存在。
      */
     @ExceptionHandler(value = ServiceException.class)
-    public Result<?> serviceExceptionHandler(ServiceException ex) {
-        log.info("[serviceExceptionHandler]", ex);
-        return Result.getError(ex.getCode(), ex.getMessage());
+    public Result<?> serviceExceptionHandler(HttpServletRequest request, ServiceException ex) {
+        return Result.getError(ex.getCode(), ErrorCode.getLocalMessage(ex.getCode(), request));
     }
 
     /**
@@ -217,10 +215,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     public Result<?> defaultExceptionHandler(HttpServletRequest request, Throwable ex) {
-        log.error("[defaultExceptionHandler]", ex);
         createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
-        return Result.getError(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMsg());
+        return Result.getError(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage(request));
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {

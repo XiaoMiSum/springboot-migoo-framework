@@ -2,6 +2,7 @@ package xyz.migoo.framework.common.exception;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import xyz.migoo.framework.common.exception.enums.ServiceErrorCodeRange;
 
 /**
@@ -16,6 +17,7 @@ public final class ServiceException extends RuntimeException {
      *
      * @see ServiceErrorCodeRange
      */
+    @Getter
     private Integer code;
     /**
      * 错误提示
@@ -36,10 +38,6 @@ public final class ServiceException extends RuntimeException {
     public ServiceException(Integer code, String message) {
         this.code = code;
         this.message = message;
-    }
-
-    public Integer getCode() {
-        return code;
     }
 
     public ServiceException setCode(Integer code) {
