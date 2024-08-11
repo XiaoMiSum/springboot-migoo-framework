@@ -9,7 +9,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.infra.controller.sys.dept.vo.DeptQueryReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
@@ -20,6 +19,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.isEnabled;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.*;
 
 @Service
@@ -159,7 +159,7 @@ public class DeptServiceImpl implements DeptService {
             throw ServiceExceptionUtil.get(DEPT_PARENT_NOT_EXITS);
         }
         // 父部门被禁用
-        if (!CommonStatusEnum.ENABLE.getStatus().equals(dept.getStatus())) {
+        if (!isEnabled(dept.getStatus())) {
             throw ServiceExceptionUtil.get(DEPT_NOT_ENABLE);
         }
         // 父部门不能是原来的子部门

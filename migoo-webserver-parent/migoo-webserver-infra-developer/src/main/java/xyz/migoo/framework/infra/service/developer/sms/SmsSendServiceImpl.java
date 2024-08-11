@@ -9,7 +9,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.common.core.KeyValue;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.isEnabled;
 import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.*;
 
 @Service
@@ -51,8 +51,7 @@ public class SmsSendServiceImpl implements SmsSendService {
         List<KeyValue<String, Object>> newTemplateParams = buildTemplateParams(template, templateParams);
 
         // 创建发送日志。如果模板被禁用，则不发送短信，只记录日志
-        Boolean isSend = CommonStatusEnum.ENABLE.getStatus().equals(template.getStatus())
-                && CommonStatusEnum.ENABLE.getStatus().equals(smsChannel.getStatus());
+        Boolean isSend = isEnabled(template.getStatus()) && isEnabled(smsChannel.getStatus());
         String content = smsTemplateService.formatSmsTemplateContent(template.getContent(), templateParams);
         Long sendLogId = smsLogService.createSmsLog(mobile, userId, userType, isSend, template, content, templateParams);
 

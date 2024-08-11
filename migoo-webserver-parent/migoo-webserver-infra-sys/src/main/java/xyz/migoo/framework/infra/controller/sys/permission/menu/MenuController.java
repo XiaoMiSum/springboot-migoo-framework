@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.infra.controller.sys.permission.menu.vo.*;
 import xyz.migoo.framework.infra.convert.sys.MenuConvert;
@@ -13,6 +12,8 @@ import xyz.migoo.framework.infra.service.sys.permission.MenuService;
 
 import java.util.Comparator;
 import java.util.List;
+
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @RestController
 @RequestMapping("/menu")
@@ -60,7 +61,7 @@ public class MenuController {
     public Result<List<MenuSimpleRespVO>> getSimpleMenus() {
         // 获得菜单列表，只要开启状态的
         MenuQueryReqVO reqVO = new MenuQueryReqVO();
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        reqVO.setStatus(enabled.status());
         List<Menu> list = menuService.get(reqVO);
         // 排序后，返回给前端
         list.sort(Comparator.comparing(Menu::getSort));

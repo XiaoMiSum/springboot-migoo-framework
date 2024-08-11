@@ -8,11 +8,9 @@ import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
-import xyz.migoo.framework.sms.core.client.SmsClientFactory;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.template.SmsTemplateCreateReqVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.template.SmsTemplatePageReqVO;
 import xyz.migoo.framework.infra.controller.developer.sms.vo.template.SmsTemplateUpdateReqVO;
@@ -20,13 +18,14 @@ import xyz.migoo.framework.infra.convert.developer.sms.SmsTemplateConvert;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsChannelDO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.sms.SmsTemplateDO;
 import xyz.migoo.framework.infra.dal.mapper.developer.sms.SmsTemplateMapper;
+import xyz.migoo.framework.sms.core.client.SmsClientFactory;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.isEnabled;
 import static xyz.migoo.framework.infra.enums.DeveloperErrorCodeConstants.*;
 
 @Service
@@ -163,7 +162,7 @@ public class SmsTemplateServiceImpl implements SmsTemplateService {
         if (channelDO == null) {
             throw ServiceExceptionUtil.get(SMS_CHANNEL_NOT_EXISTS);
         }
-        if (!Objects.equals(channelDO.getStatus(), CommonStatusEnum.ENABLE.getStatus())) {
+        if (!isEnabled(channelDO.getStatus())) {
             throw ServiceExceptionUtil.get(SMS_CHANNEL_DISABLE);
         }
         return channelDO;

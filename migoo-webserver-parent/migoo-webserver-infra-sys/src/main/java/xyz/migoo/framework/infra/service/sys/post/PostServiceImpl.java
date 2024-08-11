@@ -1,18 +1,18 @@
 package xyz.migoo.framework.infra.service.sys.post;
 
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.infra.controller.sys.post.vo.PostQueryReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Post;
 import xyz.migoo.framework.infra.dal.mapper.sys.PostMapper;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
-import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
-import xyz.migoo.framework.common.pojo.PageResult;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.POST_CODE_DUPLICATE;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.POST_NOT_FOUND;
 
@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void add(Post post) {
-        post.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        post.setStatus(enabled.status());
         mapper.insert(post);
     }
 

@@ -13,8 +13,8 @@ import xyz.migoo.framework.security.core.LoginUser;
 
 import java.util.*;
 
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.DISABLE;
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.ENABLE;
+import static xyz.migoo.framework.common.enums.CommonStatus.disabled;
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @Mapper
 public interface AuthConvert {
@@ -28,12 +28,12 @@ public interface AuthConvert {
      */
     default LoginUser convert(BaseUser<Long> user) {
         return new LoginUser()
-                .setRequiredBindAuthenticator(Objects.equals(DISABLE.getStatus(), user.getBindAuthenticator()))
-                .setRequiredVerifyAuthenticator(Objects.equals(ENABLE.getStatus(), user.getRequiredVerifyAuthenticator()))
+                .setRequiredBindAuthenticator(Objects.equals(disabled.status(), user.getBindAuthenticator()))
+                .setRequiredVerifyAuthenticator(Objects.equals(enabled.status(), user.getRequiredVerifyAuthenticator()))
                 .setId(user.getId())
                 .setName(user.getName())
                 .setUpdateTime(new Date())
-                .setEnabled(Objects.equals(user.getStatus(), ENABLE.getStatus()))
+                .setEnabled(Objects.equals(user.getStatus(), enabled.status()))
                 .setUsername(user.getUsername())
                 .setPassword(user.getPassword())
                 .setSecurityCode(user.getSecretKey());

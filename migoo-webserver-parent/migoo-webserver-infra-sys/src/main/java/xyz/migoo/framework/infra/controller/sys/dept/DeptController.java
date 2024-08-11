@@ -3,7 +3,6 @@ package xyz.migoo.framework.infra.controller.sys.dept;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.infra.controller.sys.dept.vo.*;
 import xyz.migoo.framework.infra.convert.sys.DeptConvert;
@@ -12,6 +11,8 @@ import xyz.migoo.framework.infra.service.sys.dept.DeptService;
 
 import java.util.Comparator;
 import java.util.List;
+
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @RestController
 @RequestMapping("/dept")
@@ -60,7 +61,7 @@ public class DeptController {
     @GetMapping("/simple")
     public Result<List<DeptSimpleRespVO>> getDeptSimple(DeptQueryReqVO req) {
         // 获得用户分页列表
-        req.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        req.setStatus(enabled.status());
         List<Dept> list = deptService.getList(req);
         list.sort(Comparator.comparing(Dept::getSort));
         return Result.getSuccessful(DeptConvert.INSTANCE.convert0(list));

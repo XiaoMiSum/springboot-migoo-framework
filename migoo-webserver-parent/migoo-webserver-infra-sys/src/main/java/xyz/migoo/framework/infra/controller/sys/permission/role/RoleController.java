@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.infra.controller.sys.permission.role.vo.*;
@@ -16,6 +15,7 @@ import xyz.migoo.framework.infra.service.sys.permission.RoleService;
 import java.util.List;
 import java.util.Set;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 import static xyz.migoo.framework.common.enums.NumberConstants.N_1;
 
 @RestController
@@ -66,7 +66,7 @@ public class RoleController {
     @GetMapping("/simple")
     public Result<List<RoleSimpleRespVO>> getSimpleMenus() {
         // 获得角色列表，只要开启状态 且 过滤 超级管理员
-        List<Role> list = roleService.getList(CommonStatusEnum.ENABLE.getStatus())
+        List<Role> list = roleService.getList(enabled.status())
                 .stream().filter(role -> role.getId() > N_1).toList();
         return Result.getSuccessful(RoleConvert.INSTANCE.convert(list));
     }

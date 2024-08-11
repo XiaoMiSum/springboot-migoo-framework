@@ -16,7 +16,7 @@ import xyz.migoo.framework.infra.service.developer.dictionary.DictionaryValueSer
 import java.util.List;
 import java.util.Map;
 
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
+import static xyz.migoo.framework.common.enums.CommonStatus.isDisabled;
 
 @RestController
 @RequestMapping("/developer/dictionary")

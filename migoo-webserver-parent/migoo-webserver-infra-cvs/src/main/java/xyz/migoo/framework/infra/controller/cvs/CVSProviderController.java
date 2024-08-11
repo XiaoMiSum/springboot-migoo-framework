@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.pojo.Tree;
@@ -15,6 +14,8 @@ import xyz.migoo.framework.infra.service.cvs.CVSProviderService;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @RestController
 @RequestMapping("/developer/cvs/provider")
@@ -59,7 +60,7 @@ public class CVSProviderController {
     @GetMapping("/tree")
     public Result<List<Tree>> getTree(CVSProviderQueryReqVO req) {
         // 获得用户分页列表
-        req.setStatus(CommonStatusEnum.ENABLE.getStatus());
+        req.setStatus(enabled.status());
         List<Tree> results = Lists.newArrayList();
         service.getList(req).stream().collect(Collectors.groupingBy(CVSProviderDO::getCode))
                 .forEach((key, value) -> {

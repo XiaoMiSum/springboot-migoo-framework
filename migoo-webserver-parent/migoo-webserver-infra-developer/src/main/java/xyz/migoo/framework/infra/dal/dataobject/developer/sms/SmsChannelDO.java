@@ -2,7 +2,6 @@ package xyz.migoo.framework.infra.dal.dataobject.developer.sms;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 

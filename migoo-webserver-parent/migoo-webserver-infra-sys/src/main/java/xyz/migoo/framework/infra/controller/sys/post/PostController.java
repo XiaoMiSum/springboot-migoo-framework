@@ -3,7 +3,6 @@ package xyz.migoo.framework.infra.controller.sys.post;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.infra.controller.sys.post.vo.*;
@@ -14,6 +13,8 @@ import xyz.migoo.framework.infra.service.sys.post.PostService;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @RestController
 @RequestMapping("/post")
@@ -62,7 +63,7 @@ public class PostController {
     @GetMapping("/simple")
     public Result<List<PostSimpleRespVO>> getSimplePosts() {
         // 获得岗位列表，只要开启状态的
-        List<Post> list = postService.getList(null, Collections.singleton(CommonStatusEnum.ENABLE.getStatus()));
+        List<Post> list = postService.getList(null, Collections.singleton(enabled.status()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(Post::getSort));
         return Result.getSuccessful(PostConvert.INSTANCE.convert(list));

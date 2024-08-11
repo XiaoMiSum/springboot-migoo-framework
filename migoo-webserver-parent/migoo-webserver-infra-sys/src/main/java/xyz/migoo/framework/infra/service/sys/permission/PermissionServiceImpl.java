@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
 import xyz.migoo.framework.common.util.collection.MapUtils;
 import xyz.migoo.framework.common.util.collection.SetUtils;
@@ -27,6 +26,8 @@ import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 
 @Service("ss")
 @Slf4j
@@ -240,7 +241,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (Objects.isNull(SecurityFrameworkUtils.getLoginUser())) {
             return false;
         }
-        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
+        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -276,7 +277,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (Objects.isNull(SecurityFrameworkUtils.getLoginUser())) {
             return false;
         }
-        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(CommonStatusEnum.ENABLE.getStatus()));
+        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }

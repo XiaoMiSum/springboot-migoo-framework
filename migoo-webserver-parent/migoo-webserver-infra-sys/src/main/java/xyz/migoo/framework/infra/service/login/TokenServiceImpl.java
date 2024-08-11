@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.infra.controller.login.vo.AuthLoginReqVO;
@@ -27,6 +26,7 @@ import xyz.migoo.framework.security.core.service.SecuritySessionAuthService;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.isEnabled;
 import static xyz.migoo.framework.common.enums.NumberConstants.N_2;
 
 @Slf4j
@@ -101,7 +101,7 @@ public class TokenServiceImpl implements TokenService {
         if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() > securitySessionAuthService.getSessionTimeoutMillis() / N_2) {
             // 获取用户为null 或者 被禁用 认为 token 过期，方便前端跳转到登录界面
             User user = userService.get(loginUser.getUsername());
-            if (Objects.isNull(user) || Objects.equals(user.getStatus(), CommonStatusEnum.DISABLE.getStatus())) {
+            if (Objects.isNull(user) || !isEnabled(user.getStatus())) {
                 throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_TOKEN_EXPIRED);
             }
             // 刷新 LoginUser 缓存

@@ -6,7 +6,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 import static xyz.migoo.framework.common.enums.NumberConstants.N_1;
 
 @RestController
@@ -93,7 +93,7 @@ public class UserController {
     @GetMapping("/simple")
     public Result<List<UserSimpleRespVO>> getSimple() {
         // 获得用户列表，只要开启状态的
-        List<User> list = userService.get(CommonStatusEnum.ENABLE.getStatus());
+        List<User> list = userService.get(enabled.status());
         return Result.getSuccessful(UserConvert.INSTANCE.convert(list));
     }
 

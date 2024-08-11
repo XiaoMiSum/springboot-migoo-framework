@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.ENABLE;
+import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.AUTH_LOGIN_CAPTCHA_CODE_ERROR;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.USER_PASSWORD_OLD_NEW;
 
@@ -68,11 +68,11 @@ public class LoginController {
     @GetMapping("/user-info")
     public Result<?> getUserInfo(@CurrentUser LoginUser loginUser) {
         BaseUser<Long> user = userService.get(loginUser.getId());
-        Set<Long> roleIds = permissionService.getUserRoleIds(user.getId(), SetUtils.asSet(ENABLE.getStatus()));
+        Set<Long> roleIds = permissionService.getUserRoleIds(user.getId(), SetUtils.asSet(enabled.status()));
         List<Menu> menuList = permissionService.getRoleMenusFromCache(
                 roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
-                SetUtils.asSet(ENABLE.getStatus()));
+                SetUtils.asSet(enabled.status()));
         return Result.getSuccessful(AuthConvert.INSTANCE.convert(user, menuList));
     }
 
@@ -88,12 +88,12 @@ public class LoginController {
 
     @GetMapping("user-menus")
     public Result<List<AuthMenuRespVO>> getMenus(@CurrentUser LoginUser loginUser) {
-        Set<Long> roleIds = permissionService.getUserRoleIds(loginUser.getId(), SetUtils.asSet(ENABLE.getStatus()));
+        Set<Long> roleIds = permissionService.getUserRoleIds(loginUser.getId(), SetUtils.asSet(enabled.status()));
         // 获得用户拥有的菜单列表
         List<Menu> menuList = permissionService.getRoleMenusFromCache(
                 roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()),
-                SetUtils.asSet(ENABLE.getStatus()));
+                SetUtils.asSet(enabled.status()));
         // 转换成 Tree 结构返回
         return Result.getSuccessful(AuthConvert.INSTANCE.convert(menuList));
     }
@@ -112,7 +112,7 @@ public class LoginController {
     @Authenticator
     public Result<?> bindAuthenticator(@RequestParam("_token") String token) {
         LoginUser user = tokenService.verifyTokenAndRefresh(token);
-        userService.update((User) new User().setBindAuthenticator(ENABLE.getStatus()).setId(user.getId()));
+        userService.update((User) new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
         return Result.getSuccessful();
     }
 

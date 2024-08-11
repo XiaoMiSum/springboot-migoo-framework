@@ -3,7 +3,6 @@ package xyz.migoo.framework.infra.dal.dataobject.sys;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import xyz.migoo.framework.common.enums.CommonStatusEnum;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 
 @TableName("sys_post")

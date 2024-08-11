@@ -14,7 +14,7 @@ import xyz.migoo.framework.sms.core.property.SmsChannelProperties;
 
 import java.util.List;
 
-import static xyz.migoo.framework.common.enums.CommonStatusEnum.isDisabled;
+import static xyz.migoo.framework.common.enums.CommonStatus.isDisabled;
 
 @Mapper
 public interface SmsChannelConvert {
