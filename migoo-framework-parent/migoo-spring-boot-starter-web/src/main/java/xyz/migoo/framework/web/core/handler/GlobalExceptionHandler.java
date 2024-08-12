@@ -217,6 +217,7 @@ public class GlobalExceptionHandler {
     public Result<?> defaultExceptionHandler(HttpServletRequest request, Throwable ex) {
         createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
+        log.error(ex.getMessage(), ex);
         return Result.getError(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage(request));
     }
 
