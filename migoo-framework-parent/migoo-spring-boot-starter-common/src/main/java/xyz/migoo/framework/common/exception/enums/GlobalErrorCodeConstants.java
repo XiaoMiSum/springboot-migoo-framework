@@ -54,8 +54,7 @@ public class GlobalErrorCodeConstants {
             of("zh-TW", "未知错误"), of("en-US", "Unknown error"));
 
     static {
-        ErrorCode.put(SUCCESS, BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, NOT_FOUND, METHOD_NOT_ALLOWED, LOCKED, TOO_MANY_REQUESTS,
-                SOCKET_TIME_OUT, INTERNAL_SERVER_ERROR, REPEATED_REQUESTS, DEMO_DENY, UNKNOWN);
+        ErrorCode.put(GlobalErrorCodeConstants.class);
     }
 
     public static boolean isMatch(Integer code) {

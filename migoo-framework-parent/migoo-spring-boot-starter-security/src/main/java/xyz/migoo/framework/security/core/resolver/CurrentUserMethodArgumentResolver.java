@@ -27,7 +27,7 @@ public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentR
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().isAssignableFrom(LoginUser.class)
+        return LoginUser.class.isAssignableFrom(parameter.getParameterType())
                 && parameter.hasParameterAnnotation(CurrentUser.class);
     }
 
