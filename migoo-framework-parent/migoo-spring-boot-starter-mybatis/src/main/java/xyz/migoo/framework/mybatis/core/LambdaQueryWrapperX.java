@@ -184,4 +184,15 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return this;
     }
 
+    @Override
+    public LambdaQueryWrapperX<T> or() {
+        super.or();
+        return this;
+    }
+
+    public LambdaQueryWrapperX<T> or(boolean condition) {
+        super.or(condition);
+        return this;
+    }
+
 }
