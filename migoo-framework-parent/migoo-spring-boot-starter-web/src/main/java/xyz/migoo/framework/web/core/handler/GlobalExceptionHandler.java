@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, t.getContentType()));
     }
 
@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public Result<?> missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getParameterName()));
     }
 
@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getMessage()));
     }
 
@@ -132,7 +132,7 @@ public class GlobalExceptionHandler {
     public Result<?> methodArgumentNotValidExceptionExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
         assert fieldError != null; // 断言，避免告警
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
     }
 
@@ -143,7 +143,7 @@ public class GlobalExceptionHandler {
     public Result<?> bindExceptionHandler(HttpServletRequest request, BindException ex) {
         FieldError fieldError = ex.getFieldError();
         assert fieldError != null; // 断言，避免告警
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
     }
 
@@ -153,7 +153,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
+        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
         return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, constraintViolation.getMessage()));
     }
 

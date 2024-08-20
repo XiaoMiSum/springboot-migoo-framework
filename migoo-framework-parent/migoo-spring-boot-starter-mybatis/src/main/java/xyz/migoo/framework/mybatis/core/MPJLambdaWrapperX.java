@@ -1,13 +1,11 @@
 package xyz.migoo.framework.mybatis.core;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.WrapperFunction;
-import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
 
 import java.util.Collection;
@@ -27,83 +25,69 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return (MPJLambdaWrapperX<T>) super.leftJoin(clazz, alias, function);
     }
 
-    public MPJLambdaWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
-        if (StringUtils.hasText(val)) {
-            return (MPJLambdaWrapperX<T>) super.like(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> likeIfPresent(SFunction<X, ?> column, String val) {
+        super.likeIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> inIfPresent(SFunction<T, ?> column, Collection<?> values) {
+    public <X> MPJLambdaWrapperX<T> inIfPresent(SFunction<X, ?> column, Collection<?> values) {
         if (!CollectionUtils.isEmpty(values)) {
-            return (MPJLambdaWrapperX<T>) super.in(column, values);
+            super.in(column, values);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> inIfPresent(SFunction<T, ?> column, Object... values) {
+    public <X> MPJLambdaWrapperX<T> inIfPresent(SFunction<X, ?> column, Object... values) {
         if (!ArrayUtil.isEmpty(values)) {
-            return (MPJLambdaWrapperX<T>) super.in(column, values);
+            super.in(column, values);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
-        if (ObjectUtil.isNotEmpty(val)) {
-            return (MPJLambdaWrapperX<T>) super.eq(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
+        super.eqIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> neIfPresent(SFunction<T, ?> column, Object val) {
-        if (ObjectUtil.isNotEmpty(val)) {
-            return (MPJLambdaWrapperX<T>) super.ne(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> neIfPresent(SFunction<X, ?> column, Object val) {
+        super.neIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> gtIfPresent(SFunction<T, ?> column, Object val) {
+    public <X> MPJLambdaWrapperX<T> gtIfPresent(SFunction<X, ?> column, Object val) {
         if (val != null) {
-            return (MPJLambdaWrapperX<T>) super.gt(column, val);
+            super.gt(column, val);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> geIfPresent(SFunction<T, ?> column, Object val) {
-        if (val != null) {
-            return (MPJLambdaWrapperX<T>) super.ge(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> geIfPresent(SFunction<X, ?> column, Object val) {
+        super.geIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> ltIfPresent(SFunction<T, ?> column, Object val) {
-        if (val != null) {
-            return (MPJLambdaWrapperX<T>) super.lt(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> ltIfPresent(SFunction<X, ?> column, Object val) {
+        super.ltIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> leIfPresent(SFunction<T, ?> column, Object val) {
-        if (val != null) {
-            return (MPJLambdaWrapperX<T>) super.le(column, val);
-        }
+    public <X> MPJLambdaWrapperX<T> leIfPresent(SFunction<X, ?> column, Object val) {
+        super.leIfExists(column, val);
         return this;
     }
 
-    public MPJLambdaWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object val1, Object val2) {
+    public <X> MPJLambdaWrapperX<T> betweenIfPresent(SFunction<X, ?> column, Object val1, Object val2) {
         if (val1 != null && val2 != null) {
-            return (MPJLambdaWrapperX<T>) super.between(column, val1, val2);
-        }
-        if (val1 != null) {
-            return (MPJLambdaWrapperX<T>) ge(column, val1);
-        }
-        if (val2 != null) {
-            return (MPJLambdaWrapperX<T>) le(column, val2);
+            super.between(column, val1, val2);
+        } else if (val1 != null) {
+            super.ge(column, val1);
+        } else if (val2 != null) {
+            super.le(column, val2);
         }
         return this;
     }
 
-    public MPJLambdaWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
+    public <X> MPJLambdaWrapperX<T> betweenIfPresent(SFunction<X, ?> column, Object[] values) {
         Object val1 = ArrayUtils.get(values, 0);
         Object val2 = ArrayUtils.get(values, 1);
         return betweenIfPresent(column, val1, val2);
