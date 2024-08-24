@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.collection.SetUtils;
-import xyz.migoo.framework.infra.controller.login.vo.*;
+import xyz.migoo.framework.infra.controller.login.vo.AuthLoginReqVO;
+import xyz.migoo.framework.infra.controller.login.vo.AuthLoginRespVO;
+import xyz.migoo.framework.infra.controller.login.vo.AuthMenuRespVO;
+import xyz.migoo.framework.infra.controller.login.vo.PasswordVO;
 import xyz.migoo.framework.infra.convert.AuthConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.ConfigurerDO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.enums.MenuTypeEnum;
-import xyz.migoo.framework.infra.service.login.CaptchaService;
 import xyz.migoo.framework.infra.service.login.TokenService;
 import xyz.migoo.framework.infra.service.sys.configurer.ConfigurerService;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
@@ -30,7 +32,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
-import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.AUTH_LOGIN_CAPTCHA_CODE_ERROR;
 import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.USER_PASSWORD_OLD_NEW;
 
 @RestController
@@ -45,24 +46,13 @@ public class LoginController {
     @Resource
     private PermissionService permissionService;
     @Resource
-    private CaptchaService captchaService;
-    @Resource
     private SecurityProperties securityProperties;
     @Resource
     private ConfigurerService configurerService;
 
     @PostMapping("/login")
     public Result<AuthLoginRespVO> login(@RequestBody AuthLoginReqVO req) {
-        if (enableCaptcha && !Objects.equals(req.getCode(), captchaService.getCaptchaCode(req.getUuid()))) {
-            throw ServiceExceptionUtil.get(AUTH_LOGIN_CAPTCHA_CODE_ERROR);
-        }
-        captchaService.deleteCaptchaCode(req.getUuid());
         return Result.getSuccessful(tokenService.signIn(req));
-    }
-
-    @GetMapping("/captcha")
-    public Result<CaptchaImageRespVO> getCaptchaImage() {
-        return Result.getSuccessful(captchaService.getCaptchaImage());
     }
 
     @GetMapping("/user-info")

@@ -124,12 +124,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-captcha</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
             <!-- DB 相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>

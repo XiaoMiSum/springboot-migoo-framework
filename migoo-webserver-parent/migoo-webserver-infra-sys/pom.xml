@@ -32,10 +32,6 @@
             <artifactId>migoo-spring-boot-starter-redis</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>xyz.migoo.springboot</groupId>
-            <artifactId>migoo-spring-boot-starter-captcha</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.mysql</groupId>
