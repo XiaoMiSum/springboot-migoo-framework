@@ -2,10 +2,10 @@ package xyz.migoo.framework.infra.dal.mapper.developer.errorlog;
 
 import org.apache.ibatis.annotations.Mapper;
 import xyz.migoo.framework.common.pojo.PageResult;
-import xyz.migoo.framework.mybatis.core.BaseMapperX;
-import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 import xyz.migoo.framework.infra.controller.developer.errorlog.vo.ApiErrorLogQueryReqVO;
 import xyz.migoo.framework.infra.dal.dataobject.developer.errorlog.ApiErrorLogDO;
+import xyz.migoo.framework.mybatis.core.BaseMapperX;
+import xyz.migoo.framework.mybatis.core.LambdaQueryWrapperX;
 
 @Mapper
 public interface ErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
@@ -14,6 +14,7 @@ public interface ErrorLogMapper extends BaseMapperX<ApiErrorLogDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<ApiErrorLogDO>()
                 .eqIfPresent(ApiErrorLogDO::getApplicationName, reqVO.getApplicationName())
                 .eqIfPresent(ApiErrorLogDO::getStatus, reqVO.getStatus())
-                .orderByAsc(ApiErrorLogDO::getStatus));
+                .orderByAsc(ApiErrorLogDO::getStatus)
+                .orderByDesc(ApiErrorLogDO::getId));
     }
 }
