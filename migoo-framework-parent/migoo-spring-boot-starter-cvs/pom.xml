@@ -6,7 +6,7 @@
     <parent>
         <artifactId>migoo-framework-parent</artifactId>
         <groupId>xyz.migoo.springboot</groupId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
     </parent>
 
     <artifactId>migoo-spring-boot-starter-cvs</artifactId>
