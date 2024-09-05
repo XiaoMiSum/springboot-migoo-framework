@@ -13,8 +13,8 @@ import xyz.migoo.framework.security.core.LoginUser;
 
 import java.util.*;
 
-import static xyz.migoo.framework.common.enums.CommonStatus.disabled;
-import static xyz.migoo.framework.common.enums.CommonStatus.enabled;
+import static xyz.migoo.framework.common.enums.CommonStatus.isDisabled;
+import static xyz.migoo.framework.common.enums.CommonStatus.isEnabled;
 
 @Mapper
 public interface AuthConvert {
@@ -28,12 +28,12 @@ public interface AuthConvert {
      */
     default LoginUser convert(BaseUser<Long> user) {
         return new LoginUser()
-                .setRequiredBindAuthenticator(Objects.equals(disabled.status(), user.getBindAuthenticator()))
-                .setRequiredVerifyAuthenticator(Objects.equals(enabled.status(), user.getRequiredVerifyAuthenticator()))
+                .setRequiredBindAuthenticator(isDisabled(user.getBindAuthenticator()))
+                .setRequiredVerifyAuthenticator(isEnabled(user.getRequiredVerifyAuthenticator()))
                 .setId(user.getId())
                 .setName(user.getName())
                 .setUpdateTime(new Date())
-                .setEnabled(Objects.equals(user.getStatus(), enabled.status()))
+                .setEnabled(isEnabled(user.getStatus()))
                 .setUsername(user.getUsername())
                 .setPassword(user.getPassword())
                 .setSecurityCode(user.getSecretKey());
@@ -50,6 +50,7 @@ public interface AuthConvert {
         return new AuthUserInfoRespVO()
                 .setName(user.getName())
                 .setAvatar(user.getAvatar())
+                .setRequiredBindAuthenticator(isDisabled(user.getBindAuthenticator()))
                 .setPermissions(CollectionUtils.convertSet(menus, Menu::getPermission));
     }
 

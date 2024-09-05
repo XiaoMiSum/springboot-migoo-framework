@@ -19,6 +19,8 @@ public class AuthUserInfoRespVO {
 
     private Set<String> permissions;
 
+    private Boolean requiredBindAuthenticator;
+
     public AuthUserInfoRespVO setRoles(String... roles) {
         this.roles = roles;
         return this;

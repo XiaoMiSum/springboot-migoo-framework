@@ -4,7 +4,10 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.collection.SetUtils;
@@ -89,8 +92,7 @@ public class LoginController {
     }
 
     @GetMapping("/authenticator")
-    public Result<?> getAuthenticator(@RequestParam("_token") String token) {
-        LoginUser user = tokenService.verifyTokenAndRefresh(token);
+    public Result<?> getAuthenticator(@CurrentUser LoginUser user) {
         Map<String, String> result = new HashMap<>(2);
         String content = String.format("otpauth://totp/%s@%s?secret=%s&issuer=%s", user.getUsername(), title, user.getSecurityCode(), user.getName());
         result.put("quickMark", QrCodeUtil.generateAsBase64(content, new QrConfig(), "png"));
@@ -100,8 +102,7 @@ public class LoginController {
 
     @PostMapping("/authenticator")
     @Authenticator
-    public Result<?> bindAuthenticator(@RequestParam("_token") String token) {
-        LoginUser user = tokenService.verifyTokenAndRefresh(token);
+    public Result<?> bindAuthenticator(@CurrentUser LoginUser user) {
         userService.update((User) new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
         return Result.getSuccessful();
     }
