@@ -17,12 +17,14 @@ import java.util.function.Consumer;
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
 
-    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
-        return (MPJLambdaWrapperX<T>) super.leftJoin(clazz, function);
+    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.leftJoin(clazz, function);
+        return this;
     }
 
-    public MPJLambdaWrapperX<T> leftJoinX(Class<?> clazz, String alias, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
-        return (MPJLambdaWrapperX<T>) super.leftJoin(clazz, alias, function);
+    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, String alias, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.leftJoin(clazz, alias, function);
+        return this;
     }
 
     public <X> MPJLambdaWrapperX<T> likeIfPresent(SFunction<X, ?> column, String val) {
@@ -44,7 +46,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
-    public <X> MPJLambdaWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
+    public <X> MPJLambdaWrapperX<T> eqIfPresent(SFunction<X, ?> column, Object val) {
         super.eqIfExists(column, val);
         return this;
     }
@@ -94,6 +96,17 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     // ========== 重写父类方法，方便链式调用 ==========
+
+    @Override
+    public MPJLambdaWrapperX<T> or() {
+        super.or();
+        return this;
+    }
+
+    public MPJLambdaWrapperX<T> or(boolean condition) {
+        super.or(condition);
+        return this;
+    }
 
     @Override
     public <X> MPJLambdaWrapperX<T> eq(boolean condition, SFunction<X, ?> column, Object val) {
