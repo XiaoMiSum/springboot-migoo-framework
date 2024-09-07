@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.github.yulichang.wrapper.interfaces.WrapperFunction;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
 
 import java.util.Collection;
@@ -17,12 +17,12 @@ import java.util.function.Consumer;
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
 
-    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
         super.leftJoin(clazz, function);
         return this;
     }
 
-    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, String alias, WrapperFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, String alias, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
         super.leftJoin(clazz, alias, function);
         return this;
     }
