@@ -1,5 +1,6 @@
 package xyz.migoo.framework.common.pojo;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import xyz.migoo.framework.common.enums.CommonStatus;
@@ -32,7 +33,7 @@ public class Tree {
     }
 
     private Tree(Object id, String name, Integer status, Object parentId) {
-        this(id, name, CommonStatus.isDisabled(status), parentId, List.of());
+        this(id, name, CommonStatus.isDisabled(status), parentId, Lists.newArrayList());
     }
 
     public static Tree rootNode(Object id, String name) {

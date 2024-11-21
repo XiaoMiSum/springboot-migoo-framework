@@ -40,7 +40,6 @@ import static xyz.migoo.framework.infra.enums.SysErrorCodeConstants.USER_PASSWOR
 @RestController
 public class LoginController {
 
-    public boolean enableCaptcha;
     public String title = "";
     @Resource
     private TokenService tokenService;
@@ -73,7 +72,6 @@ public class LoginController {
     public Result<?> getConfig() {
         Map<String, String> result = configurerService.getList().stream()
                 .collect(Collectors.toMap(ConfigurerDO::getName, ConfigurerDO::getValue));
-        this.enableCaptcha = Boolean.parseBoolean(result.get("required_captcha"));
         this.title = result.get("title");
         result.put("kit", securityProperties.getPasswordSecret());
         return Result.getSuccessful(result);
@@ -94,7 +92,7 @@ public class LoginController {
     @GetMapping("/authenticator")
     public Result<?> getAuthenticator(@CurrentUser LoginUser user) {
         Map<String, String> result = new HashMap<>(2);
-        String content = String.format("otpauth://totp/%s@%s?secret=%s&issuer=%s", user.getUsername(), title, user.getSecurityCode(), user.getName());
+        String content = String.format("otpauth://totp/%s@%s?secret=%s&issuer=%s", user.getUsername(), user.getName(), user.getSecurityCode(), title);
         result.put("quickMark", QrCodeUtil.generateAsBase64(content, new QrConfig(), "png"));
         result.put("securityCode", user.getSecurityCode());
         return Result.getSuccessful(result);
