@@ -7,6 +7,7 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author xiaomi
@@ -15,19 +16,17 @@ import java.util.*;
 public class Signature {
 
     public static String[] getIgnoreFields(Class<?> clazz) {
-        List<String> list = new ArrayList<>();
+        List<String> fieldNameList = new ArrayList<>();
         List<Field> fieldList = new ArrayList<>();
         Class<?> tempClass = clazz;
         while (Objects.nonNull(tempClass)) {
             fieldList.addAll(Arrays.asList(tempClass.getDeclaredFields()));
             tempClass = tempClass.getSuperclass();
         }
-        for (Field field : fieldList) {
-            if (Objects.nonNull(field.getAnnotation(SignIgnore.class))) {
-                list.add(field.getName());
-            }
-        }
-        return list.toArray(new String[0]);
+        fieldList.stream()
+                .filter(field -> Objects.nonNull(field.getAnnotation(SignIgnore.class)))
+                .forEach(field -> fieldNameList.add(field.getName()));
+        return fieldNameList.toArray(new String[0]);
     }
 
     /**
@@ -50,21 +49,16 @@ public class Signature {
      * @return 签名对象
      */
     public static String getSignSource(Map<String, ?> data, CharSequence delimiter, String... ignoreFields) {
-        List<String> keyValList = new ArrayList<>();
         List<String> ignoreKeyList = Lists.newArrayList(ignoreFields);
         ignoreKeyList.add("sign");
         ignoreKeyList.add("signature");
-        for (Map.Entry<String, ?> entry : data.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            // 检查为空是否参与签名
-            if (StrUtil.isBlankIfStr(value) || ignoreKeyList.contains(key)) {
-                continue;
-            }
-            keyValList.add(key + "=" + value);
-        }
-        Collections.sort(keyValList);
-        return StrUtil.join(delimiter, keyValList);
+        final Map<String, ?> filter =  data.entrySet().stream()
+                .filter(entry -> !StrUtil.isBlankIfStr(entry) && !ignoreKeyList.contains(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        List<String> kvs = new TreeSet<>(filter.keySet()).stream()
+                .map(key -> "%s=%s".formatted(key, filter.get(key)))
+                .collect(Collectors.toList());
+        return StrUtil.join(delimiter, kvs);
     }
 
     public static String getSign(String source) {

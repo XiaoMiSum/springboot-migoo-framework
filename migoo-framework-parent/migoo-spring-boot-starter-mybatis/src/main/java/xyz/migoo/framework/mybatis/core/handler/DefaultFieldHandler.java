@@ -40,9 +40,8 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         // 默认以当前时间为更新时间
         setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         // 默认以当前登录用户为更新人
-        BaseDO baseDO = (BaseDO) metaObject.getOriginalObject();
-        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName()
-                : baseDO.getUpdater();
+        BaseDO<?> baseDO = (BaseDO<?>) metaObject.getOriginalObject();
+        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName() : baseDO.getUpdater();
         setFieldValByName("updater", compoundName, metaObject);
     }
 }
