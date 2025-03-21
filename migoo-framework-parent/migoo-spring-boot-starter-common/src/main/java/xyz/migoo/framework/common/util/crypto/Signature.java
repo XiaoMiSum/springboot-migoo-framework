@@ -53,7 +53,7 @@ public class Signature {
         ignoreKeyList.add("sign");
         ignoreKeyList.add("signature");
         final Map<String, ?> filter =  data.entrySet().stream()
-                .filter(entry -> !StrUtil.isBlankIfStr(entry) && !ignoreKeyList.contains(entry.getKey()))
+                .filter(entry -> !StrUtil.isBlankIfStr(entry.getValue()) && !ignoreKeyList.contains(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         List<String> kvs = new TreeSet<>(filter.keySet()).stream()
                 .map(key -> "%s=%s".formatted(key, filter.get(key)))

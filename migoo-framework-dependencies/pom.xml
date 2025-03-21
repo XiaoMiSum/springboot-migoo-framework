@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.migoo.springboot</groupId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <artifactId>migoo-framework-dependencies</artifactId>
     <packaging>pom</packaging>
     <name>migoo-framework-dependencies</name>
@@ -35,7 +35,7 @@
     </developers>
 
     <properties>
-        <revision>1.2.3</revision>
+        <revision>1.2.4</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.3.3</spring.boot.version>
         <!-- DB 相关 -->
