@@ -1,5 +1,6 @@
 package xyz.migoo.framework.mybatis.core.handler;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
@@ -28,9 +29,9 @@ public class DefaultFieldHandler implements MetaObjectHandler {
             // 状态标识为空，则默认为已启用状态
             String compoundName = WebFrameworkUtils.getLoginUserName();
             // 当前登录用户不为空，创建人为空，则当前登录用户为创建人
-            baseDO.setCreator(Objects.isNull(baseDO.getCreator()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getCreator());
+            baseDO.setCreator(StrUtil.isBlank(baseDO.getCreator()) ? StrUtil.isBlank(compoundName) ? "系统" : compoundName : baseDO.getCreator());
             // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
-            baseDO.setUpdater(Objects.isNull(baseDO.getUpdater()) ? Objects.isNull(compoundName) ? "系统" : compoundName : baseDO.getUpdater());
+            baseDO.setUpdater(StrUtil.isBlank(baseDO.getUpdater()) ? StrUtil.isBlank(compoundName) ? "系统" : compoundName : baseDO.getUpdater());
             baseDO.setDeleted(0);
         }
     }
@@ -41,7 +42,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         // 默认以当前登录用户为更新人
         BaseDO<?> baseDO = (BaseDO<?>) metaObject.getOriginalObject();
-        String compoundName = Objects.isNull(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName() : baseDO.getUpdater();
-        setFieldValByName("updater", compoundName, metaObject);
+        String compoundName = StrUtil.isBlank(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName() : baseDO.getUpdater();
+        setFieldValByName("updater", StrUtil.isBlank(compoundName) ? "系统" : compoundName, metaObject);
     }
 }
