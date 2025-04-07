@@ -2,7 +2,6 @@ package xyz.migoo.framework.mybatis.core;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -140,9 +139,34 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
         return this;
     }
 
+
+    @Override
+    public LambdaUpdateWrapperX<T> ne(boolean condition, SFunction<T, ?> column, Object val) {
+        super.ne(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> ne(SFunction<T, ?> column, Object val) {
+        super.ne(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> gt(boolean condition, SFunction<T, ?> column, Object val) {
+        super.gt(condition, column, val);
+        return this;
+    }
+
     @Override
     public LambdaUpdateWrapperX<T> gt(SFunction<T, ?> column, Object val) {
         super.gt(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> ge(boolean condition, SFunction<T, ?> column, Object val) {
+        super.ge(condition, column, val);
         return this;
     }
 
@@ -153,8 +177,20 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
     }
 
     @Override
+    public LambdaUpdateWrapperX<T> le(boolean condition, SFunction<T, ?> column, Object val) {
+        super.le(condition, column, val);
+        return this;
+    }
+
+    @Override
     public LambdaUpdateWrapperX<T> le(SFunction<T, ?> column, Object val) {
         super.le(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> lt(boolean condition, SFunction<T, ?> column, Object val) {
+        super.lt(condition, column, val);
         return this;
     }
 
@@ -165,14 +201,8 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
     }
 
     @Override
-    public LambdaUpdateWrapperX<T> orderByDesc(SFunction<T, ?> column) {
-        super.orderByDesc(true, column);
-        return this;
-    }
-
-    @Override
-    public LambdaUpdateWrapperX<T> last(String lastSql) {
-        super.last(lastSql);
+    public LambdaUpdateWrapperX<T> in(boolean condition, SFunction<T, ?> column, Collection<?> coll) {
+        super.in(condition, column, coll);
         return this;
     }
 
@@ -183,8 +213,20 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
     }
 
     @Override
+    public LambdaUpdateWrapperX<T> isNotNull(boolean condition, SFunction<T, ?> column) {
+        super.isNotNull(condition, column);
+        return this;
+    }
+
+    @Override
     public LambdaUpdateWrapperX<T> isNotNull(SFunction<T, ?> column) {
         super.isNotNull(column);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> isNull(boolean condition, SFunction<T, ?> column) {
+        super.isNull(condition, column);
         return this;
     }
 

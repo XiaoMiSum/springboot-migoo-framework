@@ -12,9 +12,10 @@ import java.util.Collection;
  * Created on 2021/11/23 20:30
  */
 public class QueryWrapperX<T> extends QueryWrapper<T> {
-    
-    public QueryWrapperX<T> selectX(String... column) {
-        return (QueryWrapperX<T>) super.select(column);
+
+    public QueryWrapperX<T> limit(int n) {
+        super.last("LIMIT " + n);
+        return this;
     }
 
     public QueryWrapperX<T> likeIfPresent(String column, String val) {
@@ -96,6 +97,12 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     // ========== 重写父类方法，方便链式调用 ==========
 
     @Override
+    public QueryWrapperX<T> select(String... column) {
+        super.select(column);
+        return this;
+    }
+
+    @Override
     public QueryWrapperX<T> eq(boolean condition, String column, Object val) {
         super.eq(condition, column, val);
         return this;
@@ -108,8 +115,32 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     @Override
+    public QueryWrapperX<T> ne(boolean condition, String column, Object val) {
+        super.ne(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public QueryWrapperX<T> ne(String column, Object val) {
+        super.ne(column, val);
+        return this;
+    }
+
+    @Override
+    public QueryWrapperX<T> orderByDesc(boolean condition, String column) {
+        super.orderByDesc(condition, column);
+        return this;
+    }
+
+    @Override
     public QueryWrapperX<T> orderByDesc(String column) {
-        super.orderByDesc(true, column);
+        super.orderByDesc(column);
+        return this;
+    }
+
+    @Override
+    public QueryWrapperX<T> last(boolean condition, String lastSql) {
+        super.last(condition, lastSql);
         return this;
     }
 
@@ -120,13 +151,14 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     @Override
-    public QueryWrapperX<T> in(String column, Collection<?> coll) {
-        super.in(column, coll);
+    public QueryWrapperX<T> in(boolean condition, String column, Collection<?> coll) {
+        super.in(condition, column, coll);
         return this;
     }
 
-    public QueryWrapperX<T> limit(int n) {
-        super.last("LIMIT " + n);
+    @Override
+    public QueryWrapperX<T> in(String column, Collection<?> coll) {
+        super.in(column, coll);
         return this;
     }
 }

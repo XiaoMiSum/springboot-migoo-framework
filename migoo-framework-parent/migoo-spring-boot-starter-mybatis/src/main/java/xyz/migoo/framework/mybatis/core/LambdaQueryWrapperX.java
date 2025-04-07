@@ -20,6 +20,11 @@ import java.util.Collection;
 public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
 
+    public LambdaQueryWrapperX<T> limit(int n) {
+        super.last("LIMIT " + n);
+        return this;
+    }
+
     public LambdaQueryWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
         if (StringUtils.hasText(val)) {
             return (LambdaQueryWrapperX<T>) super.like(column, val);
@@ -131,8 +136,32 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     @Override
+    public LambdaQueryWrapperX<T> ne(boolean condition, SFunction<T, ?> column, Object val) {
+        super.ne(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> ne(SFunction<T, ?> column, Object val) {
+        super.ne(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> gt(boolean condition, SFunction<T, ?> column, Object val) {
+        super.gt(condition, column, val);
+        return this;
+    }
+
+    @Override
     public LambdaQueryWrapperX<T> gt(SFunction<T, ?> column, Object val) {
         super.gt(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> ge(boolean condition, SFunction<T, ?> column, Object val) {
+        super.ge(condition, column, val);
         return this;
     }
 
@@ -143,8 +172,20 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     @Override
+    public LambdaQueryWrapperX<T> le(boolean condition, SFunction<T, ?> column, Object val) {
+        super.le(condition, column, val);
+        return this;
+    }
+
+    @Override
     public LambdaQueryWrapperX<T> le(SFunction<T, ?> column, Object val) {
         super.le(column, val);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> lt(boolean condition, SFunction<T, ?> column, Object val) {
+        super.lt(condition, column, val);
         return this;
     }
 
@@ -155,8 +196,20 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     @Override
+    public LambdaQueryWrapperX<T> orderByDesc(boolean condition, SFunction<T, ?> column) {
+        super.orderByDesc(condition, column);
+        return this;
+    }
+
+    @Override
     public LambdaQueryWrapperX<T> orderByDesc(SFunction<T, ?> column) {
-        super.orderByDesc(true, column);
+        super.orderByDesc(column);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> last(boolean condition, String lastSql) {
+        super.last(condition, lastSql);
         return this;
     }
 
@@ -167,14 +220,32 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
     }
 
     @Override
+    public LambdaQueryWrapperX<T> in(boolean condition, SFunction<T, ?> column, Collection<?> coll) {
+        super.in(condition, column, coll);
+        return this;
+    }
+
+    @Override
     public LambdaQueryWrapperX<T> in(SFunction<T, ?> column, Collection<?> coll) {
         super.in(column, coll);
         return this;
     }
 
     @Override
+    public LambdaQueryWrapperX<T> isNotNull(boolean condition, SFunction<T, ?> column) {
+        super.isNotNull(condition, column);
+        return this;
+    }
+
+    @Override
     public LambdaQueryWrapperX<T> isNotNull(SFunction<T, ?> column) {
         super.isNotNull(column);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> isNull(boolean condition, SFunction<T, ?> column) {
+        super.isNull(condition, column);
         return this;
     }
 

@@ -17,13 +17,13 @@ import java.util.function.Consumer;
  */
 public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
 
-    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
-        super.leftJoin(clazz, function);
+    public MPJLambdaWrapperX<T> limit(int n) {
+        super.last("LIMIT " + n);
         return this;
     }
 
-    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<X> clazz, String alias, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
-        super.leftJoin(clazz, alias, function);
+    public <X> MPJLambdaWrapperX<T> innerJoinX(Class<T> clazz, SFunction<T, ?> left, String rightAlias, SFunction<X, ?> right) {
+        super.innerJoin(clazz, left, rightAlias, right);
         return this;
     }
 
@@ -46,6 +46,20 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
+    public <X> MPJLambdaWrapperX<T> notInIfPresent(SFunction<X, ?> column, Collection<?> values) {
+        if (!CollectionUtils.isEmpty(values)) {
+            super.notIn(column, values);
+        }
+        return this;
+    }
+
+    public <X> MPJLambdaWrapperX<T> notInIfPresent(SFunction<X, ?> column, Object... values) {
+        if (!ArrayUtil.isEmpty(values)) {
+            super.notIn(column, values);
+        }
+        return this;
+    }
+
     public <X> MPJLambdaWrapperX<T> eqIfPresent(SFunction<X, ?> column, Object val) {
         super.eqIfExists(column, val);
         return this;
@@ -57,9 +71,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     public <X> MPJLambdaWrapperX<T> gtIfPresent(SFunction<X, ?> column, Object val) {
-        if (val != null) {
-            super.gt(column, val);
-        }
+        super.geIfExists(column, val);
         return this;
     }
 
@@ -96,6 +108,60 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     // ========== 重写父类方法，方便链式调用 ==========
+
+    @Override
+    public MPJLambdaWrapperX<T> leftJoin(String sql) {
+        super.leftJoin(sql);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> leftJoin(Class<X> clazz, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.leftJoin(clazz, function);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> leftJoin(Class<X> clazz, String alias, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.leftJoin(clazz, alias, function);
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> rightJoin(String sql) {
+        super.rightJoin(sql);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> rightJoin(Class<X> clazz, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.rightJoin(clazz, function);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> rightJoin(Class<X> clazz, String alias, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.rightJoin(clazz, alias, function);
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> fullJoin(String sql) {
+        super.fullJoin(sql);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> fullJoin(Class<X> clazz, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.fullJoin(clazz, function);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> fullJoin(Class<X> clazz, String alias, MFunction<JoinAbstractLambdaWrapper<T, ?>> function) {
+        super.fullJoin(clazz, alias, function);
+        return this;
+    }
 
     @Override
     public MPJLambdaWrapperX<T> or() {
