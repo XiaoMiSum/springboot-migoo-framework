@@ -40,17 +40,13 @@ public interface AuthConvert {
     }
 
     default AuthUserInfoRespVO convert(BaseUser<Long> user, Set<String> permissions) {
-        return new AuthUserInfoRespVO()
-                .setName(user.getName())
-                .setAvatar(user.getAvatar())
-                .setPermissions(permissions);
+        return convert1(user).setPermissions(permissions);
     }
 
+    AuthUserInfoRespVO convert1(BaseUser<Long> user);
+
     default AuthUserInfoRespVO convert(BaseUser<Long> user, List<Menu> menus) {
-        return new AuthUserInfoRespVO()
-                .setName(user.getName())
-                .setAvatar(user.getAvatar())
-                .setRequiredBindAuthenticator(isDisabled(user.getBindAuthenticator()))
+        return convert1(user).setRequiredBindAuthenticator(isDisabled(user.getBindAuthenticator()))
                 .setPermissions(CollectionUtils.convertSet(menus, Menu::getPermission));
     }
 
