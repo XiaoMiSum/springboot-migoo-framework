@@ -102,7 +102,13 @@ public class JobServiceImpl implements JobService {
 
         // 更新状态 Job 到 Quartz 中
         if (JobStatusEnum.NORMAL.getStatus().equals(status)) { // 开启
-            schedulerManager.resumeJob(job.getHandlerName());
+            if (!JobStatusEnum.NORMAL.getStatus().equals(job.getStatus())) {
+                // 原任务状态不是开启，防止在这个时间段内有更新任务配置，需要将最新的任务数据更新到 Quartz
+                schedulerManager.updateJob(job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                        job.getRetryCount(), job.getRetryInterval());
+            }else {
+                schedulerManager.resumeJob(job.getHandlerName());
+            }
         } else { // 暂停
             schedulerManager.pauseJob(job.getHandlerName());
         }
