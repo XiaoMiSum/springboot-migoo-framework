@@ -318,7 +318,7 @@ CREATE TABLE `sys_user`
     `status`                        tinyint                                                       NOT NULL DEFAULT 1 COMMENT '状态0禁用、1启用',
     `gender`                        tinyint                                                       NULL     DEFAULT NULL COMMENT '性别 1男 2女',
     `dept_id`                       bigint                                                        NULL     DEFAULT NULL COMMENT '部门编号',
-    `post_ids`                      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '岗位编号',
+    `post_id`                       bigint                                                        NULL     DEFAULT NULL COMMENT '岗位编号',
     `email`                         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '邮箱地址',
     `secret_key`                    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '验证器安全码',
     `bind_authenticator`            tinyint                                                       NOT NULL DEFAULT 0 COMMENT '身份验证器绑定状态：0 -未绑定 1- 已绑定',
@@ -341,12 +341,6 @@ CREATE TABLE `sys_user`
 INSERT INTO `sys_user`
 VALUES (1, 'superadmin', '$2a$10$UxsSdlstbdutt3vG51ltiOkyxCAHnC8Q9p3Ds3W3o62KJ9qHLXBSa', NULL, '超级管理员', '', 1, 1,
         1, NULL, NULL, '', 1, 0, 0, '1', '2022-04-29 16:06:56', '超级管理员', '2022-11-23 12:29:42');
-INSERT INTO `sys_user`
-VALUES (2, 'developer', '$2a$10$UxsSdlstbdutt3vG51ltiOkyxCAHnC8Q9p3Ds3W3o62KJ9qHLXBSa', NULL, '开发者', NULL, 1, 0, 2,
-        '[]', 'mail@cc.com', '', 0, 1, 0, '奥丁1', '2022-05-01 17:53:00', '奥丁1', '2022-05-31 20:14:42');
-INSERT INTO `sys_user`
-VALUES (3, 'admin', '$2a$10$UxsSdlstbdutt3vG51ltiOkyxCAHnC8Q9p3Ds3W3o62KJ9qHLXBSa', NULL, '管理员', NULL, 1, NULL, 1,
-        '[]', NULL, '', 0, 1, 0, '超级管理员', '2022-07-16 21:52:15', '管理员', '2022-07-16 22:44:59');
 
 -- ----------------------------
 -- Table structure for sys_user_role

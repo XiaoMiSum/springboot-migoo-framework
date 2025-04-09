@@ -1,12 +1,17 @@
 package xyz.migoo.framework.infra.convert.sys;
 
-import xyz.migoo.framework.infra.controller.sys.user.vo.*;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
-import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+import xyz.migoo.framework.common.pojo.SimpleData;
+import xyz.migoo.framework.infra.controller.sys.user.vo.UserAddReqVO;
+import xyz.migoo.framework.infra.controller.sys.user.vo.UserPageItemRespVO;
+import xyz.migoo.framework.infra.controller.sys.user.vo.UserPasswordReqVO;
+import xyz.migoo.framework.infra.controller.sys.user.vo.UserUpdateReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
+import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserConvert {
@@ -19,7 +24,12 @@ public interface UserConvert {
 
     User convert(UserPasswordReqVO reqVO);
 
-    List<UserSimpleRespVO> convert(List<User> list);
+    default SimpleData convert1(User user) {
+        return new SimpleData(user.getId(), user.getName(), user.getStatus(),
+                Map.of("post", user.getPostId()));
+    }
+
+    List<SimpleData> convert(List<User> list);
 
     UserPageItemRespVO convert(User user);
 

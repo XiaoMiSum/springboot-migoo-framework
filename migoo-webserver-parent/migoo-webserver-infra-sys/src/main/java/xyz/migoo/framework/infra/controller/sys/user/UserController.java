@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
+import xyz.migoo.framework.common.pojo.SimpleData;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
 import xyz.migoo.framework.infra.controller.sys.user.vo.*;
 import xyz.migoo.framework.infra.convert.sys.UserConvert;
@@ -91,7 +92,7 @@ public class UserController {
     }
 
     @GetMapping("/simple")
-    public Result<List<UserSimpleRespVO>> getSimple() {
+    public Result<List<SimpleData>> getSimple() {
         // 获得用户列表，只要开启状态的
         List<User> list = userService.get(enabled.status());
         return Result.getSuccessful(UserConvert.INSTANCE.convert(list));

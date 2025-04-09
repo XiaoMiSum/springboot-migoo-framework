@@ -1,15 +1,11 @@
 package xyz.migoo.framework.infra.dal.dataobject.sys;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
-import xyz.migoo.framework.mybatis.core.handler.JsonLongSetTypeHandler;
 import xyz.migoo.framework.security.core.BaseUser;
-
-import java.util.Set;
 
 @TableName(value = "sys_user", autoResultMap = true)
 @Getter
@@ -34,11 +30,10 @@ public class User extends BaseDO<Long> implements BaseUser<Long> {
 
     private String secretKey;
 
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
-    private Set<Long> postIds;
+    private Long postId;
 
     private String email;
-    
+
     private Integer requiredVerifyAuthenticator;
 
     private Integer bindAuthenticator;

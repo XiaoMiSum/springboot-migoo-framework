@@ -5,8 +5,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Getter
 @Setter
 public abstract class UserBaseVO {
@@ -20,7 +18,7 @@ public abstract class UserBaseVO {
 
     private Long deptId;
 
-    private Set<Long> postIds;
+    private Long postId;
 
     private String email;
 
