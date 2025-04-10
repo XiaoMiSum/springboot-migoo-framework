@@ -22,6 +22,17 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
+    @SafeVarargs
+    public final <S> MPJLambdaWrapperX<T> selectX(SFunction<S, ?>... column) {
+        super.select(column);
+        return this;
+    }
+
+    public <X> MPJLambdaWrapperX<T> leftJoinX(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
+        super.leftJoin(clazz, left, right);
+        return this;
+    }
+
     public <X> MPJLambdaWrapperX<T> innerJoinX(Class<T> clazz, SFunction<T, ?> left, String rightAlias, SFunction<X, ?> right) {
         super.innerJoin(clazz, left, rightAlias, right);
         return this;

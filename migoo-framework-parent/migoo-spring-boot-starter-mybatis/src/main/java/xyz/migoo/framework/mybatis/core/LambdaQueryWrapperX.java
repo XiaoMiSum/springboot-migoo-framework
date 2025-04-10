@@ -25,6 +25,12 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return this;
     }
 
+    @SafeVarargs
+    public final LambdaQueryWrapper<T> selectX(SFunction<T, ?>... columns) {
+        super.select(columns);
+        return this;
+    }
+
     public LambdaQueryWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
         if (StringUtils.hasText(val)) {
             return (LambdaQueryWrapperX<T>) super.like(column, val);

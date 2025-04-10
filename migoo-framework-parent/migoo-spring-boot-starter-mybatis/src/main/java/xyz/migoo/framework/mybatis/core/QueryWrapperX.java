@@ -11,6 +11,7 @@ import java.util.Collection;
  * @author xiaomi
  * Created on 2021/11/23 20:30
  */
+@Deprecated(since = "1.3.0")
 public class QueryWrapperX<T> extends QueryWrapper<T> {
 
     public QueryWrapperX<T> limit(int n) {
