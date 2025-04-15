@@ -5,7 +5,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.infra.controller.sys.post.vo.*;
+import xyz.migoo.framework.common.pojo.SimpleData;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostAddReqVO;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostQueryReqVO;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostRespVO;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostUpdateReqVO;
 import xyz.migoo.framework.infra.convert.sys.PostConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Post;
 import xyz.migoo.framework.infra.service.sys.post.PostService;
@@ -61,7 +65,7 @@ public class PostController {
     }
 
     @GetMapping("/simple")
-    public Result<List<PostSimpleRespVO>> getSimplePosts() {
+    public Result<List<SimpleData>> getSimplePosts() {
         // 获得岗位列表，只要开启状态的
         List<Post> list = postService.getList(null, Collections.singleton(enabled.status()));
         // 排序后，返回给前端

@@ -1,13 +1,13 @@
 package xyz.migoo.framework.infra.convert.sys;
 
-import xyz.migoo.framework.infra.controller.sys.post.vo.PostAddReqVO;
-import xyz.migoo.framework.infra.controller.sys.post.vo.PostRespVO;
-import xyz.migoo.framework.infra.controller.sys.post.vo.PostSimpleRespVO;
-import xyz.migoo.framework.infra.controller.sys.post.vo.PostUpdateReqVO;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import xyz.migoo.framework.common.pojo.PageResult;
+import xyz.migoo.framework.common.pojo.SimpleData;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostAddReqVO;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostRespVO;
+import xyz.migoo.framework.infra.controller.sys.post.vo.PostUpdateReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Post;
 
 import java.util.List;
 
@@ -22,7 +22,11 @@ public interface PostConvert {
 
     Post convert(PostUpdateReqVO req);
 
-    List<PostSimpleRespVO> convert(List<Post> list);
+    List<SimpleData> convert(List<Post> list);
+
+    default SimpleData convert1(Post bean) {
+        return new SimpleData(bean.getId(), bean.getName());
+    }
 
     PostRespVO convert(Post post);
 }
