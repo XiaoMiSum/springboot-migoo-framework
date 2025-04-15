@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import xyz.migoo.framework.common.enums.CommonStatus;
 
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +25,11 @@ public class SimpleData {
     public SimpleData(Object value, String label, Integer status) {
         this(value, label, status, null);
     }
+
+    public SimpleData(Object value, String label, boolean disabled) {
+        this(value, label, disabled, null);
+    }
+
     public SimpleData(Object value, String label, Integer status, Object extend) {
         this(value, label, CommonStatus.isDisabled(status), extend);
     }
