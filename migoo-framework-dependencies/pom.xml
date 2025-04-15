@@ -37,7 +37,7 @@
     <properties>
         <revision>1.2.7</revision>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.3.3</spring.boot.version>
+        <spring.boot.version>3.4.4</spring.boot.version>
         <!-- DB 相关 -->
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <redisson.version>3.35.0</redisson.version>
