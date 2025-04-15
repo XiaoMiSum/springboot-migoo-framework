@@ -1,5 +1,6 @@
 package xyz.migoo.framework.infra.convert.sys;
 
+import com.google.common.collect.Maps;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import xyz.migoo.framework.common.pojo.SimpleData;
@@ -11,7 +12,6 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.Dept;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface UserConvert {
@@ -25,8 +25,9 @@ public interface UserConvert {
     User convert(UserPasswordReqVO reqVO);
 
     default SimpleData convert1(User user) {
-        return new SimpleData(user.getId(), user.getName(), user.getStatus(),
-                Map.of("post", user.getPostId()));
+        var ext = Maps.newHashMap();
+        ext.put("post", user.getPostId());
+        return new SimpleData(user.getId(), user.getName(), user.getStatus(), ext);
     }
 
     List<SimpleData> convert(List<User> list);
