@@ -2,24 +2,14 @@ package xyz.migoo.framework.infra.enums;
 
 import xyz.migoo.framework.common.exception.ErrorCode;
 
-import static xyz.migoo.framework.common.core.KeyValue.of;
-
 public class SysErrorCodeConstants {
 
     // ========== AUTH 模块 100200000 ==========
 
-    public static final ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = ErrorCode.of(100200000,
-            of("zh-CN", "登录失败，用户名或密码错误"), of("zh-TW", "登录失败，用户名或密码错误"),
-            of("en-US", "Login failed, login name or password error"));
-    public static final ErrorCode AUTH_LOGIN_USER_DISABLED = ErrorCode.of(100200001,
-            of("zh-CN", "登录失败，用户已停用"), of("zh-TW", "登录失败，用户已停用"),
-            of("en-US", "Login failed, User disabled"));
-    public static final ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = ErrorCode.of(100200002,
-            of("zh-CN", "登录失败"), of("zh-TW", "登录失败"),
-            of("en-US", "Login failed"));
-    public static final ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = ErrorCode.of(100200003,
-            of("zh-CN", "验证码错误"), of("zh-TW", "验证码错误"),
-            of("en-US", "Captcha error"));
+    public static final ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = ErrorCode.of(100200000, "登录失败，用户名或密码错误");
+    public static final ErrorCode AUTH_LOGIN_USER_DISABLED = ErrorCode.of(100200001, "登录失败，用户已停用");
+    public static final ErrorCode AUTH_LOGIN_FAIL_UNKNOWN = ErrorCode.of(100200002, "登录失败");
+    public static final ErrorCode AUTH_LOGIN_CAPTCHA_CODE_ERROR = ErrorCode.of(100200003, "验证码错误");
 
     // ========== TOKEN 模块 100200100 ==========
 
@@ -71,7 +61,4 @@ public class SysErrorCodeConstants {
     public static final ErrorCode POST_NAME_DUPLICATE = ErrorCode.of(1002005001, "已经存在该名字的岗位");
     public static final ErrorCode POST_CODE_DUPLICATE = ErrorCode.of(1002005001, "已经存在该标识的岗位");
 
-    static {
-        ErrorCode.put(SysErrorCodeConstants.class);
-    }
 }

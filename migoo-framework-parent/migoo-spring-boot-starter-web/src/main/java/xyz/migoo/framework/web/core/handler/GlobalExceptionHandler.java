@@ -23,7 +23,6 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
-import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.json.JsonUtils;
@@ -99,8 +98,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, t.getContentType()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), t.getContentType()));
     }
 
     /**
@@ -110,8 +108,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public Result<?> missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getParameterName()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), ex.getParameterName()));
     }
 
     /**
@@ -121,8 +118,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, ex.getMessage()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), ex.getMessage()));
     }
 
     /**
@@ -132,8 +128,7 @@ public class GlobalExceptionHandler {
     public Result<?> methodArgumentNotValidExceptionExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException ex) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
         assert fieldError != null; // 断言，避免告警
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), fieldError.getDefaultMessage()));
     }
 
     /**
@@ -143,8 +138,7 @@ public class GlobalExceptionHandler {
     public Result<?> bindExceptionHandler(HttpServletRequest request, BindException ex) {
         FieldError fieldError = ex.getFieldError();
         assert fieldError != null; // 断言，避免告警
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, fieldError.getDefaultMessage()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), fieldError.getDefaultMessage()));
     }
 
     /**
@@ -153,8 +147,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        String msg = ErrorCode.getLocalMessage(BAD_REQUEST.getCode(), request);
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", msg, constraintViolation.getMessage()));
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), constraintViolation.getMessage()));
     }
 
     /**
@@ -163,7 +156,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ValidationException.class)
     public Result<?> validationException(HttpServletRequest request, ValidationException ex) {
         // 无法拼接明细的错误信息，因为 Dubbo Consumer 抛出 ValidationException 异常时，是直接的字符串信息，且人类不可读
-        return Result.getError(BAD_REQUEST.getCode(), BAD_REQUEST.getMessage(request));
+        return Result.getError(BAD_REQUEST);
     }
 
     /**
@@ -175,8 +168,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public Result<?> noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
-        String msg = ErrorCode.getLocalMessage(NOT_FOUND.getCode(), request);
-        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", msg, ex.getRequestURL()));
+        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", NOT_FOUND.getMsg(), ex.getRequestURL()));
     }
 
     /**
@@ -186,8 +178,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
-        String msg = ErrorCode.getLocalMessage(METHOD_NOT_ALLOWED.getCode(), request);
-        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", msg, ex.getMethod()));
+        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", METHOD_NOT_ALLOWED.getMsg(), ex.getMethod()));
     }
 
     /**
@@ -197,7 +188,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = SocketRuntimeException.class)
     public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
-        return Result.getError(SOCKET_TIME_OUT.getCode(), SOCKET_TIME_OUT.getMessage(request));
+        return Result.getError(SOCKET_TIME_OUT);
     }
 
     /**
@@ -207,7 +198,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public Result<?> serviceExceptionHandler(HttpServletRequest request, ServiceException ex) {
-        return Result.getError(ex.getCode(), ErrorCode.getLocalMessage(ex.getCode(), request));
+        return Result.getError(ex.getCode(), ex.getMessage());
     }
 
     /**
@@ -218,7 +209,7 @@ public class GlobalExceptionHandler {
         createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
-        return Result.getError(INTERNAL_SERVER_ERROR.getCode(), INTERNAL_SERVER_ERROR.getMessage(request));
+        return Result.getError(INTERNAL_SERVER_ERROR);
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {

@@ -9,7 +9,4 @@ public class DictionaryErrorCodeConstants {
     public static final ErrorCode DICTIONARY_KEY_NOT_EXISTS = ErrorCode.of(1006010000, "字典不存在");
     public static final ErrorCode DICTIONARY_KEY_EXISTS = ErrorCode.of(1006010001, "字典已存在");
 
-    static {
-        ErrorCode.put(DictionaryErrorCodeConstants.class);
-    }
 }

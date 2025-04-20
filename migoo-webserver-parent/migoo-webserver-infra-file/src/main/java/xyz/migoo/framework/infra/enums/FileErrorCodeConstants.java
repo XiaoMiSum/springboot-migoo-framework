@@ -19,7 +19,4 @@ public class FileErrorCodeConstants {
     public static final ErrorCode FILE_CONFIG_NOT_EXISTS = ErrorCode.of(1006014001, "文件配置不存在");
     public static final ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = ErrorCode.of(1006014002, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
 
-    static {
-        ErrorCode.put(FileErrorCodeConstants.class);
-    }
 }

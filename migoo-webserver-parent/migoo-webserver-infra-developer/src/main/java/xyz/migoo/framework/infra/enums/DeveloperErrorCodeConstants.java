@@ -37,8 +37,4 @@ public class DeveloperErrorCodeConstants {
     public static final ErrorCode SMS_CODE_IS_EXISTS = ErrorCode.of(100201406, "手机号已被使用");
     public static final ErrorCode SMS_CODE_IS_UNUSED = ErrorCode.of(100201407, "验证码未被使用");
 
-
-    static {
-        ErrorCode.put(DeveloperErrorCodeConstants.class);
-    }
 }
