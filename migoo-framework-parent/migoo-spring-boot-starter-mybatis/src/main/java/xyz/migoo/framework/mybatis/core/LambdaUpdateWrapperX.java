@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * 拓展 MyBatis Plus LambdaUpdateWrapper 类，主要增加如下功能：
@@ -236,14 +237,35 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
         return this;
     }
 
+
     @Override
     public LambdaUpdateWrapperX<T> or() {
         super.or();
         return this;
     }
 
+    @Override
     public LambdaUpdateWrapperX<T> or(boolean condition) {
         super.or(condition);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> or(Consumer<LambdaUpdateWrapper<T>> consumer) {
+        super.or(consumer);
+        return this;
+    }
+
+
+    @Override
+    public LambdaUpdateWrapperX<T> and(boolean condition) {
+        super.and(condition);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> and(Consumer<LambdaUpdateWrapper<T>> consumer) {
+        super.or(consumer);
         return this;
     }
 

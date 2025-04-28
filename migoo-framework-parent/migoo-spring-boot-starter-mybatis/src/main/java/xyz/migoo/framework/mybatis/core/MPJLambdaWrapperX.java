@@ -174,16 +174,6 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
-    @Override
-    public MPJLambdaWrapperX<T> or() {
-        super.or();
-        return this;
-    }
-
-    public MPJLambdaWrapperX<T> or(boolean condition) {
-        super.or(condition);
-        return this;
-    }
 
     @Override
     public <X> MPJLambdaWrapperX<T> eq(boolean condition, SFunction<X, ?> column, Object val) {
@@ -387,6 +377,37 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     @Override
     public <S, X> MPJLambdaWrapperX<T> selectLen(SFunction<S, ?> column, SFunction<X, ?> alias) {
         super.selectLen(column, alias);
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> or() {
+        super.or();
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> or(boolean condition) {
+        super.or(condition);
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> or(Consumer<MPJLambdaWrapper<T>> consumer) {
+        super.or(consumer);
+        return this;
+    }
+
+
+    @Override
+    public MPJLambdaWrapperX<T> and(boolean condition) {
+        super.and(condition);
+        return this;
+    }
+
+    @Override
+    public MPJLambdaWrapperX<T> and(Consumer<MPJLambdaWrapper<T>> consumer) {
+        super.or(consumer);
         return this;
     }
 }
