@@ -214,6 +214,42 @@ public class LambdaUpdateWrapperX<T> extends LambdaUpdateWrapper<T> {
     }
 
     @Override
+    public LambdaUpdateWrapperX<T> in(boolean condition, SFunction<T, ?> column, Object... objects) {
+        super.in(condition, column, objects);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> in(SFunction<T, ?> column, Object... objects) {
+        super.in(column, objects);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> notIn(boolean condition, SFunction<T, ?> column, Collection<?> coll) {
+        super.notIn(condition, column, coll);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> notIn(SFunction<T, ?> column, Collection<?> coll) {
+        super.notIn(column, coll);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> notIn(boolean condition, SFunction<T, ?> column, Object... objects) {
+        super.notIn(condition, column, objects);
+        return this;
+    }
+
+    @Override
+    public LambdaUpdateWrapperX<T> notIn(SFunction<T, ?> column, Object... objects) {
+        super.notIn(column, objects);
+        return this;
+    }
+
+    @Override
     public LambdaUpdateWrapperX<T> isNotNull(boolean condition, SFunction<T, ?> column) {
         super.isNotNull(condition, column);
         return this;

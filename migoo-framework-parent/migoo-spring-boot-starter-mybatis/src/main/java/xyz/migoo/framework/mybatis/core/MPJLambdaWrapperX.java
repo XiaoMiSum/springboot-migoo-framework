@@ -174,38 +174,6 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
         return this;
     }
 
-
-    @Override
-    public <X> MPJLambdaWrapperX<T> eq(boolean condition, SFunction<X, ?> column, Object val) {
-        super.eq(condition, column, val);
-        return this;
-    }
-
-    @Override
-    public <X> MPJLambdaWrapperX<T> eq(SFunction<X, ?> column, Object val) {
-        super.eq(column, val);
-        return this;
-    }
-
-    @Override
-    public <X> MPJLambdaWrapperX<T> orderByDesc(SFunction<X, ?> column) {
-        //noinspection unchecked
-        super.orderByDesc(true, column);
-        return this;
-    }
-
-    @Override
-    public MPJLambdaWrapperX<T> last(String lastSql) {
-        super.last(lastSql);
-        return this;
-    }
-
-    @Override
-    public <X> MPJLambdaWrapperX<T> in(SFunction<X, ?> column, Collection<?> coll) {
-        super.in(column, coll);
-        return this;
-    }
-
     @Override
     public MPJLambdaWrapperX<T> selectAll(Class<?> clazz) {
         super.selectAll(clazz);
@@ -381,6 +349,84 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     @Override
+    public MPJLambdaWrapperX<T> last(String lastSql) {
+        super.last(lastSql);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> eq(boolean condition, SFunction<X, ?> column, Object val) {
+        super.eq(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> eq(SFunction<X, ?> column, Object val) {
+        super.eq(column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> ne(boolean condition, SFunction<X, ?> column, Object val) {
+        super.ne(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> ne(SFunction<X, ?> column, Object val) {
+        super.ne(column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> gt(boolean condition, SFunction<X, ?> column, Object val) {
+        super.gt(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> gt(SFunction<X, ?> column, Object val) {
+        super.gt(column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> ge(boolean condition, SFunction<X, ?> column, Object val) {
+        super.ge(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> ge(SFunction<X, ?> column, Object val) {
+        super.ge(column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> le(boolean condition, SFunction<X, ?> column, Object val) {
+        super.le(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> le(SFunction<X, ?> column, Object val) {
+        super.le(column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> lt(boolean condition, SFunction<X, ?> column, Object val) {
+        super.lt(condition, column, val);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> lt(SFunction<X, ?> column, Object val) {
+        super.lt(column, val);
+        return this;
+    }
+
+    @Override
     public MPJLambdaWrapperX<T> or() {
         super.or();
         return this;
@@ -408,6 +454,18 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     @Override
     public MPJLambdaWrapperX<T> and(Consumer<MPJLambdaWrapper<T>> consumer) {
         super.or(consumer);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> orderByAsc(SFunction<X, ?> column) {
+        super.orderByAsc(column);
+        return this;
+    }
+
+    @Override
+    public <X> MPJLambdaWrapperX<T> orderByDesc(SFunction<X, ?> column) {
+        super.orderByDesc(column);
         return this;
     }
 }
