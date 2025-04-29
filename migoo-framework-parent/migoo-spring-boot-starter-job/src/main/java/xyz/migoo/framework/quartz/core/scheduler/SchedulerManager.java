@@ -99,6 +99,16 @@ public class SchedulerManager {
     }
 
     /**
+     * 检查 Quartz 中的 Job 是否存在
+     *
+     * @param jobHandlerName 任务处理器的名字
+     * @throws SchedulerException 启动异常
+     */
+    public boolean isExists(String jobHandlerName) throws SchedulerException {
+        return scheduler.checkExists(new JobKey(jobHandlerName));
+    }
+
+    /**
      * 立即触发一次 Quartz 中的 Job
      *
      * @param jobId           任务编号

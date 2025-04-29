@@ -1,5 +1,6 @@
 package xyz.migoo.framework.infra.service.developer.job;
 
+import cn.hutool.core.util.StrUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.quartz.SchedulerException;
@@ -57,7 +58,7 @@ public class JobServiceImpl implements JobService {
 
         // 添加 Job 到 Quartz 中
         schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                createReqVO.getRetryCount(), createReqVO.getRetryInterval());
+                job.getRetryCount(), job.getRetryInterval());
         // 更新
         JobDO updateObj = new JobDO().setId(job.getId()).setStatus(JobStatusEnum.NORMAL.getStatus());
         jobMapper.updateById(updateObj);
@@ -75,11 +76,20 @@ public class JobServiceImpl implements JobService {
         JobDO updateObj = JobConvert.INSTANCE.convert(updateReqVO);
         fillJobMonitorTimeoutEmpty(updateObj);
         jobMapper.updateById(updateObj);
-        // 只有开启状态的任务才修改 Quartz Job 时，会导致任务又开始执行
-        if (job.getStatus().equals(JobStatusEnum.NORMAL.getStatus())) {
+
+        if (!StrUtil.equals(job.getHandlerName(), updateObj.getHandlerName())) {
+            // 新handlerName 与 原handlerName 不一致， 删除Quartz原handlerName任务 再添加新handlerName任务
+            schedulerManager.deleteJob(job.getHandlerName());
+            schedulerManager.addJob(updateObj.getId(), updateObj.getHandlerName(), updateObj.getHandlerParam(), updateObj.getCronExpression(),
+                    updateObj.getRetryCount(), updateObj.getRetryInterval());
+        } else {
             // 更新 Job 到 Quartz 中
-            schedulerManager.updateJob(job.getHandlerName(), updateReqVO.getHandlerParam(), updateReqVO.getCronExpression(),
+            schedulerManager.updateJob(updateObj.getHandlerName(), updateReqVO.getHandlerParam(), updateReqVO.getCronExpression(),
                     updateReqVO.getRetryCount(), updateReqVO.getRetryInterval());
+        }
+        if (job.getStatus().equals(JobStatusEnum.STOP.getStatus())) {
+            // 原任务状态是停止的，需要将任务停止
+            schedulerManager.pauseJob(updateObj.getHandlerName());
         }
     }
 
@@ -99,16 +109,9 @@ public class JobServiceImpl implements JobService {
         // 更新 Job 状态
         JobDO updateObj = new JobDO().setId(id).setStatus(status);
         jobMapper.updateById(updateObj);
-
         // 更新状态 Job 到 Quartz 中
         if (JobStatusEnum.NORMAL.getStatus().equals(status)) { // 开启
-            if (!JobStatusEnum.NORMAL.getStatus().equals(job.getStatus())) {
-                // 原任务状态不是开启，防止在这个时间段内有更新任务配置，需要将最新的任务数据更新到 Quartz
-                schedulerManager.updateJob(job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
-                        job.getRetryCount(), job.getRetryInterval());
-            }else {
-                schedulerManager.resumeJob(job.getHandlerName());
-            }
+            schedulerManager.resumeJob(job.getHandlerName());
         } else { // 暂停
             schedulerManager.pauseJob(job.getHandlerName());
         }
@@ -118,9 +121,16 @@ public class JobServiceImpl implements JobService {
     public void triggerJob(Long id) throws SchedulerException {
         // 校验存在
         JobDO job = validateJobExists(id);
-
-        // 触发 Quartz 中的 Job
-        schedulerManager.triggerJob(job.getId(), job.getHandlerName(), job.getHandlerParam());
+        if (schedulerManager.isExists(job.getHandlerName())) {
+            // 如果 Quartz 存在此 Job，则触发 Quartz 中的 Job
+            schedulerManager.triggerJob(job.getId(), job.getHandlerName(), job.getHandlerParam());
+        } else {
+            // 如果 Quartz 不存在此 Job，则添加到 Quartz 中，出发执行后再从 Quartz中删除
+            schedulerManager.addJob(job.getId(), job.getHandlerName(), job.getHandlerParam(), job.getCronExpression(),
+                    job.getRetryCount(), job.getRetryInterval());
+            schedulerManager.triggerJob(job.getId(), job.getHandlerName(), job.getHandlerParam());
+            schedulerManager.deleteJob(job.getHandlerName());
+        }
     }
 
     @Override
