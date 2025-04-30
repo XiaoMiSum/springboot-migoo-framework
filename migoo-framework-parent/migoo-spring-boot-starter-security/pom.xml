@@ -13,11 +13,37 @@
     <name>${project.artifactId}</name>
     <description>security 组件</description>
 
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
+
+
     <dependencies>
         <!-- Spring 核心 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <type>jar</type>
         </dependency>
 
         <!-- Web 相关 -->
@@ -25,17 +51,20 @@
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-web</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
         <!-- spring boot 配置所需依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

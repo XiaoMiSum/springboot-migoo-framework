@@ -40,22 +40,26 @@
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-web</artifactId>
             <scope>provided</scope>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
+            <type>jar</type>
             <exclusions>
                 <exclusion>
                     <groupId>com.baomidou</groupId>
@@ -71,6 +75,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
