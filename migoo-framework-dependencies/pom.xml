@@ -296,11 +296,6 @@
             </dependency>
 
             <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-redis</artifactId>
-            </dependency>
-
-            <dependency>
                 <!-- Milvus：https://milvus.io/ -->
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-milvus-store</artifactId>

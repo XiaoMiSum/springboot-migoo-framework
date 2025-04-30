@@ -1,6 +1,5 @@
 package xyz.migoo.framework.ai.core.enums;
 
-import cn.iocoder.migoo.framework.common.core.ArrayValuable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,7 +12,7 @@ import java.util.Arrays;
  */
 @Getter
 @AllArgsConstructor
-public enum AiPlatformEnum implements ArrayValuable<String> {
+public enum AiPlatformEnum {
 
     // ========== 国内平台 ==========
 
@@ -58,11 +57,6 @@ public enum AiPlatformEnum implements ArrayValuable<String> {
             }
         }
         throw new IllegalArgumentException("非法平台： " + platform);
-    }
-
-    @Override
-    public String[] array() {
-        return ARRAYS;
     }
 
 }

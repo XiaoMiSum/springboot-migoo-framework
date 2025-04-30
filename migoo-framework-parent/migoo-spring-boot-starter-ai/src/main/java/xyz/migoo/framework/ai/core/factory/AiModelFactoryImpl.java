@@ -84,6 +84,7 @@ import org.springframework.ai.vectorstore.observation.DefaultVectorStoreObservat
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
+import org.springframework.ai.zhipuai.*;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.BeansException;
@@ -105,7 +106,6 @@ import xyz.migoo.framework.ai.core.model.siliconflow.SiliconFlowImageApi;
 import xyz.migoo.framework.ai.core.model.siliconflow.SiliconFlowImageModel;
 import xyz.migoo.framework.ai.core.model.suno.api.SunoApi;
 import xyz.migoo.framework.ai.core.model.xinghuo.XingHuoChatModel;
-import xyz.migoo.framework.common.util.spring.SpringUtils;
 
 import java.io.File;
 import java.time.Duration;
@@ -687,7 +687,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
     private RedisVectorStore buildRedisVectorStore(EmbeddingModel embeddingModel,
                                                    Map<String, Class<?>> metadataFields) {
         // 创建 JedisPooled 对象
-        RedisProperties redisProperties = SpringUtils.getBean(RedisProperties.class);
+        RedisProperties redisProperties = SpringUtil.getBean(RedisProperties.class);
         JedisPooled jedisPooled = new JedisPooled(redisProperties.getHost(), redisProperties.getPort());
         // 创建 RedisVectorStoreProperties 对象
         RedisVectorStoreAutoConfiguration configuration = new RedisVectorStoreAutoConfiguration();

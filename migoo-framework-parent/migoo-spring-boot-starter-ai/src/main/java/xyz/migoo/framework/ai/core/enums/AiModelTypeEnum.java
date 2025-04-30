@@ -2,7 +2,6 @@ package xyz.migoo.framework.ai.core.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import xyz.migoo.framework.common.core.ArrayValuable;
 
 import java.util.Arrays;
 
@@ -13,7 +12,7 @@ import java.util.Arrays;
  */
 @Getter
 @RequiredArgsConstructor
-public enum AiModelTypeEnum implements ArrayValuable<Integer> {
+public enum AiModelTypeEnum {
 
     CHAT(1, "对话"),
     IMAGE(2, "图片"),
@@ -31,10 +30,5 @@ public enum AiModelTypeEnum implements ArrayValuable<Integer> {
      * 类型名
      */
     private final String name;
-
-    @Override
-    public Integer[] array() {
-        return ARRAYS;
-    }
 
 }

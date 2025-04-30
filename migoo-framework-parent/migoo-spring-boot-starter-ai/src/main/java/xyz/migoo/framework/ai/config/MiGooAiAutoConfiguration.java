@@ -67,7 +67,7 @@ public class MiGooAiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(DeepSeekChatModel.MODEL_DEFAULT);
         }
-        MiGooAiProperties.DouBaoProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(DeepSeekChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())
@@ -94,7 +94,7 @@ public class MiGooAiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(DouBaoChatModel.MODEL_DEFAULT);
         }
-        MiGooAiProperties.SiliconFlowProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(DouBaoChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())
@@ -121,7 +121,7 @@ public class MiGooAiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(SiliconFlowApiConstants.MODEL_DEFAULT);
         }
-        MiGooAiProperties.HunYuanProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(SiliconFlowApiConstants.DEFAULT_BASE_URL)
                         .apiKey(properties.getApiKey())
@@ -155,7 +155,7 @@ public class MiGooAiAutoConfiguration {
                             : HunYuanChatModel.BASE_URL);
         }
         // 创建 OpenAiChatModel、HunYuanChatModel 对象
-        MiGooAiProperties.XingHuoProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(properties.getBaseUrl())
                         .apiKey(properties.getApiKey())
@@ -182,7 +182,7 @@ public class MiGooAiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(XingHuoChatModel.MODEL_DEFAULT);
         }
-        MiGooAiProperties.BaiChuanProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(XingHuoChatModel.BASE_URL)
                         .apiKey(properties.getAppKey() + ":" + properties.getSecretKey())
@@ -209,7 +209,7 @@ public class MiGooAiAutoConfiguration {
         if (StrUtil.isEmpty(properties.getModel())) {
             properties.setModel(BaiChuanChatModel.MODEL_DEFAULT);
         }
-        MiGooAiProperties.MidjourneyProperties openAiChatModel = OpenAiChatModel.builder()
+        var openAiChatModel = OpenAiChatModel.builder()
                 .openAiApi(OpenAiApi.builder()
                         .baseUrl(BaiChuanChatModel.BASE_URL)
                         .apiKey(properties.getApiKey())

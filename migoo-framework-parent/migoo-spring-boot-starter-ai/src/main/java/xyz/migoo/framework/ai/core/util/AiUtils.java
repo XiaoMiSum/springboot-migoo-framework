@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
+import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.moonshot.MoonshotChatOptions;
