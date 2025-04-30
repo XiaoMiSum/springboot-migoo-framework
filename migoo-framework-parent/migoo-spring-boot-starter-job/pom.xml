@@ -14,23 +14,52 @@
     <name>${project.artifactId}</name>
     <description>spring-job 组件</description>
 
+    <packaging>jar</packaging>
+
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
+
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <!-- Job 定时任务相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
+            <type>jar</type>
         </dependency>
 
         <!-- 工具类相关 -->
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

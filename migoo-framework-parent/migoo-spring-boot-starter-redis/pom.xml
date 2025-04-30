@@ -13,17 +13,43 @@
     <name>${project.artifactId}</name>
     <description>redis 组件</description>
 
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
+
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <!-- DB 相关 -->
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 

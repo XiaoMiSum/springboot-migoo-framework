@@ -8,11 +8,34 @@
         <version>1.2.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>migoo-spring-boot-starter-common</artifactId>
-
+    <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>公共 组件</description>
+
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
 
     <dependencies>
         <!-- Spring 核心 -->
@@ -20,24 +43,28 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-expression</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -45,6 +72,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <!-- Web 相关 -->
@@ -52,75 +80,90 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope> <!-- 设置为 provided，只有工具类需要使用到 -->
+            <type>jar</type>
         </dependency>
 
         <!-- 工具类相关 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

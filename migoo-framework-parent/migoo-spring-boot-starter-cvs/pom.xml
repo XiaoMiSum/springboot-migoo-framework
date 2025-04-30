@@ -15,11 +15,36 @@
     <name>${project.artifactId}</name>
     <description>阿里云 组件</description>
 
+    <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/XiaoMiSum/migoo/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:XiaoMiSum/springboot-migoo-framework.git</developerConnection>
+        <url>https://github.com/XiaoMiSum/springboot-migoo-framework</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>xiao mi</name>
+            <email>mi_xiao@qq.com</email>
+            <organization>github</organization>
+            <organizationUrl>https://github.com/XiaoMiSum/springboot-migoo-framework</organizationUrl>
+        </developer>
+    </developers>
+
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <!-- spring boot 配置所需依赖 -->
@@ -27,17 +52,20 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+            <type>jar</type>
         </dependency>
 
         <!-- 验证相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>alibabacloud-ecs20140526</artifactId>
+            <type>jar</type>
             <exclusions>
                 <exclusion>
                     <groupId>org.bouncycastle</groupId>
@@ -49,21 +77,25 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>alibabacloud-rds20140815</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-sdk-java-cvm</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-sdk-java-cdb</artifactId>
+            <type>jar</type>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>
