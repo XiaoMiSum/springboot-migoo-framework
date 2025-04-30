@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,9 @@ import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
 import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
+
+import static java.lang.Thread.ofVirtual;
+import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
 @Configuration
 @EnableConfigurationProperties({WebProperties.class, XssProperties.class})
@@ -93,6 +97,12 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
         return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
+    }
+
+    @Bean
+    public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
+        // 创建 OfVirtual，指定虚拟线程名称的前缀，以及线程编号起始值
+        return handler -> handler.setExecutor(newThreadPerTaskExecutor(ofVirtual().name("virtual-thread-", 1).factory()));
     }
 
 }
