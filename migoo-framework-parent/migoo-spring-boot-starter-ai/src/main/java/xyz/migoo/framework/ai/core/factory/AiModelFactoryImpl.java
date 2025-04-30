@@ -84,7 +84,6 @@ import org.springframework.ai.vectorstore.observation.DefaultVectorStoreObservat
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
-import org.springframework.ai.zhipuai.*;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.ai.zhipuai.api.ZhiPuAiImageApi;
 import org.springframework.beans.BeansException;
@@ -454,7 +453,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return new MiGooAiAutoConfiguration().buildDouBaoChatClient(properties);
     }
 
-    // TODO @芋艿：手头暂时没密钥，使用建议再测试下
+    // TODO 手头暂时没密钥，使用建议再测试下
 
     /**
      * 可参考 {@link MiGooAiAutoConfiguration#hunYuanChatClient(MiGooAiProperties)}
@@ -560,7 +559,7 @@ public class AiModelFactoryImpl implements AiModelFactory {
         return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED, dashScopeEmbeddingOptions);
     }
 
-    // TODO @芋艿：手头暂时没密钥，使用建议再测试下
+    // TODO 手头暂时没密钥，使用建议再测试下
 
     /**
      * 可参考 {@link ZhiPuAiAutoConfiguration} 的 zhiPuAiEmbeddingModel 方法

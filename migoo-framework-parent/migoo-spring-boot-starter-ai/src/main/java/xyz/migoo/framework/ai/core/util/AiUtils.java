@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
-import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
 import org.springframework.ai.moonshot.MoonshotChatOptions;
@@ -57,7 +56,7 @@ public class AiUtils {
                 return OpenAiChatOptions.builder().model(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).build();
             case AZURE_OPENAI:
-                // TODO 芋艿：貌似没 model 字段？？？！
+                // TODO 貌似没 model 字段？？？！
                 return AzureOpenAiChatOptions.builder().deploymentName(model).temperature(temperature).maxTokens(maxTokens)
                         .toolNames(toolNames).build();
             case OLLAMA:
