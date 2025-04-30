@@ -36,9 +36,10 @@
     </developers>
 
     <modules>
-        <module>migoo-spring-boot-starter-info</module>
+        <module>migoo-spring-boot-starter-ai</module>
         <module>migoo-spring-boot-starter-common</module>
         <module>migoo-spring-boot-starter-cvs</module>
+        <module>migoo-spring-boot-starter-info</module>
         <module>migoo-spring-boot-starter-job</module>
         <module>migoo-spring-boot-starter-monitor</module>
         <module>migoo-spring-boot-starter-mq</module>
@@ -47,8 +48,8 @@
         <module>migoo-spring-boot-starter-redis</module>
         <module>migoo-spring-boot-starter-security</module>
         <module>migoo-spring-boot-starter-sms</module>
-        <module>migoo-spring-boot-starter-web</module>
         <module>migoo-spring-boot-starter-tomcat</module>
+        <module>migoo-spring-boot-starter-web</module>
     </modules>
 
     <properties>

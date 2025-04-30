@@ -38,6 +38,9 @@
         <revision>1.2.8</revision>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.4.4</spring.boot.version>
+        <!-- spring ai -->
+        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <tinyflow.version>1.0.0-rc.3</tinyflow.version>
         <!-- DB 相关 -->
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <redisson.version>3.35.0</redisson.version>
@@ -212,6 +215,110 @@
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
                 <version>${spring-boot-admin.version}</version>
+            </dependency>
+
+            <!-- Spring AI Model 模型接入 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-ai</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-azure-openai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-stability-ai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- 通义千问 -->
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter</artifactId>
+                <version>${spring-ai.version}.1</version>
+            </dependency>
+
+            <dependency>
+                <!-- 文心一言 -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-qianfan-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- 智谱 GLM -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-zhipuai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-minimax-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-moonshot-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- 向量存储：https://db-engines.com/en/ranking/vector+dbms -->
+            <dependency>
+                <!-- Qdrant：https://qdrant.tech/ -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-qdrant-store</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- Redis：https://redis.io/docs/latest/develop/get-started/vector-database/ -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-redis-store</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-redis</artifactId>
+            </dependency>
+
+            <dependency>
+                <!-- Milvus：https://milvus.io/ -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-milvus-store</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- Tika：负责内容的解析 -->
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-tika-document-reader</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- TinyFlow：AI 工作流 -->
+            <dependency>
+                <groupId>dev.tinyflow</groupId>
+                <artifactId>tinyflow-java-core</artifactId>
+                <version>${tinyflow.version}</version>
             </dependency>
 
             <!-- 管理系统 - 系统管理 -->
