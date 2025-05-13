@@ -67,8 +67,9 @@
         <aliyun.rds.version>6.0.4</aliyun.rds.version>
         <aliyun-sms.version>2.2.1</aliyun-sms.version>
 
-        <alipay.sdk.version>4.39.194.ALL</alipay.sdk.version>
-        <wechat-pay.version>0.2.14</wechat-pay.version>
+        <alipay.sdk.version>4.40.202.ALL</alipay.sdk.version>
+        <alipay.sdk.v3.version>3.1.38.ALL</alipay.sdk.v3.version>
+        <wechat-pay.version>0.2.17</wechat-pay.version>
 
         <tencent-cvm.version>3.1.1091</tencent-cvm.version>
         <tencent-cdb.version>3.1.1091</tencent-cdb.version>
@@ -447,16 +448,12 @@
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java</artifactId>
                 <version>${alipay.sdk.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>bcprov-jdk15on</artifactId>
-                        <groupId>org.bouncycastle</groupId>
-                    </exclusion>
-                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-sdk-java-v3</artifactId>
+                <version>${alipay.sdk.v3.version}</version>
             </dependency>
 
             <dependency>
