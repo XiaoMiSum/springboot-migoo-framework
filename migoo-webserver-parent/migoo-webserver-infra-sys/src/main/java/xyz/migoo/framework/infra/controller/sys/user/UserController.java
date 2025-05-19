@@ -1,6 +1,7 @@
 package xyz.migoo.framework.infra.controller.sys.user;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -38,6 +39,11 @@ public class UserController {
     private DeptService deptService;
     @Resource
     private PermissionService permissionService;
+
+    public static void main(String[] args) {
+        var s = SecureUtil.aes("17c553e34228909b1f8cef6d1de0b53d".getBytes()).decryptStr("ceb07a2bf3c6fd0876c81ca87fd3f2291eea1759bf86345e5537c7c62f9ce2d9");
+        System.out.println(s);
+    }
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('system:user:query')")
