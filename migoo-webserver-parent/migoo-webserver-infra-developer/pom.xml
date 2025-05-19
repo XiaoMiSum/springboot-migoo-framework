@@ -58,6 +58,11 @@
 
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
+            <artifactId>migoo-spring-boot-starter-oss</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-sms</artifactId>
         </dependency>
 

@@ -31,7 +31,7 @@ public class FileController {
         return Result.getSuccessful(fileService.createFile(file.getOriginalFilename(), path,
                 IoUtil.readBytes(file.getInputStream()), uploadReqVO.getSource()));
     }
-    
+
     @PostMapping("/create")
     public Result<Long> createFile(@Valid @RequestBody FileCreateReqVO createReqVO) {
         return Result.getSuccessful(fileService.createFile(createReqVO));

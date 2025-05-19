@@ -119,7 +119,7 @@ public class UserController {
 
     @PostMapping("/{no}/authenticator")
     @Authenticator
-    @PreAuthorize("@ss.hasPermission('member:merchant:reset-authenticator')")
+    @PreAuthorize("@ss.hasPermission('system:user:reset-authenticator')")
     public Result<Boolean> resetAuthenticator(@PathVariable("no") Long no) {
         userService.resetAuthenticator(no);
         return Result.getSuccessful(true);

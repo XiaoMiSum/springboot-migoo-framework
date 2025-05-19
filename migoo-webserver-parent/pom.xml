@@ -37,11 +37,9 @@
 
     <modules>
         <module>migoo-webserver-infra-developer</module>
-        <module>migoo-webserver-infra-file</module>
         <module>migoo-webserver-infra-sys</module>
         <module>migoo-webserver-infra-area</module>
         <module>migoo-webserver-infra-cvs</module>
-        <module>migoo-webserver-infra-dictionary</module>
         <module>migoo-webserver-infra-station-letter</module>
     </modules>
 

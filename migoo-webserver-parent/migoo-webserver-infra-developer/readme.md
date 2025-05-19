@@ -54,8 +54,44 @@
 
 - 阿里云渠道回调: POST {base}/developer/sms/callback/{CHANNEL_CODE}
 
+### 字典管理
+
+- 获取字典列表: GET {base}/developer/dictionary
+- 新增字典: POST {base}/developer/dictionary
+- 修改字典: PUT {base}/developer/dictionary
+- 删除字典: DELETE {base}/developer/dictionary/{id}
+- 获取字典下拉: GET {base}/developer/dictionary/simple
+
+### 字典数据
+
+- 获取字典数据: GET {base}/developer/dictionary/value
+- 新增字典数据: POST {base}/developer/dictionary/value
+- 修改字典数据: PUT {base}/developer/dictionary/value
+- 删除字典数据: DELETE {base}/developer/dictionary/value/{id}
+- 获取字典数据下拉: GET {base}/developer/dictionary/value/simple
+
+### 文件上传配置
+
+- 获取配置列表: GET {base}/developer/file/config
+- 新增配置: POST {base}/developer/file/config
+- 修改配置: PUT {base}/developer/file/config
+- 修改为默认配置: PUT {base}/developer/file/master
+- 获取配置详情: GET {base}/developer/file/config/{id}
+- 删除配置: DELETE {base}/developer/file/config/{id}
+- 测试上传: GET {base}/developer/file/config/test
+
+### 文件管理
+
+- 上传文件: POST {base}/developer/file/upload
+- 生成文件预签名地址信息: GET {base}/developer/file/presigned-url
+- 创建文件: POST {base}/developer/file/create
+- 删除文件: DELETE {base}/developer/file/{id}
+- 获取文件: GET {base}/d/f/{configId}/**
+- 获取文件列表: GET {base}/developer/file/
+
 # Spring Security
 
 请将下列地址加入任意访问列表
 
 - {base}/developer/sms/callback/**
+- {base}/d/f/*/*

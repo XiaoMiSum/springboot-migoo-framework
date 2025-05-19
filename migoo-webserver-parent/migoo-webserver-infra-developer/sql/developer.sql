@@ -17,6 +17,184 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+
+-- ----------------------------
+-- Table structure for infra_dictionary
+-- ----------------------------
+DROP TABLE IF EXISTS `infra_dictionary`;
+CREATE TABLE `infra_dictionary`
+(
+    `id`          int         NOT NULL AUTO_INCREMENT,
+    `code`        varchar(64) NOT NULL COMMENT '字典键值',
+    `name`        varchar(32) NOT NULL COMMENT '字典名称',
+    `source`      varchar(64) NULL DEFAULT NULL COMMENT '来源系统',
+    `status`      tinyint     NULL DEFAULT 1,
+    `deleted`     bit(1)      NULL DEFAULT b'0',
+    `creator`     varchar(64) NULL DEFAULT NULL,
+    `create_time` datetime    NULL DEFAULT NULL,
+    `updater`     varchar(64) NULL DEFAULT NULL,
+    `update_time` datetime    NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `inx` (`code` ASC, `name` ASC, `source` ASC) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 12 COMMENT = '字典信息表'
+  ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of infra_dictionary
+-- ----------------------------
+INSERT INTO `infra_dictionary`
+VALUES (1, 'common_status', '状态', 'ones', 1, b'0', '超级管理员', '2024-05-23 11:04:26', '超级管理员',
+        '2024-05-23 14:47:43');
+INSERT INTO `infra_dictionary`
+VALUES (2, 'system_role_type', '角色类型', 'ones', 1, b'0', '超级管理员', '2024-05-23 14:55:32', '超级管理员',
+        '2024-05-23 14:55:32');
+INSERT INTO `infra_dictionary`
+VALUES (3, 'system_user_gender', '性别', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:29:04', '超级管理员',
+        '2024-05-23 15:29:04');
+INSERT INTO `infra_dictionary`
+VALUES (4, 'system_menu_type', '菜单类型', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:37:52', '超级管理员',
+        '2024-05-23 15:37:52');
+INSERT INTO `infra_dictionary`
+VALUES (5, 'infra_job_status', '定时任务状态', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:45:29', '超级管理员',
+        '2024-05-23 15:45:29');
+INSERT INTO `infra_dictionary`
+VALUES (6, 'infra_job_log_status', '定时任务调度状态', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:45:59',
+        '超级管理员', '2024-05-23 15:49:54');
+INSERT INTO `infra_dictionary`
+VALUES (7, 'infra_api_error_log_process_status', '异常日志处理状态', 'ones', 1, b'0', '超级管理员',
+        '2024-05-23 15:46:22', '超级管理员', '2024-05-23 15:46:22');
+INSERT INTO `infra_dictionary`
+VALUES (8, 'infra_file_storage', '文件存储类型', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:50:50', '超级管理员',
+        '2024-05-23 15:50:50');
+INSERT INTO `infra_dictionary`
+VALUES (9, 'infra_boolean_string', '布尔类型字符', 'ones', 1, b'0', '超级管理员', '2024-05-23 15:51:11', '超级管理员',
+        '2024-05-23 15:51:11');
+INSERT INTO `infra_dictionary`
+VALUES (10, 'infra_sms_send_status', '短信发送状态', 'ones', 1, b'0', '超级管理员', '2024-05-23 16:21:22', '超级管理员',
+        '2024-05-23 16:21:22');
+INSERT INTO `infra_dictionary`
+VALUES (11, 'infra_sms_receive_status', '短信接收状态', 'ones', 1, b'0', '超级管理员', '2024-05-23 16:21:46',
+        '超级管理员', '2024-05-23 16:21:46');
+
+-- ----------------------------
+-- Table structure for infra_dictionary_value
+-- ----------------------------
+DROP TABLE IF EXISTS `infra_dictionary_value`;
+CREATE TABLE `infra_dictionary_value`
+(
+    `id`          int         NOT NULL AUTO_INCREMENT,
+    `dict_code`   varchar(64) NOT NULL COMMENT '所属字典',
+    `label`       varchar(10) NOT NULL COMMENT '页面展示名称',
+    `value`       varchar(64) NOT NULL COMMENT '字典数据值',
+    `status`      tinyint     NULL DEFAULT 1,
+    `color_type`  varchar(20) NULL DEFAULT NULL,
+    `sort`        int         NULL DEFAULT 0,
+    `deleted`     bit(1)      NULL DEFAULT b'0',
+    `creator`     varchar(64) NULL DEFAULT NULL,
+    `create_time` datetime    NULL DEFAULT NULL,
+    `updater`     varchar(64) NULL DEFAULT NULL,
+    `update_time` datetime    NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `inx_dict_key` (`dict_code` ASC) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 31 COMMENT = '字典数据表'
+  ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of infra_dictionary_value
+-- ----------------------------
+INSERT INTO `infra_dictionary_value`
+VALUES (1, 'common_status', '启用', '1', 1, 'success', 0, b'0', '超级管理员', '2024-05-23 11:30:28', '超级管理员',
+        '2024-05-23 14:47:51');
+INSERT INTO `infra_dictionary_value`
+VALUES (2, 'common_status', '禁用', '0', 1, 'danger', 1, b'0', '超级管理员', '2024-05-23 11:38:25', '超级管理员',
+        '2024-05-23 11:38:25');
+INSERT INTO `infra_dictionary_value`
+VALUES (3, 'system_role_type', '内置角色', '1', 1, 'danger', 0, b'0', '超级管理员', '2024-05-23 14:56:15', '超级管理员',
+        '2024-05-23 14:56:15');
+INSERT INTO `infra_dictionary_value`
+VALUES (4, 'system_role_type', '自定义角色', '2', 1, 'primary', 1, b'0', '超级管理员', '2024-05-23 14:56:37',
+        '超级管理员', '2024-05-23 14:56:44');
+INSERT INTO `infra_dictionary_value`
+VALUES (5, 'system_user_gender', '男', '1', 1, 'default', 0, b'0', '超级管理员', '2024-05-23 15:29:43', '超级管理员',
+        '2024-05-23 15:29:43');
+INSERT INTO `infra_dictionary_value`
+VALUES (6, 'system_user_gender', '女', '0', 1, 'default', 1, b'0', '超级管理员', '2024-05-23 15:30:00', '超级管理员',
+        '2024-05-23 15:30:00');
+INSERT INTO `infra_dictionary_value`
+VALUES (7, 'system_menu_type', '目录', '1', 1, 'danger', 0, b'0', '超级管理员', '2024-05-23 15:39:51', '超级管理员',
+        '2024-05-23 15:40:28');
+INSERT INTO `infra_dictionary_value`
+VALUES (8, 'system_menu_type', '菜单', '2', 1, 'success', 1, b'0', '超级管理员', '2024-05-23 15:40:02', '超级管理员',
+        '2024-05-23 15:40:25');
+INSERT INTO `infra_dictionary_value`
+VALUES (9, 'system_menu_type', '按钮', '3', 1, 'info', 2, b'0', '超级管理员', '2024-05-23 15:40:19', '超级管理员',
+        '2024-05-23 15:40:19');
+INSERT INTO `infra_dictionary_value`
+VALUES (10, 'infra_job_status', '初始化', '0', 1, 'info', 0, b'0', '超级管理员', '2024-05-23 15:47:31', '超级管理员',
+        '2024-05-23 15:47:31');
+INSERT INTO `infra_dictionary_value`
+VALUES (11, 'infra_job_status', '运行中', '1', 1, 'success', 1, b'0', '超级管理员', '2024-05-23 15:47:45', '超级管理员',
+        '2024-05-23 15:47:45');
+INSERT INTO `infra_dictionary_value`
+VALUES (12, 'infra_job_status', '已暂停', '2', 1, 'danger', 2, b'0', '超级管理员', '2024-05-23 15:47:59', '超级管理员',
+        '2024-05-23 15:47:59');
+INSERT INTO `infra_dictionary_value`
+VALUES (13, 'infra_job_log_status', '调度中', '0', 1, 'info', 0, b'0', '超级管理员', '2024-05-23 15:48:33',
+        '超级管理员', '2024-05-23 15:48:33');
+INSERT INTO `infra_dictionary_value`
+VALUES (14, 'infra_job_log_status', '调度成功', '1', 1, 'success', 1, b'0', '超级管理员', '2024-05-23 15:48:41',
+        '超级管理员', '2024-05-23 15:48:41');
+INSERT INTO `infra_dictionary_value`
+VALUES (15, 'infra_job_log_status', '调度失败', '2', 1, 'danger', 2, b'0', '超级管理员', '2024-05-23 15:48:51',
+        '超级管理员', '2024-05-23 15:48:51');
+INSERT INTO `infra_dictionary_value`
+VALUES (16, 'infra_api_error_log_process_status', '未处理', '0', 1, 'danger', 0, b'0', '超级管理员',
+        '2024-05-23 15:49:18', '超级管理员', '2024-05-23 15:49:18');
+INSERT INTO `infra_dictionary_value`
+VALUES (17, 'infra_api_error_log_process_status', '已处理', '1', 1, 'success', 1, b'0', '超级管理员',
+        '2024-05-23 15:49:30', '超级管理员', '2024-05-23 15:49:30');
+INSERT INTO `infra_dictionary_value`
+VALUES (18, 'infra_api_error_log_process_status', '已忽略', '2', 1, 'info', 2, b'0', '超级管理员',
+        '2024-05-23 15:49:43', '超级管理员', '2024-05-23 15:49:43');
+INSERT INTO `infra_dictionary_value`
+VALUES (19, 'infra_file_storage', '数据库', '1', 1, 'default', 0, b'0', '超级管理员', '2024-05-23 15:52:23',
+        '超级管理员', '2024-05-23 15:52:23');
+INSERT INTO `infra_dictionary_value`
+VALUES (20, 'infra_file_storage', '本地存储', '10', 1, 'warning', 10, b'0', '超级管理员', '2024-05-23 15:52:39',
+        '超级管理员', '2024-05-23 15:52:39');
+INSERT INTO `infra_dictionary_value`
+VALUES (21, 'infra_file_storage', 'S3协议', '20', 1, 'danger', 20, b'0', '超级管理员', '2024-05-23 15:52:56',
+        '超级管理员', '2024-05-23 15:52:56');
+INSERT INTO `infra_dictionary_value`
+VALUES (22, 'infra_boolean_string', '是', 'true', 1, 'success', 0, b'0', '超级管理员', '2024-05-23 15:53:39',
+        '超级管理员', '2024-05-23 15:53:39');
+INSERT INTO `infra_dictionary_value`
+VALUES (23, 'infra_boolean_string', '否', 'false', 1, 'info', 1, b'0', '超级管理员', '2024-05-23 15:53:54',
+        '超级管理员', '2024-05-23 15:53:54');
+INSERT INTO `infra_dictionary_value`
+VALUES (24, 'infra_sms_send_status', '初始化', '0', 1, 'info', 0, b'0', '超级管理员', '2024-05-23 16:22:19',
+        '超级管理员', '2024-05-23 16:22:19');
+INSERT INTO `infra_dictionary_value`
+VALUES (25, 'infra_sms_send_status', '发送成功', '10', 1, 'success', 10, b'0', '超级管理员', '2024-05-23 16:22:40',
+        '超级管理员', '2024-05-23 16:22:40');
+INSERT INTO `infra_dictionary_value`
+VALUES (26, 'infra_sms_send_status', '发送失败', '20', 1, 'danger', 20, b'0', '超级管理员', '2024-05-23 16:22:52',
+        '超级管理员', '2024-05-23 16:22:52');
+INSERT INTO `infra_dictionary_value`
+VALUES (27, 'infra_sms_send_status', '仅日志', '30', 1, 'warning', 30, b'0', '超级管理员', '2024-05-23 16:23:35',
+        '超级管理员', '2024-05-23 16:23:35');
+INSERT INTO `infra_dictionary_value`
+VALUES (28, 'infra_sms_receive_status', '初始化', '0', 1, 'info', 0, b'0', '超级管理员', '2024-05-23 16:24:21',
+        '超级管理员', '2024-05-23 16:24:21');
+INSERT INTO `infra_dictionary_value`
+VALUES (29, 'infra_sms_receive_status', '接收成功', '10', 1, 'success', 10, b'0', '超级管理员', '2024-05-23 16:24:36',
+        '超级管理员', '2024-05-23 16:24:36');
+INSERT INTO `infra_dictionary_value`
+VALUES (30, 'infra_sms_receive_status', '接收失败', '20', 1, 'danger', 20, b'0', '超级管理员', '2024-05-23 16:24:46',
+        '超级管理员', '2024-05-23 16:24:46');
+
 -- ----------------------------
 -- Table structure for infra_error_log
 -- ----------------------------
@@ -52,6 +230,77 @@ CREATE TABLE `infra_error_log`
 -- ----------------------------
 -- Records of infra_error_log
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for infra_file
+-- ----------------------------
+
+DROP TABLE IF EXISTS `infra_file`;
+CREATE TABLE `infra_file`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '文件编号',
+  `config_id` bigint NULL DEFAULT NULL COMMENT '配置编号',
+  `name` varchar(256) NULL DEFAULT NULL COMMENT '文件名',
+  `path` varchar(512) NOT NULL COMMENT '文件路径',
+  `url` varchar(1024) NOT NULL COMMENT '文件 URL',
+  `type` varchar(128) NULL DEFAULT NULL COMMENT '文件类型',
+  `source` varchar(128) NULL DEFAULT NULL COMMENT '文件来源',
+  `size` int NOT NULL COMMENT '文件大小',
+  `creator` varchar(64) NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1  COMMENT = '文件表';
+
+
+-- ----------------------------
+-- Records of infra_file
+-- ----------------------------
+BEGIN;
+COMMIT;
+
+-- ----------------------------
+-- Table structure for infra_file_config
+-- ----------------------------
+DROP TABLE IF EXISTS `infra_file_config`;
+CREATE TABLE `infra_file_config`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `name` varchar(63) NOT NULL COMMENT '配置名',
+  `storage` tinyint NOT NULL COMMENT '存储器',
+  `remark` varchar(255) NULL DEFAULT NULL COMMENT '备注',
+  `master` bit(1) NOT NULL COMMENT '是否为主配置',
+  `config` varchar(4096) NOT NULL COMMENT '存储配置',
+  `creator` varchar(64) NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT =1  COMMENT = '文件配置表';
+
+-- ----------------------------
+-- Table structure for infra_file_content
+-- ----------------------------
+DROP TABLE IF EXISTS `infra_file_content`;
+CREATE TABLE `infra_file_content`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `config_id` bigint NOT NULL COMMENT '配置编号',
+  `path` varchar(512) NOT NULL COMMENT '文件路径',
+  `content` mediumblob NOT NULL COMMENT '文件内容',
+  `creator` varchar(64) NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater` varchar(64) NULL DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1  COMMENT = '文件表';
+
+-- ----------------------------
+-- Records of infra_file_content
+-- ----------------------------
+BEGIN;
+COMMIT;
 
 -- ----------------------------
 -- Table structure for infra_job
@@ -233,61 +482,112 @@ INSERT INTO `sys_menu`
 VALUES (110, '短信管理', '', 1, 5, 2, 'message', 'ep:message', NULL, NULL, 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:17:16', '超级管理员', '2024-04-14 12:57:34');
 INSERT INTO `sys_menu`
-VALUES (130, '定时任务', 'developer:job:query', 2, 0, 107, 'list', 'fa-solid:tasks', 'JobIndex', 'developer/job/index',
+VALUES (131, '定时任务', 'developer:job:query', 2, 0, 107, 'list', 'fa-solid:tasks', 'JobIndex', 'developer/job/index',
         1, 1, 1, 1, 0, '超级管理员', '2023-03-17 17:10:47', '超级管理员', '2024-04-14 13:00:20');
 INSERT INTO `sys_menu`
-VALUES (131, '调度日志', '', 2, 1, 107, 'log', 'ep:document', 'JobLog', 'developer/job/logger/index', 1, 1, 1, 1, 0,
+VALUES (132, '调度日志', '', 2, 1, 107, 'log', 'ep:document', 'JobLog', 'developer/job/logger/index', 1, 1, 1, 1, 0,
         '超级管理员', '2023-03-18 13:50:00', '超级管理员', '2024-04-14 13:00:17');
 INSERT INTO `sys_menu`
-VALUES (132, '新增', 'developer:job:add', 3, 0, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (133, '新增', 'developer:job:add', 3, 0, 131, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-03-17 17:12:23', '超级管理员', '2024-04-14 13:01:05');
 INSERT INTO `sys_menu`
-VALUES (133, '修改', 'developer:job:update', 3, 1, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (134, '修改', 'developer:job:update', 3, 1, 131, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-03-17 17:12:39', '超级管理员', '2024-04-14 13:01:07');
 INSERT INTO `sys_menu`
-VALUES (134, '删除', 'developer:job:remove', 3, 2, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (135, '删除', 'developer:job:remove', 3, 2, 131, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-03-17 17:12:58', '超级管理员', '2024-04-14 13:01:11');
 INSERT INTO `sys_menu`
-VALUES (135, '执行', 'developer:job:trigger', 3, 3, 130, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (136, '执行', 'developer:job:trigger', 3, 3, 131, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-03-17 17:13:23', '超级管理员', '2024-04-14 13:01:15');
 INSERT INTO `sys_menu`
-VALUES (136, '修改', 'developer:error-log:update', 3, 0, 108, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (137, '修改', 'developer:error-log:update', 3, 0, 109, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2022-07-10 13:55:37', '超级管理员', '2024-04-14 13:00:07');
 INSERT INTO `sys_menu`
-VALUES (137, '删除', 'developer:error-log:remove', 3, 1, 108, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (138, '删除', 'developer:error-log:remove', 3, 1, 109, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2022-07-10 13:55:57', '超级管理员', '2024-04-14 13:00:05');
 INSERT INTO `sys_menu`
-VALUES (145, '短信渠道', 'developer:sms:channel:query', 2, 0, 110, 'channel', 'fa:at', 'SmsChannel',
+VALUES (146, '短信渠道', 'developer:sms:channel:query', 2, 0, 111, 'channel', 'fa:at', 'SmsChannel',
         'developer/sms/channel/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:21:14', '超级管理员',
         '2024-04-14 13:02:42');
 INSERT INTO `sys_menu`
-VALUES (146, '短信模板', 'developer:sms:template:query', 2, 1, 110, 'template', 'fa-solid:align-justify', 'SmsTemplate',
+VALUES (147, '短信模板', 'developer:sms:template:query', 2, 1, 111, 'template', 'fa-solid:align-justify', 'SmsTemplate',
         'developer/sms/template/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-06 17:30:09', '超级管理员',
         '2024-04-14 13:02:57');
 INSERT INTO `sys_menu`
-VALUES (147, '短信日志', 'developer:sms:log:query', 2, 2, 110, 'logger', 'ep:document', 'SmsLog',
+VALUES (148, '短信日志', 'developer:sms:log:query', 2, 2, 111, 'logger', 'ep:document', 'SmsLog',
         'developer/sms/log/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-09 16:39:31', '超级管理员',
         '2024-04-14 13:03:06');
 INSERT INTO `sys_menu`
-VALUES (148, '新增', 'developer:sms:channel:add', 3, 0, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (149, '新增', 'developer:sms:channel:add', 3, 0, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:21:43', '超级管理员', '2024-04-14 13:04:38');
 INSERT INTO `sys_menu`
-VALUES (149, '修改', 'developer:sms:channel:update', 3, 1, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (150, '修改', 'developer:sms:channel:update', 3, 1, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:22:44', '超级管理员', '2024-04-14 13:04:45');
 INSERT INTO `sys_menu`
-VALUES (150, '删除', 'developer:sms:channel:remove', 3, 2, 145, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (151, '删除', 'developer:sms:channel:remove', 3, 2, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:23:02', '超级管理员', '2024-04-14 13:04:50');
 INSERT INTO `sys_menu`
-VALUES (151, '新增', 'developer:sms:template:add', 3, 0, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (152, '新增', 'developer:sms:template:add', 3, 0, 147, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:30:23', '超级管理员', '2024-04-14 13:04:53');
 INSERT INTO `sys_menu`
-VALUES (152, '修改', 'developer:sms:template:update', 3, 1, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (153, '修改', 'developer:sms:template:update', 3, 1, 147, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:30:40', '超级管理员', '2024-04-14 13:04:55');
 INSERT INTO `sys_menu`
-VALUES (153, '删除', 'developer:sms:template:remove', 3, 2, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (154, '删除', 'developer:sms:template:remove', 3, 2, 147, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:30:57', '超级管理员', '2024-04-14 13:04:58');
 INSERT INTO `sys_menu`
-VALUES (154, '测试', 'developer:sms:template:send:sms', 3, 3, 146, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (155, '测试', 'developer:sms:template:send:sms', 3, 3, 147, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-06 17:49:03', '超级管理员', '2024-04-14 13:05:01');
+INSERT INTO `sys_menu`
+VALUES (156, '文件管理', '', 1, 1, 2, 'file', 'ep:folder-opened', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:33:21',
+        '超级管理员', '2024-04-22 14:45:31');
+INSERT INTO `sys_menu`
+VALUES (157, '文件列表', 'developer:file:query', 2, 0, 156, 'f', 'ep:files', 'FileList', 'developer/file/index',
+        1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:41:51', '超级管理员', '2024-04-22 14:45:42');
+INSERT INTO `sys_menu`
+VALUES (158, 'OSS配置', 'developer:file:config:query', 2, 1, 156, 'config', 'fa:crosshairs', 'FileConfig',
+        'developer/file/config/index', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:43:40', '超级管理员', '2024-04-22 14:45:48');
+INSERT INTO `sys_menu`
+VALUES (159, '删除', 'developer:file:remove', 3, 0, 157, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:44:01',
+        '超级管理员', '2024-04-22 14:46:12');
+INSERT INTO `sys_menu`
+VALUES (160, '新增', 'developer:file:config:add', 3, 0, 158, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:21', '超级管理员', '2024-04-22 14:46:15');
+INSERT INTO `sys_menu`
+VALUES (161, '修改', 'developer:file:config:update', 3, 1, 158, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:32', '超级管理员', '2024-04-22 14:46:18');
+INSERT INTO `sys_menu`
+VALUES (162, '删除', 'developer:file:config:remove', 3, 2, 158, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:45', '超级管理员', '2024-04-22 14:46:19');
+INSERT INTO `sys_menu`
+VALUES (163, '字典管理', '', 1, 6, 2, 'dictionary', 'ep:folder-opened', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:33:21', '超级管理员', '2024-05-23 10:03:04');
+INSERT INTO `sys_menu`
+VALUES (164, '字典列表', 'developer:dictionary:query', 2, 0, 163, 's', 'ep:files', 'DictionaryList',
+        'developer/dictionary/index', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:41:51', '超级管理员',
+        '2024-05-23 10:29:46');
+INSERT INTO `sys_menu`
+VALUES (165, '字典数据', 'developer:dictionary:value:query', 2, 1, 163, 'values', 'fa:crosshairs', 'DictionaryValue',
+        'developer/dictionary/value/index', 1, 1, 1, 1, 0, '超级管理员', '2024-04-22 14:43:40', '超级管理员',
+        '2024-05-23 11:22:38');
+INSERT INTO `sys_menu`
+VALUES (166, '新增', 'developer:dictionary:add', 3, 0, 164, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:01', '超级管理员', '2024-04-22 14:46:12');
+INSERT INTO `sys_menu`
+VALUES (167, '修改', 'developer:dictionary:update', 3, 0, 164, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:21', '超级管理员', '2024-04-22 14:46:15');
+INSERT INTO `sys_menu`
+VALUES (168, '删除', 'developer:dictionary:remove', 3, 1, 164, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:32', '超级管理员', '2024-04-22 14:46:18');
+INSERT INTO `sys_menu`
+VALUES (169, '新增', 'developer:dictionary:value:add', 3, 0, 165, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:01', '超级管理员', '2024-04-22 14:46:12');
+INSERT INTO `sys_menu`
+VALUES (170, '修改', 'developer:dictionary:value:update', 3, 0, 165, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:21', '超级管理员', '2024-04-22 14:46:15');
+INSERT INTO `sys_menu`
+VALUES (171, '删除', 'developer:dictionary:value:remove', 3, 1, 165, '', '', '', '', 1, 1, 1, 1, 0, '超级管理员',
+        '2024-04-22 14:44:32', '超级管理员', '2024-04-22 14:46:18');
+
 
 SET FOREIGN_KEY_CHECKS = 1;

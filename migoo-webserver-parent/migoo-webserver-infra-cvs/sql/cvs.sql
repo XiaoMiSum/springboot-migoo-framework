@@ -48,27 +48,27 @@ INSERT INTO `sys_menu`
 VALUES (109, '云服务器', '', 1, 4, 2, 'cvs', 'fa:cloud', NULL, NULL, 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 21:32:29', '超级管理员', '2024-04-14 12:57:36');
 INSERT INTO `sys_menu`
-VALUES (138, '实例列表', 'developer:cvs:machine:query', 2, 0, 109, 'server', 'fa:medium', 'CVSMachine',
+VALUES (139, '实例列表', 'developer:cvs:machine:query', 2, 0, 109, 'server', 'fa:medium', 'CVSMachine',
         'manager/developer/cvs/machine/index', 1, 1, 1, 1, 0, '超级管理员', '2023-06-04 22:15:16',
         '超级管理员', '2024-04-14 13:00:04');
 INSERT INTO `sys_menu`
-VALUES (139, '云服务商', 'developer:cvs:provider:query', 2, 1, 109, 'provider', 'fa-solid:address-card',
+VALUES (140, '云服务商', 'developer:cvs:provider:query', 2, 1, 109, 'provider', 'fa-solid:address-card',
         'CVSProvider', 'manager/developer/cvs/provider/index', 1, 1, 1, 1, 0, '超级管理员',
         '2023-06-04 22:18:38', '超级管理员', '2024-04-14 13:00:02');
 INSERT INTO `sys_menu`
-VALUES (140, '修改', 'developer:cvs:machine:update', 3, 0, 138, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (141, '修改', 'developer:cvs:machine:update', 3, 0, 139, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 22:17:05', '超级管理员', '2024-04-14 13:01:56');
 INSERT INTO `sys_menu`
-VALUES (141, '删除', 'developer:cvs:machine:remove', 3, 1, 138, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (142, '删除', 'developer:cvs:machine:remove', 3, 1, 139, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 22:17:19', '超级管理员', '2024-04-14 13:01:58');
 INSERT INTO `sys_menu`
-VALUES (142, '新增', 'developer:cvs:provider:add', 3, 0, 139, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (143, '新增', 'developer:cvs:provider:add', 3, 0, 140, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 22:19:19', '超级管理员', '2024-04-14 13:01:59');
 INSERT INTO `sys_menu`
-VALUES (143, '修改', 'developer:cvs:provider:update', 3, 1, 139, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (144, '修改', 'developer:cvs:provider:update', 3, 1, 140, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 22:19:32', '超级管理员', '2024-04-14 13:02:03');
 INSERT INTO `sys_menu`
-VALUES (144, '删除', 'developer:cvs:provider:remove', 3, 2, 139, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
+VALUES (145, '删除', 'developer:cvs:provider:remove', 3, 2, 140, '', '', NULL, '', 1, 1, 0, 1, 0, '超级管理员',
         '2023-06-04 22:19:43', '超级管理员', '2024-04-14 13:02:06');
 
 -- ----------------------------
