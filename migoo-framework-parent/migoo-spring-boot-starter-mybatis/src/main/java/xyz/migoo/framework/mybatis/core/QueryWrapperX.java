@@ -2,6 +2,7 @@ package xyz.migoo.framework.mybatis.core;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
@@ -27,11 +28,15 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
         if (columns.length > 0) {
             List<String> columnList = Lists.newArrayList();
             for (SFunction<T, ?> column : columns) {
-                columnList.add(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+                columnList.add(columnToString(column));
             }
             select(columnList);
         }
         return this;
+    }
+
+    private String columnToString(SFunction<T, ?> column) {
+        return StrUtil.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
     }
 
     public QueryWrapperX<T> limit(int n) {
@@ -40,7 +45,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> likeIfPresent(SFunction<T, ?> column, String val) {
-        return likeIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return likeIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> likeIfPresent(String column, String val) {
@@ -51,11 +56,11 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> inIfPresent(SFunction<T, ?> column, Object... val) {
-        return inIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return inIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> inIfPresent(SFunction<T, ?> column, Collection<?> val) {
-        return inIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return inIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> inIfPresent(String column, Collection<?> values) {
@@ -73,11 +78,11 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> notInIfPresent(SFunction<T, ?> column, Collection<?> val) {
-        return notInIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return notInIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> notInIfPresent(SFunction<T, ?> column, Object... val) {
-        return notInIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return notInIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> notInIfPresent(String column, Collection<?> coll) {
@@ -95,7 +100,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> eqIfPresent(SFunction<T, ?> column, Object val) {
-        return eqIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return eqIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> eqIfPresent(String column, Object val) {
@@ -106,7 +111,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> neIfPresent(SFunction<T, ?> column, Object val) {
-        return neIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return neIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> neIfPresent(String column, Object val) {
@@ -117,7 +122,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> gtIfPresent(SFunction<T, ?> column, Object val) {
-        return gtIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return gtIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> gtIfPresent(String column, Object val) {
@@ -128,7 +133,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> geIfPresent(SFunction<T, ?> column, Object val) {
-        return geIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return geIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> geIfPresent(String column, Object val) {
@@ -139,7 +144,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> ltIfPresent(SFunction<T, ?> column, Object val) {
-        return ltIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return ltIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> ltIfPresent(String column, Object val) {
@@ -150,7 +155,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> leIfPresent(SFunction<T, ?> column, Object val) {
-        return leIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return leIfPresent(columnToString(column), val);
     }
 
     public QueryWrapperX<T> leIfPresent(String column, Object val) {
@@ -161,7 +166,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object val1, Object val2) {
-        return betweenIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val1, val2);
+        return betweenIfPresent(columnToString(column), val1, val2);
     }
 
     public QueryWrapperX<T> betweenIfPresent(String column, Object val1, Object val2) {
@@ -178,7 +183,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> betweenIfPresent(SFunction<T, ?> column, Object[] values) {
-        return betweenIfPresent(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return betweenIfPresent(columnToString(column), values);
     }
 
     public QueryWrapperX<T> betweenIfPresent(String column, Object[] values) {
@@ -188,115 +193,115 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> eq(boolean condition, SFunction<T, ?> column, Object val) {
-        return eq(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return eq(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> eq(SFunction<T, ?> column, Object val) {
-        return eq(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return eq(columnToString(column), val);
     }
 
     public QueryWrapperX<T> ne(boolean condition, SFunction<T, ?> column, Object val) {
-        return ne(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return ne(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> ne(SFunction<T, ?> column, Object val) {
-        return ne(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return ne(columnToString(column), val);
     }
 
     public QueryWrapperX<T> gt(boolean condition, SFunction<T, ?> column, Object val) {
-        return gt(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return gt(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> gt(SFunction<T, ?> column, Object val) {
-        return gt(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return gt(columnToString(column), val);
     }
 
     public QueryWrapperX<T> ge(boolean condition, SFunction<T, ?> column, Object val) {
-        return ge(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return ge(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> ge(SFunction<T, ?> column, Object val) {
-        return ge(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return ge(columnToString(column), val);
     }
 
     public QueryWrapperX<T> lt(boolean condition, SFunction<T, ?> column, Object val) {
-        return lt(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return lt(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> lt(SFunction<T, ?> column, Object val) {
-        return lt(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return lt(columnToString(column), val);
     }
 
     public QueryWrapperX<T> le(boolean condition, SFunction<T, ?> column, Object val) {
-        return le(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return le(condition, columnToString(column), val);
     }
 
     public QueryWrapperX<T> le(SFunction<T, ?> column, Object val) {
-        return le(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), val);
+        return le(columnToString(column), val);
     }
 
     public QueryWrapperX<T> isNull(boolean condition, SFunction<T, ?> column) {
-        return isNull(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return isNull(condition, columnToString(column));
     }
 
     public QueryWrapperX<T> isNull(SFunction<T, ?> column) {
-        return isNull(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return isNull(columnToString(column));
     }
 
     public QueryWrapperX<T> isNotNull(boolean condition, SFunction<T, ?> column) {
-        return isNotNull(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return isNotNull(condition, columnToString(column));
     }
 
     public QueryWrapperX<T> isNotNull(SFunction<T, ?> column) {
-        return isNotNull(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return isNotNull(columnToString(column));
     }
 
     public QueryWrapperX<T> in(boolean condition, SFunction<T, ?> column, Object... values) {
-        return in(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return in(condition, columnToString(column), values);
     }
 
     public QueryWrapperX<T> in(SFunction<T, ?> column, Object... values) {
-        return in(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return in(columnToString(column), values);
     }
 
     public QueryWrapperX<T> in(boolean condition, SFunction<T, ?> column, Collection<?> values) {
-        return in(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return in(condition, columnToString(column), values);
     }
 
     public QueryWrapperX<T> in(SFunction<T, ?> column, Collection<?> values) {
-        return in(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return in(columnToString(column), values);
     }
 
     public QueryWrapperX<T> notIn(boolean condition, SFunction<T, ?> column, Object... values) {
-        return notIn(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return notIn(condition, columnToString(column), values);
     }
 
     public QueryWrapperX<T> notIn(SFunction<T, ?> column) {
-        return notIn(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return notIn(columnToString(column));
     }
 
     public QueryWrapperX<T> notIn(boolean condition, SFunction<T, ?> column, Collection<?> values) {
-        return notIn(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return notIn(condition, columnToString(column), values);
     }
 
     public QueryWrapperX<T> notIn(SFunction<T, ?> column, Collection<?> values) {
-        return notIn(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()), values);
+        return notIn(columnToString(column), values);
     }
 
     public QueryWrapperX<T> orderByAsc(boolean condition, SFunction<T, ?> column) {
-        return orderByAsc(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return orderByAsc(condition, columnToString(column));
     }
 
     public QueryWrapperX<T> orderByAsc(SFunction<T, ?> column) {
-        return orderByAsc(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return orderByAsc(columnToString(column));
     }
 
     public QueryWrapperX<T> orderByDesc(boolean condition, SFunction<T, ?> column) {
-        return orderByDesc(condition, PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return orderByDesc(condition, columnToString(column));
     }
 
     public QueryWrapperX<T> orderByDesc(SFunction<T, ?> column) {
-        return orderByDesc(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return orderByDesc(columnToString(column));
     }
 
     // ========== 重写父类方法，方便链式调用 ==========
