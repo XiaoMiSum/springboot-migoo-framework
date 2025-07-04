@@ -181,6 +181,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             roleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
         }
+        initLocalCache();
     }
 
     @Override
@@ -204,6 +205,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (!CollectionUtil.isEmpty(deleteMenuIds)) {
             userRoleMapper.deleteListByUserIdAndRoleIdIds(userId, deleteMenuIds);
         }
+        initLocalCache();
     }
 
     @Override
@@ -213,17 +215,20 @@ public class PermissionServiceImpl implements PermissionService {
         userRoleMapper.deleteListByRoleId(roleId);
         // 标记删除 RoleMenu
         roleMenuMapper.deleteListByRoleId(roleId);
+        initLocalCache();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void processMenuDeleted(Long menuId) {
         roleMenuMapper.deleteListByMenuId(menuId);
+        initLocalCache();
     }
 
     @Override
     public void processUserDeleted(Long userId) {
         userRoleMapper.deleteListByUserId(userId);
+        initLocalCache();
     }
 
     @Override

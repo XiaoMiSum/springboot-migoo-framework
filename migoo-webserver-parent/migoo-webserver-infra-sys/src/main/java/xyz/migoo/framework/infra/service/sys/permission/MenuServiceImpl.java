@@ -136,6 +136,7 @@ public class MenuServiceImpl implements MenuService {
         menuMapper.deleteById(menuId);
         // 删除授予给角色的权限
         permissionService.processMenuDeleted(menuId);
+        initLocalCache();
     }
 
     @Override
@@ -192,6 +193,7 @@ public class MenuServiceImpl implements MenuService {
         // 插入数据库
         initMenuProperty(menu);
         menuMapper.insert(menu);
+        initLocalCache();
     }
 
     @Override
@@ -207,6 +209,7 @@ public class MenuServiceImpl implements MenuService {
         // 更新到数据库
         initMenuProperty(menu);
         menuMapper.updateById(menu);
+        initLocalCache();
     }
 
     /**

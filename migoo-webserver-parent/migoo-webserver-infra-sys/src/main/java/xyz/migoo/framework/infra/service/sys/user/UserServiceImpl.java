@@ -14,6 +14,7 @@ import xyz.migoo.framework.infra.convert.AuthConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.dal.mapper.sys.UserMapper;
 import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
+import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
 import xyz.migoo.framework.security.core.BaseUser;
 import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
@@ -33,6 +34,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper mapper;
     @Value("${migoo.security.password-secret}")
     private String secret;
+    @Resource
+    private PermissionService permissionService;
 
     @Override
     public PageResult<User> getPage(UserQueryReqVO req) {
@@ -83,6 +86,7 @@ public class UserServiceImpl implements UserService {
         if (mapper.deleteById(id) == N_0) {
             throw ServiceExceptionUtil.get(SysErrorCodeConstants.USER_NOT_EXISTS);
         }
+        permissionService.processUserDeleted(id);
     }
 
     @Override

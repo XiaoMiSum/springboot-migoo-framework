@@ -122,6 +122,7 @@ public class RoleServiceImpl implements RoleService {
         roleMapper.deleteById(id);
         // 删除相关数据
         permissionService.processRoleDeleted(id);
+        initLocalCache();
     }
 
     @Override
@@ -187,12 +188,14 @@ public class RoleServiceImpl implements RoleService {
     public void add(Role role) {
         role.setType(RoleTypeEnum.CUSTOM.getType());
         roleMapper.insert(role);
+        initLocalCache();
     }
 
     @Override
     public void update(Role role) {
         this.verify(role.getId());
         roleMapper.updateById(role);
+        initLocalCache();
     }
 
     private void verify(Long id) {
