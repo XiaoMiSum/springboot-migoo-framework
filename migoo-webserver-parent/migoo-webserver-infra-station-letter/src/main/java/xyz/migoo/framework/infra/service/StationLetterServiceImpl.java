@@ -55,6 +55,6 @@ public class StationLetterServiceImpl implements StationLetterService {
 
     @Override
     public void remove(Collection<Long> ids) {
-        mapper.deleteBatchIds(ids);
+        mapper.deleteByIds(ids);
     }
 }

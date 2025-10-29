@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class DictionaryUpdateReqVO extends DictionaryBaseVO {
 
-    @NotNull(message = "字段编号不能为空")
+    @NotNull(message = "{infra.dict.id.empty}")
     private Long id;
 }

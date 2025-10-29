@@ -155,7 +155,7 @@ public class JobServiceImpl implements JobService {
 
     private void validateCronExpression(String cronExpression) {
         if (!CronUtils.isValid(cronExpression)) {
-            throw ServiceExceptionUtil.get(JOB_CRON_EXPRESSION_VALID);
+            throw ServiceExceptionUtil.get(JOB_CRON_EXPRESSION_INVALID);
         }
     }
 

@@ -27,9 +27,11 @@ import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.*;
 
@@ -47,6 +49,8 @@ public class GlobalExceptionHandler {
 
     private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
 
+    private final I18NMessage i18n;
+
 
     /**
      * 处理所有异常，主要是提供给 Filter 使用
@@ -57,37 +61,20 @@ public class GlobalExceptionHandler {
      * @return 通用返回
      */
     public Result<?> allExceptionHandler(HttpServletRequest request, Throwable t) {
-        if (t instanceof HttpMediaTypeNotSupportedException th) {
-            return httpMediaTypeNotSupportedException(request, th);
-        }
-        if (t instanceof MissingServletRequestParameterException th) {
-            return missingServletRequestParameterExceptionHandler(request, th);
-        }
-        if (t instanceof MethodArgumentTypeMismatchException th) {
-            return methodArgumentTypeMismatchExceptionHandler(request, th);
-        }
-        if (t instanceof MethodArgumentNotValidException th) {
-            return methodArgumentNotValidExceptionExceptionHandler(request, th);
-        }
-        if (t instanceof BindException th) {
-            return bindExceptionHandler(request, th);
-        }
-        if (t instanceof ConstraintViolationException th) {
-            return constraintViolationExceptionHandler(request, th);
-        }
-        if (t instanceof ValidationException th) {
-            return validationException(request, th);
-        }
-        if (t instanceof NoHandlerFoundException th) {
-            return noHandlerFoundExceptionHandler(request, th);
-        }
-        if (t instanceof HttpRequestMethodNotSupportedException th) {
-            return httpRequestMethodNotSupportedExceptionHandler(request, th);
-        }
-        if (t instanceof ServiceException th) {
-            return serviceExceptionHandler(request, th);
-        }
-        return defaultExceptionHandler(request, t);
+        return switch (t) {
+            case HttpMediaTypeNotSupportedException e -> httpMediaTypeNotSupportedException(request, e);
+            case MissingServletRequestParameterException e -> missingServletRequestParameterHandler(request, e);
+            case MethodArgumentTypeMismatchException e -> methodArgumentTypeMismatchExceptionHandler(request, e);
+            case MethodArgumentNotValidException e -> methodArgumentNotValidExceptionExceptionHandler(request, e);
+            case BindException e -> bindExceptionHandler(request, e);
+            case ConstraintViolationException e -> constraintViolationExceptionHandler(request, e);
+            case ValidationException e -> validationException(request, e);
+            case NoHandlerFoundException e -> noHandlerFoundExceptionHandler(request, e);
+            case HttpRequestMethodNotSupportedException e -> httpRequestMethodNotSupportedExceptionHandler(request, e);
+            case SocketRuntimeException e -> socketRuntimeExceptionHandler(request, e);
+            case ServiceException e -> serviceExceptionHandler(request, e);
+            default -> defaultExceptionHandler(request, t);
+        };
     }
 
     /**
@@ -98,7 +85,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), t.getContentType()));
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, t.getContentType()));
     }
 
     /**
@@ -107,8 +95,9 @@ public class GlobalExceptionHandler {
      * 例如说，接口上设置了 @RequestParam("xx") 参数，结果并未传递 xx 参数
      */
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
-    public Result<?> missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), ex.getParameterName()));
+    public Result<?> missingServletRequestParameterHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, ex.getParameterName()));
     }
 
     /**
@@ -118,27 +107,36 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), ex.getMessage()));
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, ex.getMessage()));
     }
 
     /**
      * 处理 SpringMVC 参数校验不正确
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<?> methodArgumentNotValidExceptionExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException ex) {
-        FieldError fieldError = ex.getBindingResult().getFieldError();
-        assert fieldError != null; // 断言，避免告警
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), fieldError.getDefaultMessage()));
+    public Result<?> methodArgumentNotValidExceptionExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException e) {
+        var errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
      * 处理 SpringMVC 参数绑定不正确，本质上也是通过 Validator 校验
      */
     @ExceptionHandler(BindException.class)
-    public Result<?> bindExceptionHandler(HttpServletRequest request, BindException ex) {
-        FieldError fieldError = ex.getFieldError();
-        assert fieldError != null; // 断言，避免告警
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), fieldError.getDefaultMessage()));
+    public Result<?> bindExceptionHandler(HttpServletRequest request, BindException e) {
+        var errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
@@ -147,7 +145,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", BAD_REQUEST.getMsg(), constraintViolation.getMessage()));
+        var message = i18n.getMessage(BAD_REQUEST.getMsg());
+        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, constraintViolation.getMessage()));
     }
 
     /**
@@ -168,7 +167,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public Result<?> noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
-        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", NOT_FOUND.getMsg(), ex.getRequestURL()));
+        var message = i18n.getMessage(NOT_FOUND.getMsg());
+        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", message, ex.getRequestURL()));
     }
 
     /**
@@ -178,7 +178,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
-        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", METHOD_NOT_ALLOWED.getMsg(), ex.getMethod()));
+        var message = i18n.getMessage(METHOD_NOT_ALLOWED.getMsg());
+        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", message, ex.getMethod()));
     }
 
     /**
@@ -188,7 +189,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = SocketRuntimeException.class)
     public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
-        return Result.getError(SOCKET_TIME_OUT);
+        var message = i18n.getMessage(SOCKET_TIME_OUT.getMsg());
+        return Result.getError(SOCKET_TIME_OUT.getCode(), message);
     }
 
     /**
@@ -198,7 +200,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = ServiceException.class)
     public Result<?> serviceExceptionHandler(HttpServletRequest request, ServiceException ex) {
-        return Result.getError(ex.getCode(), ex.getMessage());
+        var message = i18n.getMessage(ex.getMessage());
+        return Result.getError(ex.getCode(), message);
     }
 
     /**
@@ -209,7 +212,8 @@ public class GlobalExceptionHandler {
         createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
-        return Result.getError(INTERNAL_SERVER_ERROR);
+        var message = i18n.getMessage(INTERNAL_SERVER_ERROR.getMsg());
+        return Result.getError(INTERNAL_SERVER_ERROR.getCode(), message);
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {

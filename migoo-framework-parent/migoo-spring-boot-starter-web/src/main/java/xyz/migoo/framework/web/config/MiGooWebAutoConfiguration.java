@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
@@ -22,6 +23,8 @@ import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
 import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
+import xyz.migoo.framework.web.i18n.I18NLocaleResolver;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import static java.lang.Thread.ofVirtual;
 import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
@@ -55,8 +58,13 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService apiErrorLogFrameworkService) {
-        return new GlobalExceptionHandler(applicationName, apiErrorLogFrameworkService);
+    public LocaleResolver I18NLocaleResolver() {
+        return new I18NLocaleResolver();
+    }
+
+    @Bean
+    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService apiErrorLog, I18NMessage i18n) {
+        return new GlobalExceptionHandler(applicationName, apiErrorLog, i18n);
     }
 
     // ========== Filter 相关 ==========

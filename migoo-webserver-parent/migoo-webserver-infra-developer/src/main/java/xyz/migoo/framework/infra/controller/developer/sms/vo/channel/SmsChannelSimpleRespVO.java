@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class SmsChannelSimpleRespVO {
 
-    @NotNull(message = "编号不能为空")
+    @NotNull(message = "{infra.sms.channel.id.empty}")
     private Long id;
 
-    @NotNull(message = "短信签名不能为空")
+    @NotNull(message = "{infra.sms.channel.signature.empty}")
     private String signature;
 
     private String code;

@@ -10,11 +10,11 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class RoleUpdateReqVO extends RoleBaseVO {
 
-    @NotNull(message = "角色编号不能为空")
+    @NotNull(message = "{infra.role.id.empty}")
     private Long id;
 
-    @NotNull(message = "更新状态不能为空")
-    @Min(value = 1, message = "更新状态错误")
-    @Max(value = 2, message = "更新状态错误")
+    @NotNull(message = "{infra.role.status.empty}")
+    @Min(value = 1, message = "{infra.role.status.invalid}")
+    @Max(value = 2, message = "{infra.role.status.invalid}")
     private Integer status;
 }

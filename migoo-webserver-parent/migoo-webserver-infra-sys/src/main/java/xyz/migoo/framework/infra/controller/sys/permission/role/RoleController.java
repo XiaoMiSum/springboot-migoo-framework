@@ -36,7 +36,7 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:role:add')")
-    public Result<?> addRole(@RequestBody RoleAddReqVO reqVO) {
+    public Result<?> addRole(@Valid @RequestBody RoleAddReqVO reqVO) {
         roleService.verify(reqVO.getCode(), reqVO.getName(), null);
         roleService.add(RoleConvert.INSTANCE.convert(reqVO));
         return Result.getSuccessful();
@@ -44,7 +44,7 @@ public class RoleController {
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:role:update')")
-    public Result<?> updateRole(@RequestBody RoleUpdateReqVO reqVO) {
+    public Result<?> updateRole(@Valid @RequestBody RoleUpdateReqVO reqVO) {
         roleService.verify(reqVO.getCode(), reqVO.getName(), reqVO.getId());
         roleService.update(RoleConvert.INSTANCE.convert(reqVO));
         return Result.getSuccessful();

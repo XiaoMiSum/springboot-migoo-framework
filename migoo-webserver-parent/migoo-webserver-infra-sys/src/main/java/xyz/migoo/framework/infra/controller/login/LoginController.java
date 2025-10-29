@@ -4,6 +4,7 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,7 +54,7 @@ public class LoginController {
     private ConfigurerService configurerService;
 
     @PostMapping("/login")
-    public Result<AuthLoginRespVO> login(@RequestBody AuthLoginReqVO req) {
+    public Result<AuthLoginRespVO> login(@Valid @RequestBody AuthLoginReqVO req) {
         return Result.getSuccessful(tokenService.signIn(req));
     }
 
@@ -107,7 +108,7 @@ public class LoginController {
 
     @PostMapping("/password")
     @Authenticator
-    public Result<?> updatePassword(@CurrentUser LoginUser user, @RequestBody PasswordVO password) {
+    public Result<?> updatePassword(@CurrentUser LoginUser user, @Valid @RequestBody PasswordVO password) {
         if (Objects.equals(password.getNewPassword(), password.getOldPassword())) {
             throw ServiceExceptionUtil.get(USER_PASSWORD_OLD_NEW);
         }

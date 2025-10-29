@@ -1,6 +1,7 @@
 package xyz.migoo.framework.infra.controller.developer.errorlog;
 
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
@@ -32,7 +33,7 @@ public class ErrorLogController {
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:error-log:update')")
-    public Result<?> update(@RequestBody ApiErrorLogUpdateVO req) {
+    public Result<?> update(@Valid @RequestBody ApiErrorLogUpdateVO req) {
         service.update(ErrorLogConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
     }

@@ -1,6 +1,7 @@
 package xyz.migoo.framework.infra.controller.developer.job.vo;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ public class JobLogBaseVO {
     private Long jobId;
 
     @NotNull(message = "处理器的名字不能为空")
+    @Size(max = 64, message = "任务名称不能为空")
     private String handlerName;
 
     private String handlerParam;

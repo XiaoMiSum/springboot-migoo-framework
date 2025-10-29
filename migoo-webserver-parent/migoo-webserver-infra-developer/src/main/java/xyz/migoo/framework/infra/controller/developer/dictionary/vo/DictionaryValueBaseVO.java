@@ -12,22 +12,22 @@ import lombok.NoArgsConstructor;
 @Data
 public class DictionaryValueBaseVO {
 
-    @NotBlank(message = "字典标签不能为空")
-    @Size(max = 100, message = "字典标签长度不能超过100个字符")
+    @NotBlank(message = "{infra.dict.key.label.empty}")
+    @Size(max = 10, message = "{infra.dict.key.label.size.max}")
     private String label;
 
-    @NotBlank(message = "字典键值不能为空")
-    @Size(max = 100, message = "字典键值长度不能超过100个字符")
+    @NotBlank(message = "{infra.dict.key.value.empty}")
+    @Size(max = 64, message = "{infra.dict.key.value.size.max}")
     private String value;
 
-    @NotBlank(message = "字典编码不能为空")
-    @Size(max = 100, message = "字典编码长度不能超过100个字符")
+    @NotBlank(message = "{infra.dict.key.code.empty}")
+    @Size(max = 64, message = "{infra.dict.code.label.size.max}")
     private String dictCode;
 
     private Integer status;
 
     private String colorType;
 
-    @NotNull(message = "显示顺序不能为空")
+    @NotNull(message = "{common.sort.null}")
     private Integer sort;
 }

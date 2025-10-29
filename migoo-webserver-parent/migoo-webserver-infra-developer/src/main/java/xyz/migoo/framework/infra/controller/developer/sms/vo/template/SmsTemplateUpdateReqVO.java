@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class SmsTemplateUpdateReqVO extends SmsTemplateBaseVO {
 
-    @NotNull(message = "编号不能为空")
+    @NotNull(message = "{infra.sms.template.id.empty}")
     private Long id;
 
 }

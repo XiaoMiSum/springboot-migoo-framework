@@ -1,6 +1,7 @@
 package xyz.migoo.framework.infra.controller.sys.dept;
 
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.Result;
@@ -31,7 +32,7 @@ public class DeptController {
 
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:dept:add')")
-    public Result<?> addDept(@RequestBody DeptAddReqVO addReq) {
+    public Result<?> addDept(@Valid @RequestBody DeptAddReqVO addReq) {
         deptService.verify(null, addReq.getParentId(), addReq.getName());
         deptService.add(DeptConvert.INSTANCE.convert(addReq));
         return Result.getSuccessful();
@@ -39,7 +40,7 @@ public class DeptController {
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:dept:update')")
-    public Result<?> updateDept(@RequestBody DeptUpdateReqVO updateReqVO) {
+    public Result<?> updateDept(@Valid @RequestBody DeptUpdateReqVO updateReqVO) {
         deptService.verify(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
         deptService.update(DeptConvert.INSTANCE.convert(updateReqVO));
         return Result.getSuccessful();

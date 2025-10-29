@@ -1,6 +1,5 @@
 package xyz.migoo.framework.infra.controller.developer.job.vo;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,8 +8,5 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class JobCreateReqVO extends JobBaseVO {
-
-    @NotNull(message = "处理器的名字不能为空")
-    private String handlerName;
 
 }

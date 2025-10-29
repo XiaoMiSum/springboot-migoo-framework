@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UserAddReqVO extends UserBaseVO {
 
-    @NotBlank(message = "登录密码不能为空")
+    @NotBlank(message = "{infra.user.password.empty}")
     private String password;
 }

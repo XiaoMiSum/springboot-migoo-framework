@@ -12,19 +12,19 @@ public class SmsTemplateBaseVO {
 
     private Integer status;
 
-    @NotNull(message = "模板编码不能为空")
+    @NotNull(message = "{infra.sms.template.code.empty}")
     private String code;
 
-    @NotNull(message = "模板名称不能为空")
+    @NotNull(message = "{infra.sms.template.name.empty}")
     private String name;
 
-    @NotNull(message = "模板内容不能为空")
+    @NotNull(message = "{infra.sms.template.content.empty}")
     private String content;
 
-    @NotNull(message = "短信 API 的模板编号不能为空")
+    @NotNull(message = "{infra.sms.template.id.empty}")
     private String apiTemplateId;
 
-    @NotNull(message = "短信渠道编号不能为空")
+    @NotNull(message = "{infra.sms.channel.id.empty}")
     private Long channelId;
 
 }

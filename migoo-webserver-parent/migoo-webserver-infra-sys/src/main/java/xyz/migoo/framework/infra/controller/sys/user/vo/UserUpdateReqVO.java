@@ -8,8 +8,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UserUpdateReqVO extends UserBaseVO {
 
-    @NotNull(message = "用户编号不能为空")
+    @NotNull(message = "{infra.user.id.empty}")
     private Long id;
 
+    @NotNull(message = "{infra.user.status.empty}")
     private Integer status;
 }

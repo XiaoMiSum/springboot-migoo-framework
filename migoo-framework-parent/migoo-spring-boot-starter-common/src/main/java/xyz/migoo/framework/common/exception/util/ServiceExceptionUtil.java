@@ -30,15 +30,15 @@ public class ServiceExceptionUtil {
     private static final ConcurrentMap<Integer, String> MESSAGES = new ConcurrentHashMap<>();
 
     public static void putAll(Map<Integer, String> messages) {
-        ServiceExceptionUtil.MESSAGES.putAll(messages);
+        MESSAGES.putAll(messages);
     }
 
     public static void put(Integer code, String message) {
-        ServiceExceptionUtil.MESSAGES.put(code, message);
+        MESSAGES.put(code, message);
     }
 
     public static void delete(Integer code, String message) {
-        ServiceExceptionUtil.MESSAGES.remove(code, message);
+        MESSAGES.remove(code, message);
     }
 
     // ========== 和 ServiceException 的集成 ==========

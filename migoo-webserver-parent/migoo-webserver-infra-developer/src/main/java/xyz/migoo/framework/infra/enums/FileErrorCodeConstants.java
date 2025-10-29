@@ -11,12 +11,12 @@ public class FileErrorCodeConstants {
 
 
     // ========= 文件相关 1-001-003-000 =================
-    public static final ErrorCode FILE_PATH_EXISTS = ErrorCode.of(1006013000, "文件路径已存在");
-    public static final ErrorCode FILE_NOT_EXISTS = ErrorCode.of(1006013001, "文件不存在");
-    public static final ErrorCode FILE_IS_EMPTY = ErrorCode.of(1006013002, "文件为空");
+    public static final ErrorCode FILE_PATH_EXISTS = ErrorCode.of(1006013000, "infra.file.path.exists");
+    public static final ErrorCode FILE_NOT_EXISTS = ErrorCode.of(1006013001, "infra.file.path.not.exists");
+    public static final ErrorCode FILE_IS_EMPTY = ErrorCode.of(1006013002, "infra.file.empty");
 
     // ========== 文件配置 1-001-006-000 ==========
-    public static final ErrorCode FILE_CONFIG_NOT_EXISTS = ErrorCode.of(1006014001, "文件配置不存在");
-    public static final ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = ErrorCode.of(1006014002, "该文件配置不允许删除，原因：它是主配置，删除会导致无法上传文件");
+    public static final ErrorCode FILE_CONFIG_NOT_EXISTS = ErrorCode.of(1006014001, "infra.file.config.not.exists");
+    public static final ErrorCode FILE_CONFIG_DELETE_FAIL_MASTER = ErrorCode.of(1006014002, "infra.file.config.master");
 
 }

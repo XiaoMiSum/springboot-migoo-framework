@@ -8,15 +8,15 @@ import lombok.Data;
 @Data
 public class RoleBaseVO {
 
-    @NotBlank(message = "角色名称不能为空")
-    @Size(max = 30, message = "角色名称长度不能超过30个字符")
+    @NotBlank(message = "{infra.role.name.empty}")
+    @Size(max = 30, message = "{infra.role.name.size.max}")
     private String name;
 
-    @NotBlank(message = "角色标志不能为空")
-    @Size(max = 100, message = "角色标志长度不能超过100个字符")
+    @NotBlank(message = "{infra.role.code.empty}")
+    @Size(max = 100, message = "{infra.role.code.size.max}")
     private String code;
 
-    @NotNull(message = "显示顺序不能为空")
+    @NotNull(message = "{common.sort.null}")
     private Integer sort;
 
     private String remark;

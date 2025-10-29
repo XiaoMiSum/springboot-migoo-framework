@@ -11,17 +11,17 @@ import org.hibernate.validator.constraints.URL;
 @Data
 public class SmsChannelBaseVO {
 
-    @NotNull(message = "短信签名不能为空")
+    @NotNull(message = "{infra.sms.channel.signature.empty}")
     private String signature;
 
     private Integer status;
 
-    @NotNull(message = "短信 API 的账号不能为空")
+    @NotNull(message = "{infra.sms.channel.api.key.empty}")
     private String apiKey;
 
     private String apiSecret;
 
-    @URL(message = "回调 URL 格式不正确")
+    @URL(message = "{infra.sms.channel.callback.url.invalid}")
     private String callbackUrl;
 
 }

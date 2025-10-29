@@ -8,10 +8,10 @@ import java.util.Map;
 @Data
 public class SmsTemplateSendReqVO {
 
-    @NotNull(message = "手机号不能为空")
+    @NotNull(message = "{infra.sms.send.phone.empty}")
     private String mobile;
 
-    @NotNull(message = "模板编码不能为空")
+    @NotNull(message = "{infra.sms.send.template.code.empty}")
     private String templateCode;
 
     private Map<String, Object> templateParams;

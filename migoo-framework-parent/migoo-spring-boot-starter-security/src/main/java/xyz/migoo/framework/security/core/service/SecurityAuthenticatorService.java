@@ -36,7 +36,7 @@ public class SecurityAuthenticatorService {
             return;
         }
         if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(loginUser.getSecurityCode(), code)) {
-            throw ServiceExceptionUtil.get(new ErrorCode(999, "身份验证失败!"));
+            throw ServiceExceptionUtil.get(new ErrorCode(999, "2fa.failure"));
         }
     }
 

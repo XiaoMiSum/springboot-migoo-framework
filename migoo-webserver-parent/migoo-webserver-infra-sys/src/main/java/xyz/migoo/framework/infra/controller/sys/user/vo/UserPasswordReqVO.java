@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class UserPasswordReqVO {
 
-    @NotNull(message = "用户编号不能为空")
+    @NotNull(message = "{infra.user.id.empty}")
     private Long id;
 
-    @NotBlank(message = "登录密码不能为空")
+    @NotBlank(message = "{infra.user.password.empty}")
     private String password;
 }

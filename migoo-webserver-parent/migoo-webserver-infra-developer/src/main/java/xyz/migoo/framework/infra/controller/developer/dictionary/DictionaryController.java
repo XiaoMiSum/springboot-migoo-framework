@@ -3,6 +3,7 @@ package xyz.migoo.framework.infra.controller.developer.dictionary;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
@@ -36,7 +37,7 @@ public class DictionaryController {
 
     @PostMapping
     @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
-    public Result<?> add(@RequestBody DictionaryAddReqVO req) {
+    public Result<?> add(@Valid @RequestBody DictionaryAddReqVO req) {
         dictionaryService.verify(req.getCode(), null);
         dictionaryService.add(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
@@ -44,7 +45,7 @@ public class DictionaryController {
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
-    public Result<?> update(@RequestBody DictionaryUpdateReqVO req) {
+    public Result<?> update(@Valid @RequestBody DictionaryUpdateReqVO req) {
         dictionaryService.verify(req.getCode(), req.getId());
         dictionaryService.update(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
@@ -72,14 +73,14 @@ public class DictionaryController {
 
     @PostMapping("/value")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
-    public Result<?> addValue(@RequestBody DictionaryValueAddReqVO req) {
+    public Result<?> addValue(@Valid @RequestBody DictionaryValueAddReqVO req) {
         valueService.add(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
     }
 
     @PutMapping("/value")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
-    public Result<?> updateValue(@RequestBody DictionaryValueUpdateReqVO req) {
+    public Result<?> updateValue(@Valid @RequestBody DictionaryValueUpdateReqVO req) {
         valueService.update(DictionaryConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
     }

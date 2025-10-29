@@ -1,6 +1,7 @@
 package xyz.migoo.framework.infra.controller.sys.post;
 
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import xyz.migoo.framework.common.pojo.PageResult;
@@ -37,7 +38,7 @@ public class PostController {
 
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:post:add')")
-    public Result<?> add(@RequestBody PostAddReqVO req) {
+    public Result<?> add(@Valid @RequestBody PostAddReqVO req) {
         postService.verify(req.getCode(), req.getName(), null);
         postService.add(PostConvert.INSTANCE.convert(req));
         return Result.getSuccessful();
@@ -45,7 +46,7 @@ public class PostController {
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:post:update')")
-    public Result<?> update(@RequestBody PostUpdateReqVO req) {
+    public Result<?> update(@Valid @RequestBody PostUpdateReqVO req) {
         postService.verify(req.getCode(), req.getName(), req.getId());
         postService.update(PostConvert.INSTANCE.convert(req));
         return Result.getSuccessful();

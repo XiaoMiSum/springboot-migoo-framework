@@ -9,9 +9,8 @@ import java.util.Set;
 @Data
 public class PermissionAssignUserRoleReqVO {
 
-    @NotNull(message = "用户编号不能为空")
-    private Long userId;
-
     private final Set<Long> roleIds = Collections.emptySet();
+    @NotNull(message = "{infra.user.id.empty}")
+    private Long userId;
 
 }

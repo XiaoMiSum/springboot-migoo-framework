@@ -8,15 +8,15 @@ import lombok.Data;
 @Data
 public abstract class PostBaseVO {
 
-    @NotBlank(message = "岗位名称不能为空")
-    @Size(max = 50, message = "岗位名称长度不能超过50个字符")
+    @NotBlank(message = "{infra.post.name.empty}")
+    @Size(max = 50, message = "{infra.post.name.size.max}")
     private String name;
 
-    @NotBlank(message = "岗位编码不能为空")
-    @Size(max = 64, message = "岗位编码长度不能超过64个字符")
+    @NotBlank(message = "{infra.post.code.empty}")
+    @Size(max = 64, message = "{infra.post.code.size.max}")
     private String code;
 
-    @NotNull(message = "显示顺序不能为空")
+    @NotNull(message = "{common.sort.null}")
     private Integer sort;
 
     private String remark;

@@ -6,7 +6,7 @@ public class DictionaryErrorCodeConstants {
 
 
     // ========== 字典模块 1006010000 ==========
-    public static final ErrorCode DICTIONARY_KEY_NOT_EXISTS = ErrorCode.of(1006010000, "字典不存在");
-    public static final ErrorCode DICTIONARY_KEY_EXISTS = ErrorCode.of(1006010001, "字典已存在");
+    public static final ErrorCode DICTIONARY_KEY_NOT_EXISTS = ErrorCode.of(1006010000, "infra.dict.key.not.exists");
+    public static final ErrorCode DICTIONARY_KEY_EXISTS = ErrorCode.of(1006010001, "infra.dict.key.exists");
 
 }

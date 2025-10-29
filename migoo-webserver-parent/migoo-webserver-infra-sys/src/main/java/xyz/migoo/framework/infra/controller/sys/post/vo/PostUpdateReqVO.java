@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class PostUpdateReqVO extends PostBaseVO {
 
-    @NotNull(message = "岗位编号不能为空")
+    @NotNull(message = "{infra.post.id.empty}")
     private Long id;
 
     private Integer status;

@@ -8,31 +8,30 @@ import lombok.Data;
 @Data
 public abstract class MenuBaseVO {
 
-    @NotBlank(message = "菜单名称不能为空")
-    @Size(max = 50, message = "菜单名称长度不能超过50个字符")
+    @NotBlank(message = "{infra.menu.name.empty}")
+    @Size(max = 50, message = "{infra.menu.name.size.max}")
     private String name;
 
-    @Size(max = 100)
+    @Size(max = 100, message = "{infra.menu.permission.size.max}")
     private String permission;
 
-    @NotNull(message = "菜单类型不能为空")
+    @NotNull(message = "{infra.menu.type.empty}")
     private Integer type;
 
-    @NotNull(message = "显示顺序不能为空")
+    @NotNull(message = "{common.sort.null}")
     private Integer sort;
 
-    @NotNull(message = "父菜单 ID 不能为空")
     private Long parentId;
 
-    @Size(max = 200, message = "路由地址不能超过200个字符")
+    @Size(max = 200, message = "{infra.menu.path.size.max}")
     private String path;
 
     private String icon;
 
-    @Size(max = 50, message = "组件名称不能超过50个字符")
+    @Size(max = 50, message = "{infra.menu.component.name.size.max}")
     private String componentName;
 
-    @Size(max = 200, message = "组件路径不能超过255个字符")
+    @Size(max = 200, message = "{infra.menu.component.size.max}")
     private String component;
 
     /**

@@ -17,6 +17,7 @@ import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.io.IOException;
 
@@ -38,6 +39,8 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
+    private final I18NMessage i18NMessage;
+
     @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -52,7 +55,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
                     SecurityFrameworkUtils.setLoginUser(loginUser, request);
                 }
             } catch (Throwable ex) {
-                Result<?> result = ex instanceof AccessDeniedException ? accessDeniedExceptionHandler(request, (AccessDeniedException) ex)
+                Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)
                         : globalExceptionHandler.allExceptionHandler(request, ex);
                 ServletUtils.writeJSON(response, result);
                 return;
@@ -71,7 +74,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     public Result<?> accessDeniedExceptionHandler(HttpServletRequest req, AccessDeniedException ex) {
         log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", WebFrameworkUtils.getLoginUserId(req),
                 req.getRequestURL(), ex);
-        return Result.getError(FORBIDDEN);
+        return Result.getError(FORBIDDEN.getCode(), i18NMessage.getMessage(FORBIDDEN.getMsg()));
     }
 
 }

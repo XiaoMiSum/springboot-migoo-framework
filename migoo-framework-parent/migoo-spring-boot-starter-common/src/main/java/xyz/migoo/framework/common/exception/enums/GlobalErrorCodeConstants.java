@@ -14,29 +14,27 @@ import xyz.migoo.framework.common.exception.ErrorCode;
  */
 public class GlobalErrorCodeConstants {
 
-    public static final ErrorCode SUCCESS = ErrorCode.of(0, "操作成功");
+    public static final ErrorCode SUCCESS = ErrorCode.of(0, "common.success");
 
     // ========== 客户端错误段 ==========
 
-    public static final ErrorCode BAD_REQUEST = ErrorCode.of(400, "请求参数不正确");
-    public static final ErrorCode UNAUTHORIZED = ErrorCode.of(401, "认证失败");
-    public static final ErrorCode FORBIDDEN = ErrorCode.of(403, "没有该操作权限");
-    public static final ErrorCode NOT_FOUND = ErrorCode.of(404, "找不到请求地址");
-    public static final ErrorCode METHOD_NOT_ALLOWED = ErrorCode.of(405, "请求方法错误");
-    public static final ErrorCode LOCKED = ErrorCode.of(423, "请求失败，请稍后重试");// 并发请求，不允许
-    public static final ErrorCode TOO_MANY_REQUESTS = ErrorCode.of(429, "请求过于频繁，请稍后重试");
-    public static final ErrorCode SOCKET_TIME_OUT = ErrorCode.of(450, "请求超时，请稍后重试");
+    public static final ErrorCode BAD_REQUEST = ErrorCode.of(400, "common.request.bad");
+    public static final ErrorCode UNAUTHORIZED = ErrorCode.of(401, "common.authentication.failure");
+    public static final ErrorCode FORBIDDEN = ErrorCode.of(403, "common.permission.miss");
+    public static final ErrorCode NOT_FOUND = ErrorCode.of(404, "common.not.found");
+    public static final ErrorCode METHOD_NOT_ALLOWED = ErrorCode.of(405, "common.request.method.bad");
+    public static final ErrorCode LOCKED = ErrorCode.of(423, "common.frequent.request");// 并发请求，不允许
+    public static final ErrorCode TOO_MANY_REQUESTS = ErrorCode.of(429, "common.too.many.requests");
+    public static final ErrorCode SOCKET_TIME_OUT = ErrorCode.of(450, "common.request.timeout");
 
     // ========== 服务端错误段 ==========
 
-    public static final ErrorCode INTERNAL_SERVER_ERROR = ErrorCode.of(500, "系统内部异常");
+    public static final ErrorCode INTERNAL_SERVER_ERROR = ErrorCode.of(500, "common.system.error");
 
     // ========== 自定义错误段 ==========
-    public static final ErrorCode REPEATED_REQUESTS = ErrorCode.of(900, "重复请求，请稍后重试");// 重复请求
+    public static final ErrorCode REPEATED_REQUESTS = ErrorCode.of(900, "common.repeat.request");// 重复请求
 
-    public static final ErrorCode DEMO_DENY = ErrorCode.of(900, "演示模式，禁止写操作");
-
-    public static final ErrorCode UNKNOWN = ErrorCode.of(999, "未知错误");
+    public static final ErrorCode UNKNOWN = ErrorCode.of(999, "common.unknown.error");
 
     public static boolean isMatch(Integer code) {
         return code != null

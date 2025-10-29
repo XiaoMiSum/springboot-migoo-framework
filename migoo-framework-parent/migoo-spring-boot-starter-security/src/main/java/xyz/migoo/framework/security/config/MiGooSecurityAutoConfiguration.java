@@ -24,6 +24,7 @@ import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.security.core.service.SecurityAuthenticatorService;
 import xyz.migoo.framework.web.config.WebProperties;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.util.List;
 
@@ -103,7 +104,8 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
-        return new JWTAuthenticationTokenFilter(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService, globalExceptionHandler);
+        return new JWTAuthenticationTokenFilter(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService,
+                globalExceptionHandler, SpringUtil.getBean(I18NMessage.class));
     }
 
     /**

@@ -8,9 +8,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class MenuUpdateReqVO extends MenuBaseVO {
 
-    @NotNull(message = "菜单编号不能为空")
+    @NotNull(message = "{infra.menu.id.empty}")
     private Integer id;
 
-    @NotNull(message = "状态不能为空")
+    @NotNull(message = "{infra.menu.status.empty}")
     private Integer status;
 }

@@ -7,10 +7,10 @@ import xyz.migoo.framework.common.util.json.JsonUtils;
 @Data
 public class AuthLoginReqVO {
 
-    @NotBlank(message = "用户名不能为空")
+    @NotBlank(message = "{infra.login.username.empty}")
     private String username;
 
-    @NotBlank(message = "登录密码不能为空")
+    @NotBlank(message = "{infra.login.password.empty}")
     private String password;
 
     private String code;
