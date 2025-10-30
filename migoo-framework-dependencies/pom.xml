@@ -55,7 +55,7 @@
         <zxing.version>3.5.3</zxing.version>
         <bcprov.version>1.78.1</bcprov.version>
         <lombok.version>1.18.38</lombok.version>
-        <minio.version>8.6.0</minio.version>
+        <minio.version>8.5.17</minio.version>
         <tika.version>2.9.2</tika.version>
         <fastjson.version>2.0.57</fastjson.version>
         <ip2region.version>2.7.0</ip2region.version>
