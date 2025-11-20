@@ -74,6 +74,13 @@
         <tencent-cvm.version>3.1.1348</tencent-cvm.version>
         <tencent-cdb.version>3.1.1354</tencent-cdb.version>
         <tencent-sms.version>3.1.1281</tencent-sms.version>
+
+        <!-- Maven 相关 -->
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
