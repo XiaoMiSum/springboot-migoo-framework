@@ -17,7 +17,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConfigurerDO extends BaseDO<Long> {
+public class ConfigurerDO extends BaseDO<Long, ConfigurerDO> {
 
     private String name;
 

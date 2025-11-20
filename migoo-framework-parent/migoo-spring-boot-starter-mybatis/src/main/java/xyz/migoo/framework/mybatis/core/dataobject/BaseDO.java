@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
  * @author xiaomi
  */
 @Data
-public class BaseDO<T> implements Serializable {
+@SuppressWarnings("unchecked")
+public class BaseDO<T, SELF extends BaseDO<T, SELF>> implements Serializable {
 
     @TableId
     private T id;
@@ -47,5 +48,10 @@ public class BaseDO<T> implements Serializable {
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
     private Integer deleted;
+
+    public SELF setId(T id) {
+        this.id = id;
+        return (SELF) this;
+    }
 
 }

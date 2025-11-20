@@ -108,13 +108,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetAuthenticator(Long id) {
-        mapper.updateById((User) new User()
+        mapper.updateById(new User()
                 .setSecretKey(SecureUtil.aes(secret.getBytes()).encryptHex(GoogleAuthenticator.generateSecretKey()))
                 .setBindAuthenticator(INIT.getNumber())
                 .setId(id));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public LoginUser toLoginUser(BaseUser<?> baseUser) {
         return AuthConvert.INSTANCE.convert((BaseUser<Long>) baseUser);
     }

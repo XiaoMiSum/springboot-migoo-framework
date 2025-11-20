@@ -10,7 +10,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class StationLetterDO extends BaseDO<Long> {
+public class StationLetterDO extends BaseDO<Long, StationLetterDO> {
 
     /**
      * 消息编码

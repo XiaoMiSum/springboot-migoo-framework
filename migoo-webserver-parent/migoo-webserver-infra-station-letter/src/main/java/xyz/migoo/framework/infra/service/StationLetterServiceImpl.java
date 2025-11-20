@@ -49,7 +49,7 @@ public class StationLetterServiceImpl implements StationLetterService {
 
     private void update(Collection<Long> ids, int flag) {
         List<StationLetterDO> entities = Lists.newArrayList();
-        ids.forEach(id -> entities.add((StationLetterDO) new StationLetterDO().setUnread(flag).setId(id)));
+        ids.forEach(id -> entities.add(new StationLetterDO().setUnread(flag).setId(id)));
         mapper.updateBatch(entities);
     }
 

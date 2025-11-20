@@ -102,7 +102,7 @@ public class FileConfigServiceImpl implements FileConfigService {
         // 更新其它为非 master
         fileConfigMapper.updateBatch(new FileConfigDO().setMaster(false));
         // 更新
-        fileConfigMapper.updateById((FileConfigDO) new FileConfigDO().setMaster(true).setId(id));
+        fileConfigMapper.updateById(new FileConfigDO().setMaster(true).setId(id));
 
         // 清空缓存
         clearCache(null, true);

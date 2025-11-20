@@ -14,7 +14,7 @@ import java.util.List;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmsTemplateDO extends BaseDO<Long> {
+public class SmsTemplateDO extends BaseDO<Long, SmsTemplateDO> {
 
     /**
      * 启用状态

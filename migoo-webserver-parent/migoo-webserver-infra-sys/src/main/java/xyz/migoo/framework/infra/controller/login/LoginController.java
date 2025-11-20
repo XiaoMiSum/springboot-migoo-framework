@@ -102,7 +102,7 @@ public class LoginController {
     @PostMapping("/authenticator")
     @Authenticator
     public Result<?> bindAuthenticator(@CurrentUser LoginUser user) {
-        userService.update((User) new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
+        userService.update(new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
         return Result.getSuccessful();
     }
 

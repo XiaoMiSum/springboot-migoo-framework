@@ -48,7 +48,7 @@ public class SmsLogServiceImpl implements SmsLogService {
                                     String apiSendCode, String apiSendMsg,
                                     String apiRequestId, String apiSerialNo) {
         SmsSendStatusEnum sendStatus = success ? SmsSendStatusEnum.SUCCESS : SmsSendStatusEnum.FAILURE;
-        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setSendStatus(sendStatus.getStatus()).setSendTime(LocalDateTime.now())
+        smsLogMapper.updateById(new SmsLogDO().setSendStatus(sendStatus.getStatus()).setSendTime(LocalDateTime.now())
                 .setApiSendCode(apiSendCode).setApiSendMsg(apiSendMsg)
                 .setApiRequestId(apiRequestId).setApiSerialNo(apiSerialNo).setId(id));
     }
@@ -58,7 +58,7 @@ public class SmsLogServiceImpl implements SmsLogService {
                                        String apiReceiveCode, String apiReceiveMsg) {
         SmsReceiveStatusEnum receiveStatus = Objects.equals(success, true) ?
                 SmsReceiveStatusEnum.SUCCESS : SmsReceiveStatusEnum.FAILURE;
-        smsLogMapper.updateById((SmsLogDO) new SmsLogDO().setReceiveStatus(receiveStatus.getStatus())
+        smsLogMapper.updateById(new SmsLogDO().setReceiveStatus(receiveStatus.getStatus())
                 .setReceiveTime(receiveTime).setApiReceiveCode(apiReceiveCode).setApiReceiveMsg(apiReceiveMsg).setId(id));
     }
 

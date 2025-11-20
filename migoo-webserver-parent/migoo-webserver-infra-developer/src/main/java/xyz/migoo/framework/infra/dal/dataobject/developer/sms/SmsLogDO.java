@@ -18,7 +18,7 @@ import java.util.Map;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmsLogDO extends BaseDO<Long> {
+public class SmsLogDO extends BaseDO<Long, SmsLogDO> {
 
     // ========= 渠道相关字段 =========
 

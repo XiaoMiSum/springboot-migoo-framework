@@ -12,7 +12,7 @@ import java.util.Date;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiErrorLogDO extends BaseDO<Long> {
+public class ApiErrorLogDO extends BaseDO<Long, ApiErrorLogDO> {
 
     private String applicationName;
 

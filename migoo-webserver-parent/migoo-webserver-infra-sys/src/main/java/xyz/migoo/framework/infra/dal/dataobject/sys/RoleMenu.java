@@ -8,7 +8,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @TableName(value = "sys_role_menu", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RoleMenu extends BaseDO<Long> {
+public class RoleMenu extends BaseDO<Long, RoleMenu> {
 
     /**
      * 角色ID

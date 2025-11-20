@@ -3,12 +3,13 @@ package xyz.migoo.framework.infra.dal.dataobject.sys;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import xyz.migoo.framework.common.enums.CommonStatus;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 
 @TableName("sys_post")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Post extends BaseDO<Long> {
+public class Post extends BaseDO<Long, Post> {
 
     /**
      * 岗位名称
@@ -25,7 +26,7 @@ public class Post extends BaseDO<Long> {
     /**
      * 状态
      * <p>
-     * 枚举 {@link CommonStatusEnum}
+     * 枚举 {@link CommonStatus}
      */
     private Integer status;
     /**

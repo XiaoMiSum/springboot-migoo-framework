@@ -10,7 +10,7 @@ import xyz.migoo.framework.security.core.BaseUser;
 @TableName(value = "sys_user", autoResultMap = true)
 @Getter
 @Setter
-public class User extends BaseDO<Long> implements BaseUser<Long> {
+public class User extends BaseDO<Long, User> implements BaseUser<Long> {
 
     private String username;
 

@@ -21,13 +21,13 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?> baseDO) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?> baseDO) {
             // 创建时间为空，则以当前时间为插入时间
             baseDO.setCreateTime(Objects.isNull(baseDO.getCreateTime()) ? LocalDateTime.now() : baseDO.getCreateTime());
             // 更新时间为空，则以当前时间为更新时间
             baseDO.setUpdateTime(Objects.isNull(baseDO.getUpdateTime()) ? baseDO.getCreateTime() : baseDO.getUpdateTime());
             // 状态标识为空，则默认为已启用状态
-            String compoundName = WebFrameworkUtils.getLoginUserName();
+            var compoundName = WebFrameworkUtils.getLoginUserName();
             // 当前登录用户不为空，创建人为空，则当前登录用户为创建人
             baseDO.setCreator(StrUtil.isBlank(baseDO.getCreator()) ? StrUtil.isBlank(compoundName) ? "系统" : compoundName : baseDO.getCreator());
             // 当前登录用户不为空，更新人为空，则当前登录用户为更新人
@@ -41,8 +41,8 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         // 默认以当前时间为更新时间
         setFieldValByName("updateTime", LocalDateTime.now(), metaObject);
         // 默认以当前登录用户为更新人
-        BaseDO<?> baseDO = (BaseDO<?>) metaObject.getOriginalObject();
-        String compoundName = StrUtil.isBlank(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName() : baseDO.getUpdater();
+        var baseDO = (BaseDO<?, ?>) metaObject.getOriginalObject();
+        var compoundName = StrUtil.isBlank(baseDO.getUpdater()) ? WebFrameworkUtils.getLoginUserName() : baseDO.getUpdater();
         setFieldValByName("updater", StrUtil.isBlank(compoundName) ? "系统" : compoundName, metaObject);
     }
 }

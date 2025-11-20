@@ -14,12 +14,8 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobLogDO extends BaseDO<Long> {
-
-    /**
-     * 日志编号
-     */
-    private Long id;
+public class JobLogDO extends BaseDO<Long, JobLogDO> {
+    
     /**
      * 任务编号
      * <p>

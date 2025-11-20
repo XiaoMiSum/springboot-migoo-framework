@@ -17,7 +17,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDO extends BaseDO<Long> {
+public class FileDO extends BaseDO<Long, FileDO> {
 
     /**
      * 配置编号

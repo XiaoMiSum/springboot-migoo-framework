@@ -9,7 +9,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @TableName(value = "sys_menu", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Menu extends BaseDO<Long> {
+public class Menu extends BaseDO<Long, Menu> {
 
     /**
      * 菜单名称

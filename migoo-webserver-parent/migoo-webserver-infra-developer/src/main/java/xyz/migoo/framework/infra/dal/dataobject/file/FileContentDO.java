@@ -18,7 +18,7 @@ import xyz.migoo.framework.oss.core.client.db.DBFileClient;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileContentDO extends BaseDO<Long> {
+public class FileContentDO extends BaseDO<Long, FileConfigDO> {
 
     /**
      * 配置编号

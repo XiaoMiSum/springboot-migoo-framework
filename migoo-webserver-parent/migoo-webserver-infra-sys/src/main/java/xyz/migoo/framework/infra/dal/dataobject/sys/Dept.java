@@ -9,7 +9,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @TableName(value = "sys_dept", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Dept extends BaseDO<Long> {
+public class Dept extends BaseDO<Long, Dept> {
     /**
      * 部门名称
      */

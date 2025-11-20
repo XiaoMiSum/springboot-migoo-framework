@@ -1,6 +1,5 @@
 package xyz.migoo.framework.infra.dal.dataobject.developer.job;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import xyz.migoo.framework.infra.enums.JobStatusEnum;
@@ -12,13 +11,8 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JobDO extends BaseDO<Long> {
+public class JobDO extends BaseDO<Long, JobDO> {
 
-    /**
-     * 任务编号
-     */
-    @TableId
-    private Long id;
     /**
      * 任务名称
      */

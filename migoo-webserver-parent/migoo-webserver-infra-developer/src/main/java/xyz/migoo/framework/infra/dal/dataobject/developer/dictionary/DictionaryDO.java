@@ -10,7 +10,7 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "infra_dictionary", autoResultMap = true)
-public class DictionaryDO extends BaseDO<Long> {
+public class DictionaryDO extends BaseDO<Long, DictionaryDO> {
 
     private String code;
 

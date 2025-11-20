@@ -2,6 +2,7 @@ package xyz.migoo.framework.infra.dal.dataobject.developer.sms;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import xyz.migoo.framework.common.enums.CommonStatus;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 
@@ -12,7 +13,7 @@ import xyz.migoo.framework.sms.core.enums.SmsChannelEnum;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmsChannelDO extends BaseDO<Long> {
+public class SmsChannelDO extends BaseDO<Long, SmsChannelDO> {
 
     /**
      * 短信签名
@@ -27,7 +28,7 @@ public class SmsChannelDO extends BaseDO<Long> {
     /**
      * 启用状态
      * <p>
-     * 枚举 {@link CommonStatusEnum}
+     * 枚举 {@link CommonStatus}
      */
     private Integer status;
     /**

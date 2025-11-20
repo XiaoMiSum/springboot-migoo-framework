@@ -23,7 +23,7 @@ import xyz.migoo.framework.oss.core.enums.FileStorageEnum;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileConfigDO extends BaseDO<Long> {
+public class FileConfigDO extends BaseDO<Long, FileConfigDO> {
 
     /**
      * 配置名

@@ -102,17 +102,6 @@ public class RoleServiceImpl implements RoleService {
         return roleMapper.selectList();
     }
 
-
-    @Override
-    public void updateRoleDataScope(Long id, Integer dataScope, Set<Long> dataScopeDeptIds) {
-        // 校验是否可以更新
-        verify(id);
-        // 更新数据范围
-        Role updateObject = new Role();
-        updateObject.setId(id);
-        roleMapper.updateById(updateObject);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void remove(Long id) {

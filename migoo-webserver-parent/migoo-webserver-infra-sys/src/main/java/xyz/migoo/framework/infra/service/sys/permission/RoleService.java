@@ -1,9 +1,9 @@
 package xyz.migoo.framework.infra.service.sys.permission;
 
-import xyz.migoo.framework.infra.controller.sys.permission.role.vo.RoleQueryReqVO;
-import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
 import org.springframework.lang.Nullable;
 import xyz.migoo.framework.common.pojo.PageResult;
+import xyz.migoo.framework.infra.controller.sys.permission.role.vo.RoleQueryReqVO;
+import xyz.migoo.framework.infra.dal.dataobject.sys.Role;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,15 +22,6 @@ public interface RoleService {
      * @param id 角色编号
      */
     void remove(Long id);
-
-    /**
-     * 设置角色的数据权限
-     *
-     * @param id               角色编号
-     * @param dataScope        数据范围
-     * @param dataScopeDeptIds 部门编号数组
-     */
-    void updateRoleDataScope(Long id, Integer dataScope, Set<Long> dataScopeDeptIds);
 
     /**
      * 获得角色，从缓存中
