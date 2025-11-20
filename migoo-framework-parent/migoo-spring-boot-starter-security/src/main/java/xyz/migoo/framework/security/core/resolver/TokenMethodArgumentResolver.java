@@ -16,6 +16,7 @@ import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
  * Created on 2021/11/22 19:33
  */
 public class TokenMethodArgumentResolver implements HandlerMethodArgumentResolver {
+
     @Resource
     private SecurityProperties properties;
 
@@ -27,9 +28,12 @@ public class TokenMethodArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
-        Object token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
+        var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
+        var annotation = parameter.getParameterAnnotation(Token.class);
         if (token != null) {
             return token;
+        } else if (annotation != null && !annotation.required()) {
+            return null;
         }
         throw new MissingServletRequestPartException("token");
     }

@@ -24,9 +24,12 @@ public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentR
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
-        Object user = SecurityFrameworkUtils.getLoginUser();
+        var user = SecurityFrameworkUtils.getLoginUser();
+        var annotation = parameter.getParameterAnnotation(CurrentUser.class);
         if (user != null) {
             return user;
+        } else if (annotation != null && !annotation.required()) {
+            return null;
         }
         throw new MissingServletRequestPartException("currentUser");
     }
