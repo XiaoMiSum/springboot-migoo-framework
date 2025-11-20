@@ -9,14 +9,18 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.mq.core.RedisMQTemplate;
+import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
+import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author xiaomi
  * Created on 2021/11/21 14:19
  */
-public abstract class AbstractStreamMessageListener<T extends StreamMessage> implements StreamListener<String, ObjectRecord<String, String>> {
+public abstract class AbstractStreamMessageListener<T extends AbstractStreamMessage> implements StreamListener<String, ObjectRecord<String, String>> {
 
     /**
      * 消息类型
@@ -34,6 +38,12 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
     @Value("${migoo.mq.group:def_group}")
     @Getter
     private String group;
+
+    /**
+     * RedisMQTemplate
+     */
+    @Setter
+    private RedisMQTemplate redisMQTemplate;
     /**
      *
      */
@@ -43,22 +53,28 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
     @SneakyThrows
     protected AbstractStreamMessageListener() {
         this.messageType = getMessageClass();
-        this.streamKey = messageType.getConstructor().newInstance().getStreamKey();
+        this.streamKey = messageType.getConstructor().newInstance().getChannel();
     }
 
     @Override
     public void onMessage(ObjectRecord<String, String> message) {
         // 消费消息
         T messageObj = JsonUtils.parseObject(message.getValue(), messageType);
-        this.onMessage(messageObj);
-        // ack 消息消费完成
-        redisTemplate.opsForStream().acknowledge(group, message);
-        redisTemplate.opsForStream().delete(message);
-        // TODO: 2021/11/21
-        // 1. 处理异常的情况
-        // 2. 发送日志；以及事务的结合
-        // 3. 消费日志；以及通用的幂等性
-        // 4. 消费失败的重试，https://zhuanlan.zhihu.com/p/60501638
+        try {
+            consumeMessageBefore(messageObj);
+            this.onMessage(messageObj);
+
+            // ack 消息消费完成
+            redisTemplate.opsForStream().acknowledge(group, message);
+            redisTemplate.opsForStream().delete(message);
+            // TODO: 2021/11/21
+            // 1. 处理异常的情况
+            // 2. 发送日志；以及事务的结合
+            // 3. 消费日志；以及通用的幂等性
+            // 4. 消费失败的重试，https://zhuanlan.zhihu.com/p/60501638
+        } finally {
+            consumeMessageAfter(messageObj);
+        }
     }
 
     /**
@@ -80,6 +96,22 @@ public abstract class AbstractStreamMessageListener<T extends StreamMessage> imp
             throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
         }
         return (Class<T>) type;
+    }
+
+    private void consumeMessageBefore(AbstractMessage message) {
+        assert redisMQTemplate != null;
+        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
+        // 正序
+        interceptors.forEach(interceptor -> interceptor.consumeMessageBefore(message));
+    }
+
+    private void consumeMessageAfter(AbstractMessage message) {
+        assert redisMQTemplate != null;
+        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
+        // 倒序
+        for (int i = interceptors.size() - 1; i >= 0; i--) {
+            interceptors.get(i).consumeMessageAfter(message);
+        }
     }
 
 }

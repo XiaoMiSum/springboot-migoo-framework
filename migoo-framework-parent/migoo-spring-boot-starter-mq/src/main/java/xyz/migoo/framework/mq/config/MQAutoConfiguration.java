@@ -3,6 +3,7 @@ package xyz.migoo.framework.mq.config;
 import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -28,9 +29,20 @@ import java.util.List;
 public class MQAutoConfiguration {
 
     /**
+     * 构建消费者名字，使用本地 IP + 进程编号的方式。
+     * 参考自 RocketMQ clientId 的实现
+     *
+     * @return 消费者名字
+     */
+    private static String buildConsumerName() {
+        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    }
+
+    /**
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @ConditionalOnBean(AbstractChannelMessageListener.class)
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory, List<AbstractChannelMessageListener<?>> listeners) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
@@ -51,6 +63,7 @@ public class MQAutoConfiguration {
      * Redis Stream 的 xreadgroup 命令：https://www.geek-book.com/src/docs/redis/redis/redis.io/commands/xreadgroup.html
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
+    @ConditionalOnBean(AbstractStreamMessageListener.class)
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
             RedisTemplate<String, Object> redisTemplate, List<AbstractStreamMessageListener<?>> listeners) {
         // 第一步，创建 StreamMessageListenerContainer 容器
@@ -93,15 +106,5 @@ public class MQAutoConfiguration {
                     listener.getStreamKey(), listener.getClass().getName());
         });
         return container;
-    }
-
-    /**
-     * 构建消费者名字，使用本地 IP + 进程编号的方式。
-     * 参考自 RocketMQ clientId 的实现
-     *
-     * @return 消费者名字
-     */
-    private static String buildConsumerName() {
-        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
     }
 }

@@ -1,18 +1,23 @@
 package xyz.migoo.framework.mq.core.pubsub;
 
 import cn.hutool.core.util.TypeUtil;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.mq.core.RedisMQTemplate;
+import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
+import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * @author xiaomi
  * Created on 2021/11/21 14:15
  */
-public abstract class AbstractChannelMessageListener<T extends ChannelMessage> implements MessageListener {
+public abstract class AbstractChannelMessageListener<T extends AbstractChannelMessage> implements MessageListener {
 
     /**
      * 消息类型
@@ -22,6 +27,12 @@ public abstract class AbstractChannelMessageListener<T extends ChannelMessage> i
      * Redis Channel
      */
     private final String channel;
+
+    /**
+     * RedisMQTemplate
+     */
+    @Setter
+    private RedisMQTemplate redisMQTemplate;
 
     @SneakyThrows
     protected AbstractChannelMessageListener() {
@@ -41,7 +52,13 @@ public abstract class AbstractChannelMessageListener<T extends ChannelMessage> i
     @Override
     public final void onMessage(Message message, byte[] bytes) {
         T messageObj = JsonUtils.parseObject(message.getBody(), messageType);
-        this.onMessage(messageObj);
+        try {
+            consumeMessageBefore(messageObj);
+            // 消费消息
+            this.onMessage(messageObj);
+        } finally {
+            consumeMessageAfter(messageObj);
+        }
     }
 
     /**
@@ -63,5 +80,21 @@ public abstract class AbstractChannelMessageListener<T extends ChannelMessage> i
             throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
         }
         return (Class<T>) type;
+    }
+
+    private void consumeMessageBefore(AbstractMessage message) {
+        assert redisMQTemplate != null;
+        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
+        // 正序
+        interceptors.forEach(interceptor -> interceptor.consumeMessageBefore(message));
+    }
+
+    private void consumeMessageAfter(AbstractMessage message) {
+        assert redisMQTemplate != null;
+        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
+        // 倒序
+        for (int i = interceptors.size() - 1; i >= 0; i--) {
+            interceptors.get(i).consumeMessageAfter(message);
+        }
     }
 }

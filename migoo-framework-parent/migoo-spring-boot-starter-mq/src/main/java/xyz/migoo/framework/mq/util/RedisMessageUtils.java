@@ -4,8 +4,8 @@ import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 import xyz.migoo.framework.common.util.json.JsonUtils;
-import xyz.migoo.framework.mq.core.pubsub.ChannelMessage;
-import xyz.migoo.framework.mq.core.stream.StreamMessage;
+import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessage;
+import xyz.migoo.framework.mq.core.stream.AbstractStreamMessage;
 
 /**
  * @author xiaomi
@@ -19,7 +19,7 @@ public class RedisMessageUtils {
      * @param redisTemplate Redis 操作模板
      * @param message       消息
      */
-    public static <T extends ChannelMessage> void sendChannelMessage(RedisTemplate<?, ?> redisTemplate, T message) {
+    public static <T extends AbstractChannelMessage> void sendChannelMessage(RedisTemplate<?, ?> redisTemplate, T message) {
         redisTemplate.convertAndSend(message.getChannel(), JsonUtils.toJsonString(message));
     }
 
@@ -30,7 +30,7 @@ public class RedisMessageUtils {
      * @param message       消息
      * @return 消息记录的编号对象
      */
-    public static <T extends StreamMessage> RecordId sendStreamMessage(RedisTemplate<String, ?> redisTemplate, T message) {
+    public static <T extends AbstractStreamMessage> RecordId sendStreamMessage(RedisTemplate<String, ?> redisTemplate, T message) {
         return redisTemplate.opsForStream().add(StreamRecords.newRecord()
                 .ofObject(JsonUtils.toJsonString(message))
                 .withStreamKey(message.getStreamKey()));

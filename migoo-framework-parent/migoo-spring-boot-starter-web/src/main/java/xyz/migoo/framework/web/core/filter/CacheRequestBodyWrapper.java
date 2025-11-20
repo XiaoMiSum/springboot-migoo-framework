@@ -33,6 +33,17 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
         return new BufferedReader(new InputStreamReader(this.getInputStream()));
     }
 
+
+    @Override
+    public int getContentLength() {
+        return body.length;
+    }
+
+    @Override
+    public long getContentLengthLong() {
+        return body.length;
+    }
+
     @Override
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(body);
@@ -56,6 +67,11 @@ public class CacheRequestBodyWrapper extends HttpServletRequestWrapper {
 
             @Override
             public void setReadListener(ReadListener readListener) {
+            }
+
+            @Override
+            public int available() {
+                return body.length;
             }
 
         };
