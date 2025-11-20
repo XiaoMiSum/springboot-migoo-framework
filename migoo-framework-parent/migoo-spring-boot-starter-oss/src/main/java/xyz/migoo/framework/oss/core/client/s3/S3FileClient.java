@@ -11,9 +11,10 @@ import java.io.ByteArrayInputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云等云服务
+ * 基于 S3 协议的文件客户端，实现 MinIO、阿里云、腾讯云、七牛云、华为云、AWS S3 等云服务
  * <p>
- * S3 协议的客户端，采用亚马逊提供的 software.amazon.awssdk.s3 库
+ * S3 协议的客户端，采用 MinIO 提供的 io.minio 库
+ * 支持标准 S3 协议的所有云存储服务
  *
  * @author xiaomi
  */
@@ -62,6 +63,13 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
         if (HttpUtil.isHttp(config.getEndpoint()) || HttpUtil.isHttps(config.getEndpoint())) {
             return StrUtil.format("{}/{}", config.getEndpoint(), config.getBucket());
         }
+        // AWS S3 域名构建：支持虚拟主机风格和路径风格
+        if (config.getEndpoint().contains(S3FileClientConfig.ENDPOINT_AWS)) {
+            // 使用虚拟主机风格：https://bucket-name.s3.region.amazonaws.com
+            // https://amzn-s3-demo-bucket.s3.us-west-2.amazonaws.com
+            String region = buildRegion();
+            return StrUtil.format("https://{}.s3.{}.{}", config.getBucket(), region, S3FileClientConfig.ENDPOINT_AWS);
+        }
         // 阿里云、腾讯云、华为云都适合。七牛云比较特殊，必须有自定义域名
         return StrUtil.format("https://{}.{}", config.getBucket(), config.getEndpoint());
     }
@@ -72,6 +80,18 @@ public class S3FileClient extends AbstractFileClient<S3FileClientConfig> {
      * @return region 地区
      */
     private String buildRegion() {
+        // AWS S3 必须有 region，从 endpoint 中提取
+        if (config.getEndpoint().contains(S3FileClientConfig.ENDPOINT_AWS)) {
+            // 从 s3.us-east-1.amazonaws.com 中提取 us-east-1
+            if (config.getEndpoint().startsWith("s3.")) {
+                String[] parts = config.getEndpoint().split("\\.");
+                if (parts.length >= 2 && !parts[1].equals("amazonaws")) {
+                    return parts[1]; // 返回区域，如 us-east-1
+                }
+            }
+            // 如果是 s3.amazonaws.com，默认为 us-east-1
+            return "us-east-1";
+        }
         // 阿里云必须有 region，否则会报错
         if (config.getEndpoint().contains(S3FileClientConfig.ENDPOINT_ALIYUN)) {
             return StrUtil.subBefore(config.getEndpoint(), '.', false)
