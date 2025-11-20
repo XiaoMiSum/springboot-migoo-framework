@@ -75,10 +75,15 @@
         <tencent-sms.version>3.1.1281</tencent-sms.version>
 
         <!-- Maven 相关 -->
-        <java.version>21</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <clean.version>3.4.0</clean.version>
+        <compiler.version>3.13.0</compiler.version>
+        <publishing.version>0.8.0</publishing.version>
+        <javadoc.version>3.11.2</javadoc.version>
+        <surefire.version>3.5.2</surefire.version>
+        <gpg-plugin.version>3.2.7</gpg-plugin.version>
+        <dependency.version>3.8.1</dependency.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -106,24 +111,22 @@
                 <version>${spring.boot.version}</version>
             </dependency>
 
-            <!-- web 相关 -->
+            <!-- 基础框架 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-info</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- web 相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-web</artifactId>
+                <artifactId>migoo-spring-boot-starter-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- web 相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-tomcat</artifactId>
+                <artifactId>migoo-spring-boot-starter-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -140,9 +143,52 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- Redis 相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 消息队列相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-mq</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 定时任务相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-job</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 监控相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-monitor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- 短信相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-sms</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- OSS相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-oss</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- AI 相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-ai</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -170,42 +216,6 @@
                 <version>${durid.version}</version>
             </dependency>
 
-            <!-- 消息队列相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-mq</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- 定时任务相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-job</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- 监控相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-monitor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-
-            <!-- 短信相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-sms</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- OSS相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-oss</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-client</artifactId> <!-- 实现 Spring Boot Admin Server 服务端 -->
@@ -219,12 +229,6 @@
             </dependency>
 
             <!-- Spring AI Model 模型接入 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-ai</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
@@ -331,13 +335,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- 管理系统 - 开发者工具 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-webserver-infra-file</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- 管理系统 - 区域工具 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
@@ -345,31 +342,10 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- 管理系统 - 云服务器 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-webserver-infra-cvs</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- 管理系统 - 字典管理 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-webserver-infra-dictionary</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- 管理系统 - 站内信 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-webserver-infra-station-letter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- 工具相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -529,7 +505,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
+                <version>${gpg-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -542,7 +518,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>${publishing.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
