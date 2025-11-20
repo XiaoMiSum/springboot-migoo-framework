@@ -23,7 +23,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
 
     private static final String ID_TYPE_KEY = "mybatis-plus.global-config.db-config.id-type";
 
-    private static final String DATASOURCE_DYNAMIC_KEY = "spring.datasource.dynamic";
+    private static final String DATASOURCE_URL_KEY = "spring.datasource.url";
 
     private static final String QUARTZ_JOB_STORE_DRIVER_KEY = "spring.quartz.properties.org.quartz.jobStore.driverDelegateClass";
 
@@ -31,11 +31,7 @@ public class IdTypeEnvironmentPostProcessor implements EnvironmentPostProcessor 
             DbType.POSTGRE_SQL, DbType.KINGBASE_ES, DbType.DB2, DbType.H2);
 
     public static DbType getDbType(ConfigurableEnvironment environment) {
-        String primary = environment.getProperty(DATASOURCE_DYNAMIC_KEY + "." + "primary");
-        if (StrUtil.isEmpty(primary)) {
-            return null;
-        }
-        String url = environment.getProperty(DATASOURCE_DYNAMIC_KEY + ".datasource." + primary + ".url");
+        String url = environment.getProperty(DATASOURCE_URL_KEY);
         if (StrUtil.isEmpty(url)) {
             return null;
         }
