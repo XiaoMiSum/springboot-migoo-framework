@@ -5,7 +5,11 @@ import lombok.Getter;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
+import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
+import xyz.migoo.framework.mq.core.message.AbstractMessage;
+import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessage;
+import xyz.migoo.framework.mq.core.stream.AbstractStreamMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,13 +50,13 @@ public class RedisMQTemplate {
      * @param message 消息
      * @return 消息记录的编号对象
      */
-    public <T extends AbstractRedisStreamMessage> RecordId send(T message) {
+    public <T extends AbstractStreamMessage> RecordId send(T message) {
         try {
             sendMessageBefore(message);
             // 发送消息
             return redisTemplate.opsForStream().add(StreamRecords.newRecord()
                     .ofObject(JsonUtils.toJsonString(message)) // 设置内容
-                    .withStreamKey(message.getStreamKey())); // 设置 stream key
+                    .withStreamKey(message.getChannel())); // 设置 stream key
         } finally {
             sendMessageAfter(message);
         }
@@ -67,12 +71,12 @@ public class RedisMQTemplate {
         interceptors.add(interceptor);
     }
 
-    private void sendMessageBefore(AbstractRedisMessage message) {
+    private void sendMessageBefore(AbstractMessage message) {
         // 正序
         interceptors.forEach(interceptor -> interceptor.sendMessageBefore(message));
     }
 
-    private void sendMessageAfter(AbstractRedisMessage message) {
+    private void sendMessageAfter(AbstractMessage message) {
         // 倒序
         for (int i = interceptors.size() - 1; i >= 0; i--) {
             interceptors.get(i).sendMessageAfter(message);

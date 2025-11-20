@@ -33,7 +33,7 @@ public class RedisMessageUtils {
     public static <T extends AbstractStreamMessage> RecordId sendStreamMessage(RedisTemplate<String, ?> redisTemplate, T message) {
         return redisTemplate.opsForStream().add(StreamRecords.newRecord()
                 .ofObject(JsonUtils.toJsonString(message))
-                .withStreamKey(message.getStreamKey()));
+                .withStreamKey(message.getChannel()));
     }
 
 }
