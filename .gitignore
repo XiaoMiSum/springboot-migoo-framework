@@ -5,3 +5,5 @@
 *.*.versionsBackup
 */doc/
 */*/doc
+*/*/.flattened-pom.xml
+*/.flattened-pom.xml
