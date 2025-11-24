@@ -17,12 +17,12 @@ import java.util.Map;
  * Created on 2021/11/20 11:58
  */
 @Data
-public class LoginUser implements UserDetails {
+public class LoginUser<T> implements UserDetails {
 
     /**
      * 用户编号
      */
-    private Long id;
+    private T id;
     /**
      * 最后更新时间
      */
@@ -66,20 +66,6 @@ public class LoginUser implements UserDetails {
         return username;
     }
 
-    public LoginUser setUsername(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public LoginUser setRequiredVerifyAuthenticator(boolean b) {
-        this.requiredVerifyAuthenticator = b;
-        return this;
-    }
-
-    public LoginUser putAttr(String key, Object object) {
-        this.attrs.put(key, object);
-        return this;
-    }
 
     @Override
     @JsonIgnore
