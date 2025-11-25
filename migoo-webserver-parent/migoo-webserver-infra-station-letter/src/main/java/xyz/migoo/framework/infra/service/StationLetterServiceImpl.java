@@ -32,7 +32,7 @@ public class StationLetterServiceImpl implements StationLetterService {
     public Long add(String code, String title, String content, String fromUserType, Long toUserId, String toUserType) {
         StationLetterDO bean = new StationLetterDO().setCode(code).setTitle(title).setContent(content)
                 .setToUserId(toUserId).setToUserType(toUserType)
-                .setFromUserId(SecurityFrameworkUtils.getLoginUserId()).setFromUserType(fromUserType);
+                .setFromUserId((Long) SecurityFrameworkUtils.getLoginUserId()).setFromUserType(fromUserType);
         mapper.insert(bean);
         return bean.getId();
     }

@@ -20,7 +20,7 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
 import xyz.migoo.framework.security.config.SecurityProperties;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.service.SecuritySessionAuthService;
 
 import java.nio.charset.StandardCharsets;
@@ -53,14 +53,14 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public LoginUser verifyTokenAndRefresh(String token) {
-        // 获得 LoginUser
-        LoginUser loginUser = securitySessionAuthService.getLoginUser(token);
-        if (Objects.nonNull(loginUser)) {
-            // 刷新 LoginUser 缓存
-            this.refreshLoginUserCache(token, loginUser);
+    public AuthUserDetails verifyTokenAndRefresh(String token) {
+        // 获得 AuthUserDetails
+        AuthUserDetails authUserDetails = securitySessionAuthService.getLoginUser(token);
+        if (Objects.nonNull(authUserDetails)) {
+            // 刷新 AuthUserDetails 缓存
+            this.refreshLoginUserCache(token, authUserDetails);
         }
-        return loginUser;
+        return authUserDetails;
     }
 
     @Override
@@ -70,21 +70,21 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public AuthLoginRespVO signIn(AuthLoginReqVO req) {
-        LoginUser loginUser = login0(JsonUtils.toJsonString(req), req.getPassword());
+        AuthUserDetails authUserDetails = login0(JsonUtils.toJsonString(req), req.getPassword());
         // 缓存登陆用户到 Redis 中，返回 sessionId 编号
-        String token = securitySessionAuthService.createUserSession(loginUser);
+        String token = securitySessionAuthService.createUserSession(authUserDetails);
         return new AuthLoginRespVO().setToken(token)
-                .setRequiredBindAuthenticator(loginUser.isRequiredBindAuthenticator());
+                .setRequiredBindAuthenticator(authUserDetails.isRequiredBindAuthenticator());
     }
 
 
-    private LoginUser login0(String reqJson, String password) {
+    private AuthUserDetails login0(String reqJson, String password) {
         try {
             // 调用 Spring Security 的 AuthenticationManager#authenticate(...) 方法，使用账号密码进行认证
             // 在其内部，会调用到 loadUserByUsername 方法，获取 User 信息
             password = SecureUtil.aes(securityProperties.getPasswordSecret().getBytes(StandardCharsets.UTF_8)).decryptStr(password);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(reqJson, password));
-            return (LoginUser) authentication.getPrincipal();
+            return (AuthUserDetails) authentication.getPrincipal();
         } catch (BadCredentialsException badCredentialsException) {
             throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_LOGIN_BAD_CREDENTIALS);
         } catch (DisabledException disabledException) {
@@ -95,16 +95,16 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    private void refreshLoginUserCache(String token, LoginUser loginUser) {
-        // 每 1/2 的 Session 超时时间，刷新 LoginUser 缓存
-        if (System.currentTimeMillis() - loginUser.getUpdateTime().getTime() > securitySessionAuthService.getSessionTimeoutMillis() / N_2) {
+    private void refreshLoginUserCache(String token, AuthUserDetails authUserDetails) {
+        // 每 1/2 的 Session 超时时间，刷新 AuthUserDetails 缓存
+        if (System.currentTimeMillis() - authUserDetails.getUpdateTime().getTime() > securitySessionAuthService.getSessionTimeoutMillis() / N_2) {
             // 获取用户为null 或者 被禁用 认为 token 过期，方便前端跳转到登录界面
-            User user = userService.get(loginUser.getUsername());
+            User user = userService.get(authUserDetails.getUsername());
             if (Objects.isNull(user) || !isEnabled(user.getStatus())) {
                 throw ServiceExceptionUtil.get(SysErrorCodeConstants.AUTH_TOKEN_EXPIRED);
             }
-            // 刷新 LoginUser 缓存
-            securitySessionAuthService.refreshUserSession(token, loginUser);
+            // 刷新 AuthUserDetails 缓存
+            securitySessionAuthService.refreshUserSession(token, authUserDetails);
         }
     }
 }

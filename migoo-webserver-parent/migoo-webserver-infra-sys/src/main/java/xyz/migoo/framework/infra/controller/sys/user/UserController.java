@@ -18,9 +18,9 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.service.sys.dept.DeptService;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.MiGooUserDetails;
+import xyz.migoo.framework.security.core.annotation.AuthUser;
 import xyz.migoo.framework.security.core.annotation.Authenticator;
-import xyz.migoo.framework.security.core.annotation.CurrentUser;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('system:user:query')")
-    public Result<PageResult<UserPageItemRespVO>> getUserPage(@CurrentUser LoginUser currentUser, UserQueryReqVO req) {
+    public Result<PageResult<UserPageItemRespVO>> getUserPage(@AuthUser MiGooUserDetails currentUser, UserQueryReqVO req) {
         // 获得用户分页列表
         PageResult<User> pageResult = userService.getPage(req);
         if (CollUtil.isEmpty(pageResult.getList())) {

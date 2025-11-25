@@ -8,13 +8,17 @@ public class StationLetterPageReqVO extends PageParam {
 
     private String code;
 
-    private Long toUserId;
+    private String toUserId;
 
     private String toUserType;
 
-    private Long fromUserId;
+    private String fromUserId;
 
     private String fromUserType;
 
     private Integer unread;
+
+    public void setToUserId(Object toUserId) {
+        this.toUserId = toUserId.toString();
+    }
 }

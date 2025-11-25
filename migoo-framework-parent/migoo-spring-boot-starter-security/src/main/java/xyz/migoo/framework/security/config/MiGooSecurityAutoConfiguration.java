@@ -18,7 +18,7 @@ import xyz.migoo.framework.security.core.handler.AccessDeniedHandlerImpl;
 import xyz.migoo.framework.security.core.handler.AuthenticationEntryPointImpl;
 import xyz.migoo.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import xyz.migoo.framework.security.core.interceptor.AuthenticatorInterceptor;
-import xyz.migoo.framework.security.core.resolver.CurrentUserMethodArgumentResolver;
+import xyz.migoo.framework.security.core.resolver.AuthUserMethodArgumentResolver;
 import xyz.migoo.framework.security.core.resolver.TokenMethodArgumentResolver;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.security.core.service.SecurityAuthenticatorService;
@@ -112,8 +112,8 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * 方法参数转换处理器
      */
     @Bean
-    public CurrentUserMethodArgumentResolver currentUserMethodArgumentResolver() {
-        return new CurrentUserMethodArgumentResolver();
+    public AuthUserMethodArgumentResolver currentUserMethodArgumentResolver() {
+        return new AuthUserMethodArgumentResolver();
     }
 
     /**

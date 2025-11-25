@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.security.config.SecurityProperties;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.service.LoginUserCacheService;
 import xyz.migoo.framework.security.core.service.SecuritySessionAuthService;
 
@@ -30,20 +30,20 @@ public class SecuritySessionAuthServiceImpl implements SecuritySessionAuthServic
     }
 
     @Override
-    public String createUserSession(LoginUser loginUser, String... params) {
+    public String createUserSession(AuthUserDetails authUserDetails, String... params) {
         // 生成 Session 编号
         String sessionId = generateSessionId();
         // 写入 缓存
-        loginUser.setUpdateTime(new Date());
-        loginUserCacheService.set(sessionId, loginUser);
+        authUserDetails.setUpdateTime(new Date());
+        loginUserCacheService.set(sessionId, authUserDetails);
         // 返回 Session 编号
         return sessionId;
     }
 
     @Override
-    public void refreshUserSession(String sessionId, LoginUser loginUser) {
-        loginUser.setUpdateTime(new Date());
-        loginUserCacheService.set(sessionId, loginUser);
+    public void refreshUserSession(String sessionId, AuthUserDetails authUserDetails) {
+        authUserDetails.setUpdateTime(new Date());
+        loginUserCacheService.set(sessionId, authUserDetails);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SecuritySessionAuthServiceImpl implements SecuritySessionAuthServic
     }
 
     @Override
-    public LoginUser getLoginUser(String sessionId) {
+    public AuthUserDetails getLoginUser(String sessionId) {
         return loginUserCacheService.get(sessionId);
     }
 

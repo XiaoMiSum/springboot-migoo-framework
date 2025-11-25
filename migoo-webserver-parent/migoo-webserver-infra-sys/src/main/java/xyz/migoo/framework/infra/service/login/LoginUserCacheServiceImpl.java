@@ -4,7 +4,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import xyz.migoo.framework.infra.dal.redis.LoginUserRedis;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.service.LoginUserCacheService;
 
 @Slf4j
@@ -15,13 +15,13 @@ public class LoginUserCacheServiceImpl implements LoginUserCacheService {
     private LoginUserRedis usersCache;
 
     @Override
-    public LoginUser get(String sessionId) {
+    public AuthUserDetails get(String sessionId) {
         return usersCache.get(sessionId);
     }
 
     @Override
-    public void set(String sessionId, LoginUser loginUser) {
-        usersCache.set(sessionId, loginUser);
+    public void set(String sessionId, AuthUserDetails authUserDetails) {
+        usersCache.set(sessionId, authUserDetails);
     }
 
     @Override

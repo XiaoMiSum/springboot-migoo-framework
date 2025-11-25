@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.NativeWebRequest;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 
 /**
@@ -54,7 +54,7 @@ public class SecurityFrameworkUtils {
      * @return 当前用户
      */
     @Nullable
-    public static LoginUser getLoginUser() {
+    public static AuthUserDetails getLoginUser() {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context == null) {
             return null;
@@ -63,7 +63,7 @@ public class SecurityFrameworkUtils {
         if (authentication == null) {
             return null;
         }
-        return authentication.getPrincipal() instanceof LoginUser ? (LoginUser) authentication.getPrincipal() : null;
+        return authentication.getPrincipal() instanceof AuthUserDetails ? (AuthUserDetails) authentication.getPrincipal() : null;
     }
 
     /**
@@ -72,29 +72,29 @@ public class SecurityFrameworkUtils {
      * @return 用户编号
      */
     @Nullable
-    public static Long getLoginUserId() {
-        LoginUser loginUser = getLoginUser();
-        return loginUser != null ? loginUser.getId() : null;
+    public static Object getLoginUserId() {
+        AuthUserDetails authUserDetails = getLoginUser();
+        return authUserDetails != null ? authUserDetails.getId() : null;
     }
 
     /**
      * 设置当前用户
      *
-     * @param loginUser 登录用户
-     * @param request   请求
+     * @param authUserDetails 登录用户
+     * @param request         请求
      */
-    public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
+    public static void setLoginUser(AuthUserDetails authUserDetails, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser, null, loginUser.getAuthorities());
+                authUserDetails, null, authUserDetails.getAuthorities());
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // 设置到上下文
         //何时调用  SecurityContextHolder.clearContext. spring security filter 应该会调用 clearContext
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
         // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
-        WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
-        WebFrameworkUtils.setLoginUserName(request, loginUser.getName());
+        WebFrameworkUtils.setLoginUserId(request, authUserDetails.getId());
+        WebFrameworkUtils.setLoginUserName(request, authUserDetails.getName());
     }
 
 }

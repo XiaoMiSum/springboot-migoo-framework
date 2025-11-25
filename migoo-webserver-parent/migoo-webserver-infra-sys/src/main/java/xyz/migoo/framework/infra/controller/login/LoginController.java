@@ -27,9 +27,9 @@ import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.BaseUser;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.MiGooUserDetails;
+import xyz.migoo.framework.security.core.annotation.AuthUser;
 import xyz.migoo.framework.security.core.annotation.Authenticator;
-import xyz.migoo.framework.security.core.annotation.CurrentUser;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -59,8 +59,8 @@ public class LoginController {
     }
 
     @GetMapping("/user-info")
-    public Result<?> getUserInfo(@CurrentUser LoginUser loginUser) {
-        BaseUser<Long> user = userService.get(loginUser.getId());
+    public Result<?> getUserInfo(@AuthUser MiGooUserDetails authUserDetails) {
+        BaseUser<Long> user = userService.get(authUserDetails.getId());
         Set<Long> roleIds = permissionService.getUserRoleIds(user.getId(), SetUtils.asSet(enabled.status()));
         List<Menu> menuList = permissionService.getRoleMenusFromCache(
                 roleIds,
@@ -79,8 +79,8 @@ public class LoginController {
     }
 
     @GetMapping("user-menus")
-    public Result<List<AuthMenuRespVO>> getMenus(@CurrentUser LoginUser loginUser) {
-        Set<Long> roleIds = permissionService.getUserRoleIds(loginUser.getId(), SetUtils.asSet(enabled.status()));
+    public Result<List<AuthMenuRespVO>> getMenus(@AuthUser MiGooUserDetails authUserDetails) {
+        Set<Long> roleIds = permissionService.getUserRoleIds(authUserDetails.getId(), SetUtils.asSet(enabled.status()));
         // 获得用户拥有的菜单列表
         List<Menu> menuList = permissionService.getRoleMenusFromCache(
                 roleIds,
@@ -91,7 +91,7 @@ public class LoginController {
     }
 
     @GetMapping("/authenticator")
-    public Result<?> getAuthenticator(@CurrentUser LoginUser user) {
+    public Result<?> getAuthenticator(@AuthUser MiGooUserDetails user) {
         Map<String, String> result = new HashMap<>(2);
         String content = String.format("otpauth://totp/%s@%s?secret=%s&issuer=%s", user.getUsername(), user.getName(), user.getSecurityCode(), title);
         result.put("quickMark", QrCodeUtil.generateAsBase64(content, new QrConfig(), "png"));
@@ -101,14 +101,14 @@ public class LoginController {
 
     @PostMapping("/authenticator")
     @Authenticator
-    public Result<?> bindAuthenticator(@CurrentUser LoginUser user) {
+    public Result<?> bindAuthenticator(@AuthUser MiGooUserDetails user) {
         userService.update(new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
         return Result.getSuccessful();
     }
 
     @PostMapping("/password")
     @Authenticator
-    public Result<?> updatePassword(@CurrentUser LoginUser user, @Valid @RequestBody PasswordVO password) {
+    public Result<?> updatePassword(@AuthUser MiGooUserDetails user, @Valid @RequestBody PasswordVO password) {
         if (Objects.equals(password.getNewPassword(), password.getOldPassword())) {
             throw ServiceExceptionUtil.get(USER_PASSWORD_OLD_NEW);
         }

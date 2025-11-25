@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.security.config.SecurityProperties;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.service.dto.AuthenticatorDTO;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
@@ -29,13 +29,13 @@ public class SecurityAuthenticatorService {
         String code = request.getParameter("_code");
         String token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
         // 兼容绑定身份验证器时，token 在请求参数中
-        LoginUser loginUser = loginUserService.getLoginUser(!Strings.isNullOrEmpty(token) ? token :
+        AuthUserDetails<?> authUserDetails = loginUserService.getLoginUser(!Strings.isNullOrEmpty(token) ? token :
                 request.getParameter("_token"));
-        // assert Objects.nonNull(loginUser);
-        if (!loginUser.isRequiredVerifyAuthenticator()) {
+        // assert Objects.nonNull(authUserDetails);
+        if (!authUserDetails.isRequiredVerifyAuthenticator()) {
             return;
         }
-        if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(loginUser.getSecurityCode(), code)) {
+        if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(authUserDetails.getSecurityCode(), code)) {
             throw ServiceExceptionUtil.get(new ErrorCode(999, "2fa.failure"));
         }
     }

@@ -1,7 +1,7 @@
 package xyz.migoo.framework.security.core.service;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 
 /**
  * Security 框架 Auth Service 接口，定义 security 组件需要的功能
@@ -17,7 +17,7 @@ public interface SecurityAuthFrameworkService extends UserDetailsService {
      * @param token token
      * @return 用户信息
      */
-    LoginUser verifyTokenAndRefresh(String token);
+    AuthUserDetails verifyTokenAndRefresh(String token);
 
     /**
      * 基于 token 退出登录

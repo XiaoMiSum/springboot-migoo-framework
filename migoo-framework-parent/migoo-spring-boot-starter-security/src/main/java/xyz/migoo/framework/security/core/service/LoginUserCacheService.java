@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.service;
 
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 
 /**
  * @author xiaomi
@@ -9,20 +9,20 @@ import xyz.migoo.framework.security.core.LoginUser;
 public interface LoginUserCacheService {
 
     /**
-     * 通过sessionId 获取 LoginUser
+     * 通过sessionId 获取 AuthUserDetails
      *
      * @param sessionId sessionId
      * @return 登录用户
      */
-    LoginUser get(String sessionId);
+    AuthUserDetails get(String sessionId);
 
     /**
      * 设置登录用户缓存
      *
-     * @param sessionId sessionId
-     * @param loginUser 登录用户
+     * @param sessionId       sessionId
+     * @param authUserDetails 登录用户
      */
-    void set(String sessionId, LoginUser loginUser);
+    void set(String sessionId, AuthUserDetails authUserDetails);
 
     /**
      * 通过 sessionId 删除登录用户缓存

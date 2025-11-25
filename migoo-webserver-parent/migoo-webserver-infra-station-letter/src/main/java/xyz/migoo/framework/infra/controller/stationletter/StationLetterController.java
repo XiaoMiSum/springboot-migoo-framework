@@ -11,8 +11,8 @@ import xyz.migoo.framework.infra.controller.stationletter.vo.StationLetterRespVO
 import xyz.migoo.framework.infra.controller.stationletter.vo.StationLetterUpdateReqVO;
 import xyz.migoo.framework.infra.convert.stationletter.StationLetterConvert;
 import xyz.migoo.framework.infra.service.StationLetterService;
-import xyz.migoo.framework.security.core.LoginUser;
-import xyz.migoo.framework.security.core.annotation.CurrentUser;
+import xyz.migoo.framework.security.core.MiGooUserDetails;
+import xyz.migoo.framework.security.core.annotation.AuthUser;
 
 @RestController
 @RequestMapping("/station-letter")
@@ -22,8 +22,8 @@ public class StationLetterController {
     private StationLetterService service;
 
     @GetMapping
-    public Result<PageResult<StationLetterPageRespVO>> getPage(@CurrentUser LoginUser loginUser, StationLetterPageReqVO req) {
-        req.setToUserId(loginUser.getId());
+    public Result<PageResult<StationLetterPageRespVO>> getPage(@AuthUser MiGooUserDetails authUserDetails, StationLetterPageReqVO req) {
+        req.setToUserId(authUserDetails.getId());
         var result = StationLetterConvert.INSTANCE.convert(service.getPage(req));
         return Result.getSuccessful(result);
     }

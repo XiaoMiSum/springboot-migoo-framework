@@ -246,7 +246,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (Objects.isNull(SecurityFrameworkUtils.getLoginUser())) {
             return false;
         }
-        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
+        Set<Long> roleIds = getUserRoleIds((Long) SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }
@@ -282,7 +282,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (Objects.isNull(SecurityFrameworkUtils.getLoginUser())) {
             return false;
         }
-        Set<Long> roleIds = getUserRoleIds(SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
+        Set<Long> roleIds = getUserRoleIds((Long) SecurityFrameworkUtils.getLoginUserId(), SetUtils.asSet(enabled.status()));
         if (CollUtil.isEmpty(roleIds)) {
             return false;
         }

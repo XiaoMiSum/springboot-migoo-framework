@@ -9,7 +9,7 @@ import xyz.migoo.framework.infra.controller.login.vo.AuthUserInfoRespVO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
 import xyz.migoo.framework.infra.enums.MenuIdEnum;
 import xyz.migoo.framework.security.core.BaseUser;
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.MiGooUserDetails;
 
 import java.util.*;
 
@@ -26,8 +26,8 @@ public interface AuthConvert {
      * @param user 管理员或会员
      * @return 登录用户对象
      */
-    default LoginUser convert(BaseUser<Long> user) {
-        return new LoginUser()
+    default MiGooUserDetails convert(BaseUser<Long> user) {
+        return new MiGooUserDetails()
                 .setRequiredBindAuthenticator(isDisabled(user.getBindAuthenticator()))
                 .setRequiredVerifyAuthenticator(isEnabled(user.getRequiredVerifyAuthenticator()))
                 .setId(user.getId())

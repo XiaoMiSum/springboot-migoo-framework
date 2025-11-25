@@ -18,7 +18,7 @@ public class WebFrameworkUtils {
 
     private static final String REQUEST_ATTRIBUTE_RESULT = "result";
 
-    public static void setLoginUserId(ServletRequest request, Long userId) {
+    public static void setLoginUserId(ServletRequest request, Object userId) {
         request.setAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID, userId);
     }
 
@@ -32,11 +32,11 @@ public class WebFrameworkUtils {
      * @param request 请求
      * @return 用户编号
      */
-    public static Long getLoginUserId(HttpServletRequest request) {
+    public static Object getLoginUserId(HttpServletRequest request) {
         if (request == null) {
             return null;
         }
-        return (Long) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID);
+        return request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_ID);
     }
 
     /**
@@ -52,7 +52,7 @@ public class WebFrameworkUtils {
         return (String) request.getAttribute(REQUEST_ATTRIBUTE_LOGIN_USER_NAME);
     }
 
-    public static Long getLoginUserId() {
+    public static Object getLoginUserId() {
         HttpServletRequest request = getRequest();
         return getLoginUserId(request);
     }
@@ -72,10 +72,9 @@ public class WebFrameworkUtils {
 
     private static HttpServletRequest getRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+        if (!(requestAttributes instanceof ServletRequestAttributes servletRequestAttributes)) {
             return null;
         }
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
         return servletRequestAttributes.getRequest();
     }
 }

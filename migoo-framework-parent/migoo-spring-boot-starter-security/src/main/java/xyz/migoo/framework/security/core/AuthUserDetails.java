@@ -1,8 +1,8 @@
 package xyz.migoo.framework.security.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,13 +16,13 @@ import java.util.Map;
  * @author xiaomi
  * Created on 2021/11/20 11:58
  */
-@Data
-public class LoginUser<T> implements UserDetails {
+@Getter
+@AllArgsConstructor
+@SuppressWarnings("unchecked")
+public abstract class AuthUserDetails<Sub> implements UserDetails {
 
-    /**
-     * 用户编号
-     */
-    private T id;
+    private Sub self;
+
     /**
      * 最后更新时间
      */
@@ -53,7 +53,58 @@ public class LoginUser<T> implements UserDetails {
 
     private boolean requiredBindAuthenticator;
 
-    private Map<String, Object> attrs = Maps.newHashMap();
+    private Map<String, Object> attrs;
+
+    public AuthUserDetails() {
+        self = (Sub) this;
+    }
+
+    public abstract Object getId();
+
+    public Sub setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+        return self;
+    }
+
+    public Sub setName(String name) {
+        this.name = name;
+        return self;
+    }
+
+    public Sub setUsername(String username) {
+        this.username = username;
+        return self;
+    }
+
+    public Sub setPassword(String password) {
+        this.password = password;
+        return self;
+    }
+
+    public Sub setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+        return self;
+    }
+
+    public Sub setSecurityCode(String securityCode) {
+        this.securityCode = securityCode;
+        return self;
+    }
+
+    public Sub setRequiredVerifyAuthenticator(boolean requiredVerifyAuthenticator) {
+        this.requiredVerifyAuthenticator = requiredVerifyAuthenticator;
+        return self;
+    }
+
+    public Sub setRequiredBindAuthenticator(boolean requiredBindAuthenticator) {
+        this.requiredBindAuthenticator = requiredBindAuthenticator;
+        return self;
+    }
+
+    public Sub etAttrs(Map<String, Object> attrs) {
+        this.attrs = attrs;
+        return self;
+    }
 
     @Override
     @JsonIgnore

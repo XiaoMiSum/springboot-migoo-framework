@@ -6,26 +6,26 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import xyz.migoo.framework.security.core.LoginUser;
-import xyz.migoo.framework.security.core.annotation.CurrentUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
+import xyz.migoo.framework.security.core.annotation.AuthUser;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 /**
  * @author xiaomi
  * Created on 2021/11/22 19:33
  */
-public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return LoginUser.class.isAssignableFrom(parameter.getParameterType())
-                && parameter.hasParameterAnnotation(CurrentUser.class);
+        return AuthUserDetails.class.isAssignableFrom(parameter.getParameterType())
+                && parameter.hasParameterAnnotation(AuthUser.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
         var user = SecurityFrameworkUtils.getLoginUser();
-        var annotation = parameter.getParameterAnnotation(CurrentUser.class);
+        var annotation = parameter.getParameterAnnotation(AuthUser.class);
         if (user != null) {
             return user;
         } else if (annotation != null && !annotation.required()) {

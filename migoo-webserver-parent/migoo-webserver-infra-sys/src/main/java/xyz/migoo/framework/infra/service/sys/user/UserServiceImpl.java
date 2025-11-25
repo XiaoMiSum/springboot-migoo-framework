@@ -15,8 +15,8 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.dal.mapper.sys.UserMapper;
 import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.BaseUser;
-import xyz.migoo.framework.security.core.LoginUser;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
 import xyz.migoo.framework.security.utils.PasswordUtils;
 
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public LoginUser toLoginUser(BaseUser<?> baseUser) {
+    public AuthUserDetails toLoginUser(BaseUser<?> baseUser) {
         return AuthConvert.INSTANCE.convert((BaseUser<Long>) baseUser);
     }
 }

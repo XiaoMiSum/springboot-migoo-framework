@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.service;
 
-import xyz.migoo.framework.security.core.LoginUser;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 
 /**
  * 在线用户 Session Core Service 接口
@@ -13,19 +13,19 @@ public interface SecuritySessionAuthService {
     /**
      * 创建在线用户 Session
      *
-     * @param loginUser 登录用户
-     * @param params    扩展参数
+     * @param authUserDetails 登录用户
+     * @param params          扩展参数
      * @return Session 编号
      */
-    String createUserSession(LoginUser loginUser, String... params);
+    String createUserSession(AuthUserDetails authUserDetails, String... params);
 
     /**
      * 刷新在线用户 Session 的更新时间
      *
-     * @param sessionId Session 编号
-     * @param loginUser 登录用户
+     * @param sessionId       Session 编号
+     * @param authUserDetails 登录用户
      */
-    void refreshUserSession(String sessionId, LoginUser loginUser);
+    void refreshUserSession(String sessionId, AuthUserDetails authUserDetails);
 
     /**
      * 删除在线用户 Session
@@ -40,7 +40,7 @@ public interface SecuritySessionAuthService {
      * @param sessionId Session 编号
      * @return 在线用户
      */
-    LoginUser getLoginUser(String sessionId);
+    AuthUserDetails getLoginUser(String sessionId);
 
     /**
      * 获得 Session 超时时间，单位：毫秒
