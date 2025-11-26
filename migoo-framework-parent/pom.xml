@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>${revision}</version>
+    <version>1.3.6</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -51,7 +51,7 @@
     </modules>
 
     <properties>
-        <revision>1.3.5</revision>
+        <revision>1.3.6</revision>
         <!-- Maven 相关 -->
         <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <clean.version>3.4.0</clean.version>
