@@ -1,5 +1,6 @@
 package xyz.migoo.framework.security.core.resolver;
 
+import cn.hutool.core.util.StrUtil;
 import jakarta.annotation.Resource;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -29,10 +30,11 @@ public class TokenMethodArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
         var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
-        var annotation = parameter.getParameterAnnotation(Token.class);
-        if (token != null) {
+        if (StrUtil.isNotBlank(token)) {
             return token;
-        } else if (annotation != null && !annotation.required()) {
+        }
+        var annotation = parameter.getParameterAnnotation(Token.class);
+        if (annotation != null && !annotation.required()) {
             return null;
         }
         throw new MissingServletRequestPartException("token");

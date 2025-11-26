@@ -25,10 +25,11 @@ public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentReso
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
         var user = SecurityFrameworkUtils.getLoginUser();
-        var annotation = parameter.getParameterAnnotation(AuthUser.class);
         if (user != null) {
             return user;
-        } else if (annotation != null && !annotation.required()) {
+        }
+        var annotation = parameter.getParameterAnnotation(AuthUser.class);
+        if (annotation != null && !annotation.required()) {
             return null;
         }
         throw new MissingServletRequestPartException("currentUser");
