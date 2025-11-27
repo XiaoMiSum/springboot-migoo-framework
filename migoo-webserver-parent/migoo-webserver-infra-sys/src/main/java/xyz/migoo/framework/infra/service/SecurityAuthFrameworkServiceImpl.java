@@ -3,6 +3,7 @@ package xyz.migoo.framework.infra.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import cn.hutool.jwt.signers.JWTSignerUtil;
@@ -66,7 +67,9 @@ public class SecurityAuthFrameworkServiceImpl implements SecurityAuthFrameworkSe
             if (!StrUtil.equals("migoo", issuer)) {
                 throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
-            return JsonUtils.parseObject(payload.get("user").toString(), MiGooUserDetails.class);
+            var user = JsonUtils.parseObject(payload.get("user").toString(), MiGooUserDetails.class);
+            assert user != null;
+            return user.setSecurityCode(SecureUtil.aes(properties.getToken().getSecret().getBytes()).encryptBase64(user.getSecurityCode()));
         } catch (Exception e) {
             throw ServiceExceptionUtil.get(UNAUTHORIZED);
         }
@@ -81,10 +84,11 @@ public class SecurityAuthFrameworkServiceImpl implements SecurityAuthFrameworkSe
     public Authenticated<MiGooUserDetails> authenticate(String username, String password) {
         try {
             var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            var authUserDetails = (MiGooUserDetails) authentication.getPrincipal();
+            var user = (MiGooUserDetails) authentication.getPrincipal();
+            user.setSecurityCode(SecureUtil.aes(properties.getToken().getSecret().getBytes()).encryptBase64(user.getSecurityCode()));
             var now = DateTime.now();
             var assessExpireAt = new Date(System.currentTimeMillis() + properties.getToken().getTimeout().toMillis());
-            Map<String, Object> payload = BeanUtil.beanToMap(authUserDetails, false, false);
+            Map<String, Object> payload = BeanUtil.beanToMap(user, false, false);
             var signer = JWTSignerUtil.hs256(properties.getToken().getSecret().getBytes());
             var accessToken = JWT.create().setSigner(signer).setPayload("user", payload)
                     .setIssuedAt(now).setIssuer("migoo").setNotBefore(now)
@@ -93,7 +97,7 @@ public class SecurityAuthFrameworkServiceImpl implements SecurityAuthFrameworkSe
             var refreshToken = JWT.create().setSigner(signer)
                     .setIssuedAt(now).setIssuer("migoo").setNotBefore(now)
                     .setAudience("Authenticated").setExpiresAt(refreshExpireAt).sign(signer);
-            return new Authenticated<MiGooUserDetails>().setUser(authUserDetails)
+            return new Authenticated<MiGooUserDetails>().setUser(user)
                     .setAccessToken(accessToken).setAccessTokenExpiresAt(assessExpireAt)
                     .setRefreshToken(refreshToken).setRefreshTokenExpiresAt(refreshExpireAt);
         } catch (BadCredentialsException badCredentialsException) {

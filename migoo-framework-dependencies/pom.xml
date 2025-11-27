@@ -49,6 +49,7 @@
         <!-- 监控相关 -->
         <spring-boot-admin.version>3.3.3</spring-boot-admin.version>
         <!-- 工具类相关 -->
+        <jjwt.version>0.13.0</jjwt.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool.version>5.8.41</hutool.version>
         <guava.version>33.4.6-jre</guava.version>
@@ -394,6 +395,23 @@
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- JWT  https://github.com/jwtk/jjwt -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+                <version>${jjwt.version}</version>
             </dependency>
 
             <!-- 阿里云SDK -->
