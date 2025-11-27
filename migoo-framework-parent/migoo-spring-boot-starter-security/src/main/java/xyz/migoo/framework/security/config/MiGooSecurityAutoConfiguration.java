@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import xyz.migoo.framework.security.core.handler.AccessDeniedHandlerImpl;
 import xyz.migoo.framework.security.core.handler.AuthenticationEntryPointImpl;
@@ -83,7 +84,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * 退出处理类 Bean
      */
     @Bean
-    public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthFrameworkService securityFrameworkService) {
+    public LogoutSuccessHandler logoutSuccessHandler(SecurityAuthFrameworkService<? extends AuthUserDetails<?>> securityFrameworkService) {
         return new LogoutSuccessHandlerImpl(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService);
     }
 
@@ -102,7 +103,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * Token 认证过滤器 Bean
      */
     @Bean
-    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService securityFrameworkService,
+    public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService<? extends AuthUserDetails<?>> securityFrameworkService,
                                                                   GlobalExceptionHandler globalExceptionHandler) {
         return new JWTAuthenticationTokenFilter(SpringUtil.getBean(SecurityProperties.class), securityFrameworkService,
                 globalExceptionHandler, SpringUtil.getBean(I18NMessage.class));

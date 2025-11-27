@@ -10,13 +10,10 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.infra.controller.login.vo.PasswordVO;
 import xyz.migoo.framework.infra.controller.sys.user.vo.UserQueryReqVO;
-import xyz.migoo.framework.infra.convert.AuthConvert;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.dal.mapper.sys.UserMapper;
 import xyz.migoo.framework.infra.enums.SysErrorCodeConstants;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
-import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.BaseUser;
 import xyz.migoo.framework.security.core.util.GoogleAuthenticator;
 import xyz.migoo.framework.security.utils.PasswordUtils;
 
@@ -112,11 +109,5 @@ public class UserServiceImpl implements UserService {
                 .setSecretKey(SecureUtil.aes(secret.getBytes()).encryptHex(GoogleAuthenticator.generateSecretKey()))
                 .setBindAuthenticator(INIT.getNumber())
                 .setId(id));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public AuthUserDetails toLoginUser(BaseUser<?> baseUser) {
-        return AuthConvert.INSTANCE.convert((BaseUser<Long>) baseUser);
     }
 }

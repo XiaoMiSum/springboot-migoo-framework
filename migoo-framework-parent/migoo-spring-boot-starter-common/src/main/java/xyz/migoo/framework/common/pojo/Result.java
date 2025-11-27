@@ -21,7 +21,7 @@ public class Result<T> implements Serializable {
     /**
      * 错误码
      *
-     * @see ErrorCode#getCode()
+     * @see ErrorCode#code()
      */
     private Integer code;
     /**
@@ -31,7 +31,7 @@ public class Result<T> implements Serializable {
     /**
      * 错误提示，用户可阅读
      *
-     * @see ErrorCode#getMsg() ()
+     * @see ErrorCode#msg() ()
      */
     private String msg;
 
@@ -49,7 +49,7 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> getError(Integer code, String message) {
-        Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.getCode().equals(code), "code 必须是错误的！");
+        Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.code().equals(code), "code 必须是错误的！");
         Result<T> result = new Result<>();
         result.code = code;
         result.msg = message;
@@ -57,13 +57,13 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> getError(ErrorCode errorCode) {
-        return getError(errorCode.getCode(), errorCode.getMsg());
+        return getError(errorCode.code(), errorCode.msg());
     }
 
     public static <T> Result<T> getSuccessful(T data) {
         Result<T> result = new Result<>();
-        result.code = GlobalErrorCodeConstants.SUCCESS.getCode();
-        result.msg = GlobalErrorCodeConstants.SUCCESS.getMsg();
+        result.code = GlobalErrorCodeConstants.SUCCESS.code();
+        result.msg = GlobalErrorCodeConstants.SUCCESS.msg();
         result.data = data;
         return result;
     }
@@ -73,7 +73,11 @@ public class Result<T> implements Serializable {
     }
 
     public static boolean isSuccessful(Integer code) {
-        return Objects.equals(code, GlobalErrorCodeConstants.SUCCESS.getCode());
+        return Objects.equals(code, GlobalErrorCodeConstants.SUCCESS.code());
+    }
+
+    public static <T> Result<T> getError(ServiceException serviceException) {
+        return getError(serviceException.getCode(), serviceException.getMessage());
     }
 
     @JsonIgnore // 避免 jackson 序列化
@@ -81,12 +85,12 @@ public class Result<T> implements Serializable {
         return isSuccessful(code);
     }
 
+    // ========= 和 Exception 异常体系集成 =========
+
     @JsonIgnore // 避免 jackson 序列化
     public boolean isError() {
         return !isSuccessful();
     }
-
-    // ========= 和 Exception 异常体系集成 =========
 
     /**
      * 判断是否有异常。如果有，则抛出 {@link ServiceException} 异常
@@ -96,10 +100,6 @@ public class Result<T> implements Serializable {
             // 业务异常
             throw new ServiceException(code, msg);
         }
-    }
-
-    public static <T> Result<T> getError(ServiceException serviceException) {
-        return getError(serviceException.getCode(), serviceException.getMessage());
     }
 
 }

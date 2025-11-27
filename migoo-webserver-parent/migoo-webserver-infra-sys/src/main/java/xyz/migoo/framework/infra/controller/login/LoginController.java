@@ -13,7 +13,6 @@ import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.collection.SetUtils;
 import xyz.migoo.framework.infra.controller.login.vo.AuthLoginReqVO;
-import xyz.migoo.framework.infra.controller.login.vo.AuthLoginRespVO;
 import xyz.migoo.framework.infra.controller.login.vo.AuthMenuRespVO;
 import xyz.migoo.framework.infra.controller.login.vo.PasswordVO;
 import xyz.migoo.framework.infra.convert.AuthConvert;
@@ -21,7 +20,6 @@ import xyz.migoo.framework.infra.dal.dataobject.sys.ConfigurerDO;
 import xyz.migoo.framework.infra.dal.dataobject.sys.Menu;
 import xyz.migoo.framework.infra.dal.dataobject.sys.User;
 import xyz.migoo.framework.infra.enums.MenuTypeEnum;
-import xyz.migoo.framework.infra.service.login.TokenService;
 import xyz.migoo.framework.infra.service.sys.configurer.ConfigurerService;
 import xyz.migoo.framework.infra.service.sys.permission.PermissionService;
 import xyz.migoo.framework.infra.service.sys.user.UserService;
@@ -30,6 +28,8 @@ import xyz.migoo.framework.security.core.BaseUser;
 import xyz.migoo.framework.security.core.MiGooUserDetails;
 import xyz.migoo.framework.security.core.annotation.AuthUser;
 import xyz.migoo.framework.security.core.annotation.Authenticator;
+import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
+import xyz.migoo.framework.security.core.service.dto.Authenticated;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -43,7 +43,7 @@ public class LoginController {
 
     public String title = "";
     @Resource
-    private TokenService tokenService;
+    private SecurityAuthFrameworkService<MiGooUserDetails> tokenService;
     @Resource
     private UserService userService;
     @Resource
@@ -54,8 +54,8 @@ public class LoginController {
     private ConfigurerService configurerService;
 
     @PostMapping("/login")
-    public Result<AuthLoginRespVO> login(@Valid @RequestBody AuthLoginReqVO req) {
-        return Result.getSuccessful(tokenService.signIn(req));
+    public Result<Authenticated<MiGooUserDetails>> login(@Valid @RequestBody AuthLoginReqVO req) {
+        return Result.getSuccessful(tokenService.authenticate(req.getUsername(), req.getPassword()));
     }
 
     @GetMapping("/user-info")

@@ -1,9 +1,8 @@
 package xyz.migoo.framework.security.core.service;
 
-import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.BaseUser;
 
-public interface IBaseUserService {
+public interface IBaseUserService<T, U> {
 
-    AuthUserDetails toLoginUser(BaseUser<?> baseUser);
+    T toLoginUser(BaseUser<U> baseUser);
 }

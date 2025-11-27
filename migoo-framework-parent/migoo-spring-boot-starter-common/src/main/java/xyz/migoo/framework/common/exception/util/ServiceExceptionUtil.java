@@ -44,13 +44,13 @@ public class ServiceExceptionUtil {
     // ========== 和 ServiceException 的集成 ==========
 
     public static ServiceException get(ErrorCode errorCode) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
-        return get0(errorCode.getCode(), messagePattern);
+        String messagePattern = MESSAGES.getOrDefault(errorCode.code(), errorCode.msg());
+        return get0(errorCode.code(), messagePattern);
     }
 
     public static ServiceException get(ErrorCode errorCode, Object... params) {
-        String messagePattern = MESSAGES.getOrDefault(errorCode.getCode(), errorCode.getMsg());
-        return get0(errorCode.getCode(), messagePattern, params);
+        String messagePattern = MESSAGES.getOrDefault(errorCode.code(), errorCode.msg());
+        return get0(errorCode.code(), messagePattern, params);
     }
 
     /**

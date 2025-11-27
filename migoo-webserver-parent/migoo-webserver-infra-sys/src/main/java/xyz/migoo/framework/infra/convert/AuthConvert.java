@@ -32,10 +32,10 @@ public interface AuthConvert {
                 .setRequiredVerifyAuthenticator(isEnabled(user.getRequiredVerifyAuthenticator()))
                 .setId(user.getId())
                 .setName(user.getName())
-                .setUpdateTime(new Date())
                 .setEnabled(isEnabled(user.getStatus()))
                 .setUsername(user.getUsername())
                 .setPassword(user.getPassword())
+                // todo 这里要加密
                 .setSecurityCode(user.getSecretKey());
     }
 

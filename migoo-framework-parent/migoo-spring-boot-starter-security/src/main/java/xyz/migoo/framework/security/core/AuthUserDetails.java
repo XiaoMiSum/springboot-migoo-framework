@@ -7,7 +7,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -19,15 +18,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @SuppressWarnings("unchecked")
-public abstract class AuthUserDetails<Sub> implements UserDetails {
-
-    private Sub self;
-
-    /**
-     * 最后更新时间
-     */
-    private Date updateTime;
-
+public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub>> implements UserDetails {
     /**
      * 用户姓名
      */
@@ -45,7 +36,7 @@ public abstract class AuthUserDetails<Sub> implements UserDetails {
     /**
      * 启用标识
      */
-    private Boolean enabled;
+    private boolean enabled;
 
     private String securityCode;
 
@@ -56,54 +47,33 @@ public abstract class AuthUserDetails<Sub> implements UserDetails {
     private Map<String, Object> attrs;
 
     public AuthUserDetails() {
-        self = (Sub) this;
     }
 
     public abstract Object getId();
 
-    public Sub setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-        return self;
-    }
-
     public Sub setName(String name) {
         this.name = name;
-        return self;
-    }
-
-    public Sub setUsername(String username) {
-        this.username = username;
-        return self;
-    }
-
-    public Sub setPassword(String password) {
-        this.password = password;
-        return self;
-    }
-
-    public Sub setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-        return self;
+        return (Sub) this;
     }
 
     public Sub setSecurityCode(String securityCode) {
         this.securityCode = securityCode;
-        return self;
+        return (Sub) this;
     }
 
     public Sub setRequiredVerifyAuthenticator(boolean requiredVerifyAuthenticator) {
         this.requiredVerifyAuthenticator = requiredVerifyAuthenticator;
-        return self;
+        return (Sub) this;
     }
 
     public Sub setRequiredBindAuthenticator(boolean requiredBindAuthenticator) {
         this.requiredBindAuthenticator = requiredBindAuthenticator;
-        return self;
+        return (Sub) this;
     }
 
     public Sub etAttrs(Map<String, Object> attrs) {
         this.attrs = attrs;
-        return self;
+        return (Sub) this;
     }
 
     @Override
@@ -117,11 +87,20 @@ public abstract class AuthUserDetails<Sub> implements UserDetails {
         return username;
     }
 
+    public Sub setUsername(String username) {
+        this.username = username;
+        return (Sub) this;
+    }
 
     @Override
     @JsonIgnore
     public String getPassword() {
         return password;
+    }
+
+    public Sub setPassword(String password) {
+        this.password = password;
+        return (Sub) this;
     }
 
     @Override
@@ -145,6 +124,11 @@ public abstract class AuthUserDetails<Sub> implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public Sub setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return (Sub) this;
     }
 }
 

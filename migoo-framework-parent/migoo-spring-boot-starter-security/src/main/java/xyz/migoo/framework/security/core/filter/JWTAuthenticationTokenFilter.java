@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.filter.OncePerRequestFilter;
+import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
@@ -22,6 +23,7 @@ import xyz.migoo.framework.web.i18n.I18NMessage;
 import java.io.IOException;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
+import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * JWT 过滤器，验证 token 的有效性
@@ -35,7 +37,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
 
-    private final SecurityAuthFrameworkService authService;
+    private final SecurityAuthFrameworkService<? extends AuthUserDetails<?>> authService;
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
@@ -45,22 +47,25 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
-        if (StrUtil.isNotEmpty(token)) {
-            try {
-                // 验证 token 有效性
-                AuthUserDetails authUserDetails = authService.verifyTokenAndRefresh(token);
-                // 设置当前用户
-                if (authUserDetails != null) {
-                    SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
-                }
-            } catch (Throwable ex) {
-                Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)
-                        : globalExceptionHandler.allExceptionHandler(request, ex);
-                ServletUtils.writeJSON(response, result);
-                return;
+
+        try {
+            String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
+            if (StrUtil.isBlank(token)) {
+                throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
+            // 验证 token 有效性
+            var authUserDetails = authService.verify(token);
+            // 设置当前用户
+            if (authUserDetails != null) {
+                SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
+            }
+        } catch (Throwable ex) {
+            Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)
+                    : globalExceptionHandler.allExceptionHandler(request, ex);
+            ServletUtils.writeJSON(response, result);
+            return;
         }
+
 
         // 继续过滤链
         chain.doFilter(request, response);
@@ -74,7 +79,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     public Result<?> accessDeniedExceptionHandler(HttpServletRequest req, AccessDeniedException ex) {
         log.warn("[accessDeniedExceptionHandler][userId({}) 无法访问 url({})]", WebFrameworkUtils.getLoginUserId(req),
                 req.getRequestURL(), ex);
-        return Result.getError(FORBIDDEN.getCode(), i18NMessage.getMessage(FORBIDDEN.getMsg()));
+        return Result.getError(FORBIDDEN.code(), i18NMessage.getMessage(FORBIDDEN.msg()));
     }
 
 }

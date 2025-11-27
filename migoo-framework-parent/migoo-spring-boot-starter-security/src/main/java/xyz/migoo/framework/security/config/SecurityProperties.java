@@ -67,6 +67,20 @@ public class SecurityProperties {
          */
         @NotEmpty(message = "Token 秘钥不能为空")
         private String secret;
-    }
 
+        /**
+         * Token 刷新的过期时间
+         * <p>
+         * 默认 7 天
+         */
+        @NotNull(message = "refreshTimeout Token刷新的过期时间不能为空")
+        private Duration refreshTimeout = Duration.ofDays(7);
+        /**
+         * Token 刷新的请求 Header
+         * <p>
+         * 默认：X-Refresh-Token
+         */
+        @NotEmpty(message = "refreshHeaderName Token刷新的请求Header不能为空")
+        private String refreshHeaderName = "X-Refresh-Token";
+    }
 }

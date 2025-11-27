@@ -54,7 +54,7 @@ public class SecurityFrameworkUtils {
      * @return 当前用户
      */
     @Nullable
-    public static AuthUserDetails getLoginUser() {
+    public static AuthUserDetails<? extends AuthUserDetails<?>> getLoginUser() {
         SecurityContext context = SecurityContextHolder.getContext();
         if (context == null) {
             return null;
@@ -63,7 +63,7 @@ public class SecurityFrameworkUtils {
         if (authentication == null) {
             return null;
         }
-        return authentication.getPrincipal() instanceof AuthUserDetails ? (AuthUserDetails) authentication.getPrincipal() : null;
+        return authentication.getPrincipal() instanceof AuthUserDetails ? (AuthUserDetails<? extends AuthUserDetails<?>>) authentication.getPrincipal() : null;
     }
 
     /**
@@ -73,7 +73,7 @@ public class SecurityFrameworkUtils {
      */
     @Nullable
     public static Object getLoginUserId() {
-        AuthUserDetails authUserDetails = getLoginUser();
+        AuthUserDetails<? extends AuthUserDetails<?>> authUserDetails = getLoginUser();
         return authUserDetails != null ? authUserDetails.getId() : null;
     }
 
@@ -83,7 +83,7 @@ public class SecurityFrameworkUtils {
      * @param authUserDetails 登录用户
      * @param request         请求
      */
-    public static void setLoginUser(AuthUserDetails authUserDetails, HttpServletRequest request) {
+    public static void setLoginUser(AuthUserDetails<? extends AuthUserDetails<?>> authUserDetails, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 authUserDetails, null, authUserDetails.getAuthorities());

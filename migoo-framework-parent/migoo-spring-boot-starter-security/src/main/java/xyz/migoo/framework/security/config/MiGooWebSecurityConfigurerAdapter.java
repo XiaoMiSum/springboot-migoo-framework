@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.filter.JWTAuthenticationTokenFilter;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 
@@ -39,7 +40,7 @@ public class MiGooWebSecurityConfigurerAdapter {
      * 自定义用户【认证】逻辑
      */
     @Resource
-    private SecurityAuthFrameworkService userDetailsService;
+    private SecurityAuthFrameworkService<? extends AuthUserDetails<?>> userDetailsService;
     /**
      * Spring Security 加密器
      */

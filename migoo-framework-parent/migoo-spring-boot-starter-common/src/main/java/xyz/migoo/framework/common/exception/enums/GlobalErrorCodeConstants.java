@@ -38,7 +38,7 @@ public class GlobalErrorCodeConstants {
 
     public static boolean isMatch(Integer code) {
         return code != null
-                && code >= SUCCESS.getCode() && code <= UNKNOWN.getCode();
+                && code >= SUCCESS.code() && code <= UNKNOWN.code();
     }
 
 }

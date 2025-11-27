@@ -85,8 +85,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     @ResponseBody
     public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, t.getContentType()));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, t.getContentType()));
     }
 
     /**
@@ -96,8 +96,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public Result<?> missingServletRequestParameterHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, ex.getParameterName()));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getParameterName()));
     }
 
     /**
@@ -107,8 +107,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, ex.getMessage()));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getMessage()));
     }
 
     /**
@@ -121,8 +121,8 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, String.join(",", errors)));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
@@ -135,8 +135,8 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, String.join(",", errors)));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
@@ -145,8 +145,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
-        var message = i18n.getMessage(BAD_REQUEST.getMsg());
-        return Result.getError(BAD_REQUEST.getCode(), String.format("%s:%s", message, constraintViolation.getMessage()));
+        var message = i18n.getMessage(BAD_REQUEST.msg());
+        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, constraintViolation.getMessage()));
     }
 
     /**
@@ -167,8 +167,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     public Result<?> noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
-        var message = i18n.getMessage(NOT_FOUND.getMsg());
-        return Result.getError(NOT_FOUND.getCode(), String.format("%s:%s", message, ex.getRequestURL()));
+        var message = i18n.getMessage(NOT_FOUND.msg());
+        return Result.getError(NOT_FOUND.code(), String.format("%s:%s", message, ex.getRequestURL()));
     }
 
     /**
@@ -178,8 +178,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
-        var message = i18n.getMessage(METHOD_NOT_ALLOWED.getMsg());
-        return Result.getError(METHOD_NOT_ALLOWED.getCode(), String.format("%s:%s", message, ex.getMethod()));
+        var message = i18n.getMessage(METHOD_NOT_ALLOWED.msg());
+        return Result.getError(METHOD_NOT_ALLOWED.code(), String.format("%s:%s", message, ex.getMethod()));
     }
 
     /**
@@ -189,8 +189,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = SocketRuntimeException.class)
     public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
-        var message = i18n.getMessage(SOCKET_TIME_OUT.getMsg());
-        return Result.getError(SOCKET_TIME_OUT.getCode(), message);
+        var message = i18n.getMessage(SOCKET_TIME_OUT.msg());
+        return Result.getError(SOCKET_TIME_OUT.code(), message);
     }
 
     /**
@@ -212,8 +212,8 @@ public class GlobalExceptionHandler {
         createExceptionLog(request, ex);
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
-        var message = i18n.getMessage(INTERNAL_SERVER_ERROR.getMsg());
-        return Result.getError(INTERNAL_SERVER_ERROR.getCode(), message);
+        var message = i18n.getMessage(INTERNAL_SERVER_ERROR.msg());
+        return Result.getError(INTERNAL_SERVER_ERROR.code(), message);
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {
