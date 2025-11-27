@@ -35,7 +35,6 @@ public interface AuthConvert {
                 .setEnabled(isEnabled(user.getStatus()))
                 .setUsername(user.getUsername())
                 .setPassword(user.getPassword())
-                // todo 这里要加密
                 .setSecurityCode(user.getSecretKey());
     }
 
