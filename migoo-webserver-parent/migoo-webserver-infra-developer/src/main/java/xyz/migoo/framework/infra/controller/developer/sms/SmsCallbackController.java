@@ -26,7 +26,7 @@ public class SmsCallbackController {
         String text = ServletUtils.getBody(request);
         smsSendService.receiveSmsStatus(SmsChannelEnum.ALIYUN.getCode(), text);
          */
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @PostMapping("/tencent")
@@ -36,7 +36,7 @@ public class SmsCallbackController {
         /*
         String text = ServletUtils.getBody(request);
          */
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
 }

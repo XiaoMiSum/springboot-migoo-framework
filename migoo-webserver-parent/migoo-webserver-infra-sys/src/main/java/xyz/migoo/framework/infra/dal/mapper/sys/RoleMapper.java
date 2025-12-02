@@ -30,7 +30,7 @@ public interface RoleMapper extends BaseMapperX<Role> {
 
     default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Role>()
-                .gt(BaseDO::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
+                .gt(BaseDO::getUpdatedAt, maxUpdateTime).last("LIMIT 1")) != null;
     }
 
     default PageResult<Role> selectPage(RoleQueryReqVO req) {

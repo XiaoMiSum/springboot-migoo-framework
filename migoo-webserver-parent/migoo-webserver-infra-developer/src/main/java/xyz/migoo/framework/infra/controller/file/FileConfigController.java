@@ -26,48 +26,48 @@ public class FileConfigController {
     @PostMapping
     @PreAuthorize("@ss.hasPermission('developer:file:config:add')")
     public Result<Long> createFileConfig(@Valid @RequestBody FileConfigSaveReqVO createReqVO) {
-        return Result.getSuccessful(fileConfigService.createFileConfig(createReqVO));
+        return Result.ok(fileConfigService.createFileConfig(createReqVO));
     }
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:file:config:update')")
     public Result<Boolean> updateFileConfig(@Valid @RequestBody FileConfigSaveReqVO updateReqVO) {
         fileConfigService.updateFileConfig(updateReqVO);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @PutMapping("/master")
     @PreAuthorize("@ss.hasPermission('developer:file:config:update')")
     public Result<Boolean> updateFileConfigMaster(@RequestParam("id") Long id) {
         fileConfigService.updateFileConfigMaster(id);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:file:config:remove')")
     public Result<Boolean> deleteFileConfig(@PathVariable("id") Long id) {
         fileConfigService.deleteFileConfig(id);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:file:config:query')")
     public Result<FileConfigRespVO> getFileConfig(@PathVariable("id") Long id) {
         FileConfigDO config = fileConfigService.getFileConfig(id);
-        return Result.getSuccessful(BeanUtil.toBean(config, FileConfigRespVO.class));
+        return Result.ok(BeanUtil.toBean(config, FileConfigRespVO.class));
     }
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:file:config:query')")
     public Result<PageResult<FileConfigRespVO>> getFileConfigPage(@Valid FileConfigPageReqVO pageVO) {
         PageResult<FileConfigDO> pageResult = fileConfigService.getFileConfigPage(pageVO);
-        return Result.getSuccessful(FileConfigConvert.INSTANCE.convert(pageResult));
+        return Result.ok(FileConfigConvert.INSTANCE.convert(pageResult));
     }
 
     @GetMapping("/test")
     @PreAuthorize("@ss.hasPermission('developer:file:config:query')")
     public Result<String> testFileConfig(@RequestParam("id") Long id) throws Exception {
         String url = fileConfigService.testFileConfig(id);
-        return Result.getSuccessful(url);
+        return Result.ok(url);
     }
 }

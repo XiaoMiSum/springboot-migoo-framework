@@ -70,8 +70,8 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     // ========== Filter 相关 ==========
 
     @Bean
-    public GlobalResponseBodyHandler globalResponseBodyHandler() {
-        return new GlobalResponseBodyHandler();
+    public GlobalResponseBodyHandler globalResponseBodyHandler(I18NMessage i18n) {
+        return new GlobalResponseBodyHandler(i18n);
     }
 
     /**

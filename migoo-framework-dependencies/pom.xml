@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.migoo.springboot</groupId>
-    <version>1.3.7</version>
+    <version>1.3.8</version>
     <artifactId>migoo-framework-dependencies</artifactId>
     <packaging>pom</packaging>
     <name>migoo-framework-dependencies</name>
@@ -35,7 +35,7 @@
     </developers>
 
     <properties>
-        <migoo.version>1.3.7</migoo.version>
+        <migoo.version>1.3.8</migoo.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.5.7</spring.boot.version>
         <!-- spring ai -->
@@ -116,12 +116,6 @@
             <!-- 基础框架 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-info</artifactId>
-                <version>${migoo.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-common</artifactId>
                 <version>${migoo.version}</version>
             </dependency>
@@ -163,13 +157,6 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-job</artifactId>
-                <version>${migoo.version}</version>
-            </dependency>
-
-            <!-- 监控相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-monitor</artifactId>
                 <version>${migoo.version}</version>
             </dependency>
 

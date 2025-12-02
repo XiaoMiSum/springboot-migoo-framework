@@ -51,7 +51,7 @@ public class UserController {
         // 获得用户分页列表
         PageResult<User> pageResult = userService.getPage(req);
         if (CollUtil.isEmpty(pageResult.getList())) {
-            return Result.getSuccessful(PageResult.empty());
+            return Result.ok(PageResult.empty());
         }
         // 获得拼接需要的数据
         Collection<Long> deptIds = CollectionUtils.convertList(pageResult.getList(), User::getDeptId);
@@ -66,7 +66,7 @@ public class UserController {
             respVO.setDept(UserConvert.INSTANCE.convert(deptMap.get(user.getDeptId())));
             userList.add(respVO);
         }
-        return Result.getSuccessful(new PageResult<>(userList, pageResult.getTotal()));
+        return Result.ok(new PageResult<>(userList, pageResult.getTotal()));
     }
 
     @PostMapping
@@ -74,53 +74,53 @@ public class UserController {
     public Result<?> addUser(@Valid @RequestBody UserAddReqVO user) {
         userService.verify(user.getUsername());
         userService.add(UserConvert.INSTANCE.convert(user));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public Result<?> updateUser(@Valid @RequestBody UserUpdateReqVO user) {
         userService.update(UserConvert.INSTANCE.convert(user));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
     public Result<?> getUser(@PathVariable("id") Long id) {
-        return Result.getSuccessful(UserConvert.INSTANCE.convert(userService.get(id)));
+        return Result.ok(UserConvert.INSTANCE.convert(userService.get(id)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:user:remove')")
     public Result<?> removeUser(@PathVariable("id") Long id) {
         userService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/simple")
     public Result<List<SimpleData>> getSimple() {
         // 获得用户列表，只要开启状态的
         List<User> list = userService.get(enabled.status());
-        return Result.getSuccessful(UserConvert.INSTANCE.convert(list));
+        return Result.ok(UserConvert.INSTANCE.convert(list));
     }
 
     @GetMapping("/{userId}/role")
     public Result<Set<Long>> getUserRoles(@PathVariable("userId") Long userId) {
-        return Result.getSuccessful(permissionService.getUserRoleIs(userId));
+        return Result.ok(permissionService.getUserRoleIs(userId));
     }
 
     @PostMapping("/role")
     @PreAuthorize("@ss.hasPermission('system:permission:assign-user-role')")
     public Result<?> assignUserRole(@Valid @RequestBody PermissionAssignUserRoleReqVO reqVO) {
         permissionService.assignUserRole(reqVO.getUserId(), reqVO.getRoleIds());
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @PostMapping("/password")
     @PreAuthorize("@ss.hasPermission('system:user:reset-password')")
     public Result<?> resetPassword(@RequestBody @Valid UserPasswordReqVO reqVO) {
         userService.update(UserConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @PostMapping("/{no}/authenticator")
@@ -128,6 +128,6 @@ public class UserController {
     @PreAuthorize("@ss.hasPermission('system:user:reset-authenticator')")
     public Result<Boolean> resetAuthenticator(@PathVariable("no") Long no) {
         userService.resetAuthenticator(no);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 }

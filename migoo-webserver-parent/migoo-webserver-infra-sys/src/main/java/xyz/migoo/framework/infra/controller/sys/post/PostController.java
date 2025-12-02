@@ -33,7 +33,7 @@ public class PostController {
     public Result<PageResult<PostRespVO>> getPage(PostQueryReqVO req) {
         PageResult<PostRespVO> result = PostConvert.INSTANCE.convert(postService.getPage(req));
         result.getList().sort(Comparator.comparing(PostRespVO::getSort));
-        return Result.getSuccessful(result);
+        return Result.ok(result);
     }
 
     @PostMapping
@@ -41,7 +41,7 @@ public class PostController {
     public Result<?> add(@Valid @RequestBody PostAddReqVO req) {
         postService.verify(req.getCode(), req.getName(), null);
         postService.add(PostConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
@@ -49,20 +49,20 @@ public class PostController {
     public Result<?> update(@Valid @RequestBody PostUpdateReqVO req) {
         postService.verify(req.getCode(), req.getName(), req.getId());
         postService.update(PostConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:post:update')")
     public Result<?> get(@PathVariable("id") Long id) {
-        return Result.getSuccessful(PostConvert.INSTANCE.convert(postService.get(id)));
+        return Result.ok(PostConvert.INSTANCE.convert(postService.get(id)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:post:remove')")
     public Result<?> remove(@PathVariable("id") Long id) {
         postService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/simple")
@@ -71,6 +71,6 @@ public class PostController {
         List<Post> list = postService.getList(null, Collections.singleton(enabled.status()));
         // 排序后，返回给前端
         list.sort(Comparator.comparing(Post::getSort));
-        return Result.getSuccessful(PostConvert.INSTANCE.convert(list));
+        return Result.ok(PostConvert.INSTANCE.convert(list));
     }
 }

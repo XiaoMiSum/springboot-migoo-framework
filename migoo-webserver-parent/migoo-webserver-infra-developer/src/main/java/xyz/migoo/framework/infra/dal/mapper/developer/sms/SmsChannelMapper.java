@@ -14,7 +14,7 @@ public interface SmsChannelMapper extends BaseMapperX<SmsChannelDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<SmsChannelDO>()
                 .likeIfPresent(SmsChannelDO::getSignature, reqVO.getSignature())
                 .eqIfPresent(SmsChannelDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(SmsChannelDO::getCreateTime, reqVO.getCreateTime())
+                .betweenIfPresent(SmsChannelDO::getCreatedAt, reqVO.getCreateTime())
                 .orderByDesc(SmsChannelDO::getId));
     }
 

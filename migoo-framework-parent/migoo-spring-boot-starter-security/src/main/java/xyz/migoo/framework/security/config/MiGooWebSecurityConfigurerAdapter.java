@@ -11,6 +11,7 @@ import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -108,6 +109,7 @@ public class MiGooWebSecurityConfigurerAdapter {
                 .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
                 // 登出
                 .logout(logout -> logout.logoutUrl(properties.getLogoutUrl()).logoutSuccessHandler(logoutSuccessHandler))
+
                 // 设置每个请求的权限 ①：配置的可以任意访问的url
                 .authorizeHttpRequests(requests -> requests.requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll()
                 )
@@ -118,4 +120,9 @@ public class MiGooWebSecurityConfigurerAdapter {
                 .build();
     }
 
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/public/**", "/static/**", "/resources/**");
+    }
 }

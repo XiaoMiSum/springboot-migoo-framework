@@ -55,7 +55,7 @@ public class DeptServiceImpl implements DeptService {
         deptCache = builder.build();
         parentDeptCache = parentBuilder.build();
         assert !deptList.isEmpty();
-        maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = deptList.stream().max(Comparator.comparing(BaseDO::getUpdatedAt)).get().getUpdatedAt();
         log.info("[initLocalCache][初始化 Dept 数量为 {}]", deptList.size());
     }
 

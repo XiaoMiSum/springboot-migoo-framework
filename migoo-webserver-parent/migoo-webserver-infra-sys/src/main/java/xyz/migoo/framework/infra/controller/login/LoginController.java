@@ -55,7 +55,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public Result<Authenticated<MiGooUserDetails>> login(@Valid @RequestBody AuthLoginReqVO req) {
-        return Result.getSuccessful(tokenService.authenticate(req.getUsername(), req.getPassword()));
+        return Result.ok(tokenService.authenticate(req.getUsername(), req.getPassword()));
     }
 
     @GetMapping("/user-info")
@@ -66,7 +66,7 @@ public class LoginController {
                 roleIds,
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType(), MenuTypeEnum.BUTTON.getType()),
                 SetUtils.asSet(enabled.status()));
-        return Result.getSuccessful(AuthConvert.INSTANCE.convert(user, menuList));
+        return Result.ok(AuthConvert.INSTANCE.convert(user, menuList));
     }
 
     @GetMapping("/configurer")
@@ -75,7 +75,7 @@ public class LoginController {
                 .collect(Collectors.toMap(ConfigurerDO::getName, ConfigurerDO::getValue));
         this.title = result.get("title");
         result.put("kit", securityProperties.getPasswordSecret());
-        return Result.getSuccessful(result);
+        return Result.ok(result);
     }
 
     @GetMapping("user-menus")
@@ -87,7 +87,7 @@ public class LoginController {
                 SetUtils.asSet(MenuTypeEnum.DIR.getType(), MenuTypeEnum.MENU.getType()),
                 SetUtils.asSet(enabled.status()));
         // 转换成 Tree 结构返回
-        return Result.getSuccessful(AuthConvert.INSTANCE.convert(menuList));
+        return Result.ok(AuthConvert.INSTANCE.convert(menuList));
     }
 
     @GetMapping("/authenticator")
@@ -96,14 +96,14 @@ public class LoginController {
         String content = String.format("otpauth://totp/%s@%s?secret=%s&issuer=%s", user.getUsername(), user.getName(), user.getSecurityCode(), title);
         result.put("quickMark", QrCodeUtil.generateAsBase64(content, new QrConfig(), "png"));
         result.put("securityCode", user.getSecurityCode());
-        return Result.getSuccessful(result);
+        return Result.ok(result);
     }
 
     @PostMapping("/authenticator")
     @Authenticator
     public Result<?> bindAuthenticator(@AuthUser MiGooUserDetails user) {
         userService.update(new User().setBindAuthenticator(enabled.status()).setId(user.getId()));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PostMapping("/password")
@@ -118,6 +118,6 @@ public class LoginController {
                 .decryptStr(password.getOldPassword()));
         password.setId(user.getId());
         userService.update(password);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 }

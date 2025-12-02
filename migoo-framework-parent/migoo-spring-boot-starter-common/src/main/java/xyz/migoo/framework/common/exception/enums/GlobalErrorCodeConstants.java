@@ -8,18 +8,18 @@ import xyz.migoo.framework.common.exception.ErrorCode;
  * <p>
  * 一般情况下，使用 HTTP 响应状态码 https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Status
  * 虽然说，HTTP 响应状态码作为业务使用表达能力偏弱，但是使用在系统层面还是非常不错的
- * 比较特殊的是，因为之前一直使用 0 作为成功，就不使用 200 啦。
  *
  * @author xiaomi
  */
 public class GlobalErrorCodeConstants {
 
-    public static final ErrorCode SUCCESS = ErrorCode.of(0, "common.success");
+    public static final ErrorCode SUCCESS = ErrorCode.of(200, "common.success");
 
     // ========== 客户端错误段 ==========
 
     public static final ErrorCode BAD_REQUEST = ErrorCode.of(400, "common.request.bad");
     public static final ErrorCode UNAUTHORIZED = ErrorCode.of(401, "common.authentication.failure");
+    public static final ErrorCode INVALID_AUTHORIZED = ErrorCode.of(401, "common.authentication.invalid");
     public static final ErrorCode FORBIDDEN = ErrorCode.of(403, "common.permission.miss");
     public static final ErrorCode NOT_FOUND = ErrorCode.of(404, "common.not.found");
     public static final ErrorCode METHOD_NOT_ALLOWED = ErrorCode.of(405, "common.request.method.bad");

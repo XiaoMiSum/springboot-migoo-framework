@@ -25,30 +25,30 @@ public class StationLetterController {
     public Result<PageResult<StationLetterPageRespVO>> getPage(@AuthUser MiGooUserDetails authUserDetails, StationLetterPageReqVO req) {
         req.setToUserId(authUserDetails.getId());
         var result = StationLetterConvert.INSTANCE.convert(service.getPage(req));
-        return Result.getSuccessful(result);
+        return Result.ok(result);
     }
 
     @GetMapping("/{id}")
     public Result<StationLetterRespVO> getPage(@PathVariable("id") Long id) {
         var result = StationLetterConvert.INSTANCE.convert1(service.get(id));
-        return Result.getSuccessful(result);
+        return Result.ok(result);
     }
 
     @PutMapping("read")
     public Result<?> read(@RequestBody StationLetterUpdateReqVO req) {
         service.read(req.getIds());
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping("unread")
     public Result<?> unread(@RequestBody StationLetterUpdateReqVO req) {
         service.unread(req.getIds());
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @DeleteMapping
     public Result<StationLetterRespVO> remove(@RequestParam("ids") String ids) {
         service.remove(StrUtils.splitToLong(ids, ","));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 }

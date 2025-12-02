@@ -30,6 +30,6 @@ public interface DeptMapper extends BaseMapperX<Dept> {
 
     default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Dept>()
-                .gt(Dept::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
+                .gt(Dept::getUpdatedAt, maxUpdateTime).last("LIMIT 1")) != null;
     }
 }

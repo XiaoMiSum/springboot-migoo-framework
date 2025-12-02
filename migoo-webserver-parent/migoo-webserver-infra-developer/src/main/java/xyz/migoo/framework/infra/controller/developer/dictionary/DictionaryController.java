@@ -32,7 +32,7 @@ public class DictionaryController {
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:dictionary:query')")
     public Result<PageResult<?>> getPage(DictionaryPageReqVO req) {
-        return Result.getSuccessful(DictionaryConvert.INSTANCE.convert(dictionaryService.get(req)));
+        return Result.ok(DictionaryConvert.INSTANCE.convert(dictionaryService.get(req)));
     }
 
     @PostMapping
@@ -40,7 +40,7 @@ public class DictionaryController {
     public Result<?> add(@Valid @RequestBody DictionaryAddReqVO req) {
         dictionaryService.verify(req.getCode(), null);
         dictionaryService.add(DictionaryConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
@@ -48,48 +48,48 @@ public class DictionaryController {
     public Result<?> update(@Valid @RequestBody DictionaryUpdateReqVO req) {
         dictionaryService.verify(req.getCode(), req.getId());
         dictionaryService.update(DictionaryConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:remove')")
     public Result<?> remove(@PathVariable("id") Long id) {
         dictionaryService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/simple")
     public Result<List<?>> getSimple() {
         List<SimpleData> results = Lists.newArrayList();
         dictionaryService.get().forEach(item -> results.add(new SimpleData(item.getCode(), item.getName(), item.getStatus())));
-        return Result.getSuccessful(results);
+        return Result.ok(results);
     }
 
     @GetMapping("/value")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:query')")
     public Result<PageResult<?>> getPage(DictionaryValuePageReqVO req) {
-        return Result.getSuccessful(DictionaryConvert.INSTANCE.convert2(valueService.get(req)));
+        return Result.ok(DictionaryConvert.INSTANCE.convert2(valueService.get(req)));
     }
 
     @PostMapping("/value")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:add')")
     public Result<?> addValue(@Valid @RequestBody DictionaryValueAddReqVO req) {
         valueService.add(DictionaryConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping("/value")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:update')")
     public Result<?> updateValue(@Valid @RequestBody DictionaryValueUpdateReqVO req) {
         valueService.update(DictionaryConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @DeleteMapping("/value/{id}")
     @PreAuthorize("@ss.hasPermission('developer:dictionary:remove')")
     public Result<?> removeValue(@PathVariable("id") Long id) {
         valueService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/value/simple")
@@ -104,6 +104,6 @@ public class DictionaryController {
             map.put("disabled", isDisabled(item.getStatus()));
             map.put("colorType", item.getColorType());
         });
-        return Result.getSuccessful(results);
+        return Result.ok(results);
     }
 }

@@ -28,18 +28,18 @@ public class FileController {
     public Result<String> uploadFile(FileUploadReqVO uploadReqVO) throws Exception {
         MultipartFile file = uploadReqVO.getFile();
         String path = uploadReqVO.getPath();
-        return Result.getSuccessful(fileService.createFile(file.getOriginalFilename(), path,
+        return Result.ok(fileService.createFile(file.getOriginalFilename(), path,
                 IoUtil.readBytes(file.getInputStream()), uploadReqVO.getSource()));
     }
 
     @PostMapping("/create")
     public Result<Long> createFile(@Valid @RequestBody FileCreateReqVO createReqVO) {
-        return Result.getSuccessful(fileService.createFile(createReqVO));
+        return Result.ok(fileService.createFile(createReqVO));
     }
 
     @GetMapping("/presigned-url")
     public Result<FilePresignedUrlRespVO> getFilePresignedUrl(@RequestParam("path") String path) throws Exception {
-        return Result.getSuccessful(fileService.getFilePresignedUrl(path));
+        return Result.ok(fileService.getFilePresignedUrl(path));
     }
 
 
@@ -47,14 +47,14 @@ public class FileController {
     @PreAuthorize("@ss.hasPermission('developer:file:remove')")
     public Result<Boolean> deleteFile(@PathVariable("id") Long id) throws Exception {
         fileService.deleteFile(id);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:file:query')")
     public Result<PageResult<FileRespVO>> getFilePage(@Valid FilePageReqVO pageVO) {
         PageResult<FileDO> pageResult = fileService.getFilePage(pageVO);
-        return Result.getSuccessful(FileContentConvert.INSTANCE.convert(pageResult));
+        return Result.ok(FileContentConvert.INSTANCE.convert(pageResult));
     }
 
 }

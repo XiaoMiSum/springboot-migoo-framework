@@ -30,7 +30,7 @@ public interface MenuMapper extends BaseMapperX<Menu> {
 
     default boolean selectExistsByUpdateTimeAfter(LocalDateTime maxUpdateTime) {
         return selectOne(new LambdaQueryWrapperX<Menu>()
-                .gt(BaseDO::getUpdateTime, maxUpdateTime).last("LIMIT 1")) != null;
+                .gt(BaseDO::getUpdatedAt, maxUpdateTime).last("LIMIT 1")) != null;
     }
 
     default List<Menu> selectList(MenuQueryReqVO reqVO) {

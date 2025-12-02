@@ -27,34 +27,34 @@ public class MenuController {
     public Result<List<MenuRespVO>> getMenus(MenuQueryReqVO reqVO) {
         List<Menu> list = menuService.get(reqVO);
         list.sort(Comparator.comparing(Menu::getSort));
-        return Result.getSuccessful(MenuConvert.INSTANCE.convert(list));
+        return Result.ok(MenuConvert.INSTANCE.convert(list));
     }
 
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:menu:add')")
     public Result<?> createMenu(@Valid @RequestBody MenuAddReqVO reqVO) {
         menuService.add(MenuConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public Result<?> updateMenu(@Valid @RequestBody MenuUpdateReqVO reqVO) {
         menuService.update(MenuConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:menu:remove')")
     public Result<?> deleteMenu(@PathVariable("id") Long id) {
         menuService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public Result<MenuRespVO> getMenu(@PathVariable("id") Long id) {
-        return Result.getSuccessful(MenuConvert.INSTANCE.convert(menuService.get(id)));
+        return Result.ok(MenuConvert.INSTANCE.convert(menuService.get(id)));
     }
 
     @GetMapping("/simple")
@@ -65,6 +65,6 @@ public class MenuController {
         List<Menu> list = menuService.get(reqVO);
         // 排序后，返回给前端
         list.sort(Comparator.comparing(Menu::getSort));
-        return Result.getSuccessful(MenuConvert.INSTANCE.convert0(list));
+        return Result.ok(MenuConvert.INSTANCE.convert0(list));
     }
 }

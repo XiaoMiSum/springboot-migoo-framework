@@ -25,29 +25,18 @@ public class BaseDO<T, SELF extends BaseDO<T, SELF>> implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private LocalDateTime createdAt;
     /**
      * 最后更新时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    /**
-     * 创建者姓名
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private String creator;
-    /**
-     * 更新者姓名
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updater;
+    private LocalDateTime updatedAt;
     /**
      * 是否删除
      */
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
-    private Integer deleted;
+    private Boolean isDeleted;
 
     public SELF setId(T id) {
         this.id = id;

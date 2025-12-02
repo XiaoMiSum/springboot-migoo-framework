@@ -1,6 +1,5 @@
 package xyz.migoo.framework.common.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.util.Assert;
 import xyz.migoo.framework.common.exception.ErrorCode;
@@ -8,7 +7,6 @@ import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * 通用返回
@@ -44,11 +42,11 @@ public class Result<T> implements Serializable {
      * @param <T>    返回的泛型
      * @return 新的 CommonResult 对象
      */
-    public static <T> Result<T> getError(Result<?> result) {
-        return getError(result.getCode(), result.getMsg());
+    public static <T> Result<T> error(Result<?> result) {
+        return error(result.getCode(), result.getMsg());
     }
 
-    public static <T> Result<T> getError(Integer code, String message) {
+    public static <T> Result<T> error(Integer code, String message) {
         Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.code().equals(code), "code 必须是错误的！");
         Result<T> result = new Result<>();
         result.code = code;
@@ -56,11 +54,11 @@ public class Result<T> implements Serializable {
         return result;
     }
 
-    public static <T> Result<T> getError(ErrorCode errorCode) {
-        return getError(errorCode.code(), errorCode.msg());
+    public static <T> Result<T> error(ErrorCode errorCode) {
+        return error(errorCode.code(), errorCode.msg());
     }
 
-    public static <T> Result<T> getSuccessful(T data) {
+    public static <T> Result<T> ok(T data) {
         Result<T> result = new Result<>();
         result.code = GlobalErrorCodeConstants.SUCCESS.code();
         result.msg = GlobalErrorCodeConstants.SUCCESS.msg();
@@ -68,38 +66,12 @@ public class Result<T> implements Serializable {
         return result;
     }
 
-    public static <T> Result<T> getSuccessful() {
-        return getSuccessful(null);
+    public static <T> Result<T> ok() {
+        return ok(null);
     }
 
-    public static boolean isSuccessful(Integer code) {
-        return Objects.equals(code, GlobalErrorCodeConstants.SUCCESS.code());
-    }
-
-    public static <T> Result<T> getError(ServiceException serviceException) {
-        return getError(serviceException.getCode(), serviceException.getMessage());
-    }
-
-    @JsonIgnore // 避免 jackson 序列化
-    public boolean isSuccessful() {
-        return isSuccessful(code);
-    }
-
-    // ========= 和 Exception 异常体系集成 =========
-
-    @JsonIgnore // 避免 jackson 序列化
-    public boolean isError() {
-        return !isSuccessful();
-    }
-
-    /**
-     * 判断是否有异常。如果有，则抛出 {@link ServiceException} 异常
-     */
-    public void checkError() throws ServiceException {
-        if (!isSuccessful()) {
-            // 业务异常
-            throw new ServiceException(code, msg);
-        }
+    public static <T> Result<T> error(ServiceException serviceException) {
+        return error(serviceException.getCode(), serviceException.getMessage());
     }
 
 }

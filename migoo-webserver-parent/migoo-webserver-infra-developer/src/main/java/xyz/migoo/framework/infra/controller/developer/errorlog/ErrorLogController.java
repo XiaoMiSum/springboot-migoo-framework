@@ -22,26 +22,26 @@ public class ErrorLogController {
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:error-log:query')")
     public Result<PageResult<ApiErrorLogPageRespVO>> getPage(ApiErrorLogQueryReqVO req) {
-        return Result.getSuccessful(ErrorLogConvert.INSTANCE.convert(service.getPage(req)));
+        return Result.ok(ErrorLogConvert.INSTANCE.convert(service.getPage(req)));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:error-log:update')")
     public Result<?> get(@PathVariable("id") Long id) {
-        return Result.getSuccessful(ErrorLogConvert.INSTANCE.convert(service.get(id)));
+        return Result.ok(ErrorLogConvert.INSTANCE.convert(service.get(id)));
     }
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:error-log:update')")
     public Result<?> update(@Valid @RequestBody ApiErrorLogUpdateVO req) {
         service.update(ErrorLogConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:error-log:remove')")
     public Result<?> remove(@PathVariable("id") Long id) {
         service.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 }

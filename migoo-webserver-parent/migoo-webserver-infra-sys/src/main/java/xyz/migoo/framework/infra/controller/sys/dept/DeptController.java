@@ -27,7 +27,7 @@ public class DeptController {
         // 获得用户分页列表
         List<Dept> list = deptService.getList(req);
         list.sort(Comparator.comparing(Dept::getSort));
-        return Result.getSuccessful(DeptConvert.INSTANCE.convert(list));
+        return Result.ok(DeptConvert.INSTANCE.convert(list));
     }
 
     @PostMapping
@@ -35,7 +35,7 @@ public class DeptController {
     public Result<?> addDept(@Valid @RequestBody DeptAddReqVO addReq) {
         deptService.verify(null, addReq.getParentId(), addReq.getName());
         deptService.add(DeptConvert.INSTANCE.convert(addReq));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
@@ -43,20 +43,20 @@ public class DeptController {
     public Result<?> updateDept(@Valid @RequestBody DeptUpdateReqVO updateReqVO) {
         deptService.verify(updateReqVO.getId(), updateReqVO.getParentId(), updateReqVO.getName());
         deptService.update(DeptConvert.INSTANCE.convert(updateReqVO));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:dept:update')")
     public Result<?> getDept(@PathVariable("id") Long id) {
-        return Result.getSuccessful(DeptConvert.INSTANCE.convert(deptService.get(id)));
+        return Result.ok(DeptConvert.INSTANCE.convert(deptService.get(id)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:dept:remove')")
     public Result<?> removeDept(@PathVariable("id") Long id) {
         deptService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/simple")
@@ -65,6 +65,6 @@ public class DeptController {
         req.setStatus(enabled.status());
         List<Dept> list = deptService.getList(req);
         list.sort(Comparator.comparing(Dept::getSort));
-        return Result.getSuccessful(DeptConvert.INSTANCE.convert0(list));
+        return Result.ok(DeptConvert.INSTANCE.convert0(list));
     }
 }

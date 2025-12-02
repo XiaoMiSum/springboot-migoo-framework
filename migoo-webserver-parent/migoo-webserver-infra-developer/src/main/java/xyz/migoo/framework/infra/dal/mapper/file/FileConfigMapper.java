@@ -14,7 +14,7 @@ public interface FileConfigMapper extends BaseMapperX<FileConfigDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<FileConfigDO>()
                 .likeIfPresent(FileConfigDO::getName, reqVO.getName())
                 .eqIfPresent(FileConfigDO::getStorage, reqVO.getStorage())
-                .betweenIfPresent(FileConfigDO::getCreateTime, reqVO.getCreateTime())
+                .betweenIfPresent(FileConfigDO::getCreatedAt, reqVO.getCreateTime())
                 .orderByDesc(FileConfigDO::getId));
     }
 

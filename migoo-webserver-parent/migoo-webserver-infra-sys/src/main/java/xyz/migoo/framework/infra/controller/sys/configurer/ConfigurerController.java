@@ -22,12 +22,12 @@ public class ConfigurerController {
     @PreAuthorize("@ss.hasPermission('system:configurer:update')")
     public Result<?> save(@RequestBody RequestBodyVO req) {
         service.save(ConfigurerConvert.INSTANCE.convert(req));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/page")
     public Result<?> getAll() {
         List<RequestBodyVO> results = ConfigurerConvert.INSTANCE.convert(service.getList());
-        return Result.getSuccessful(results.stream().collect(Collectors.toMap(RequestBodyVO::getName, item -> item)));
+        return Result.ok(results.stream().collect(Collectors.toMap(RequestBodyVO::getName, item -> item)));
     }
 }

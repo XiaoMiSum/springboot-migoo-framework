@@ -85,7 +85,7 @@ public class MenuServiceImpl implements MenuService {
         menuCache = menuCacheBuilder.build();
         permissionMenuCache = permMenuCacheBuilder.build();
         assert !menuList.isEmpty();
-        maxUpdateTime = menuList.stream().max(Comparator.comparing(Menu::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = menuList.stream().max(Comparator.comparing(Menu::getUpdatedAt)).get().getUpdatedAt();
         log.info("[initLocalCache][缓存菜单，数量为:{}]", menuList.size());
     }
 

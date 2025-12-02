@@ -31,7 +31,7 @@ public class RoleController {
     @GetMapping
     @PreAuthorize("@ss.hasPermission('system:role:query')")
     public Result<PageResult<RoleRespVO>> getRolePage(RoleQueryReqVO req) {
-        return Result.getSuccessful(RoleConvert.INSTANCE.convert(roleService.getPage(req)));
+        return Result.ok(RoleConvert.INSTANCE.convert(roleService.getPage(req)));
     }
 
     @PostMapping
@@ -39,7 +39,7 @@ public class RoleController {
     public Result<?> addRole(@Valid @RequestBody RoleAddReqVO reqVO) {
         roleService.verify(reqVO.getCode(), reqVO.getName(), null);
         roleService.add(RoleConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @PutMapping
@@ -47,20 +47,20 @@ public class RoleController {
     public Result<?> updateRole(@Valid @RequestBody RoleUpdateReqVO reqVO) {
         roleService.verify(reqVO.getCode(), reqVO.getName(), reqVO.getId());
         roleService.update(RoleConvert.INSTANCE.convert(reqVO));
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:role:update')")
     public Result<?> getRole(@PathVariable("id") Long id) {
-        return Result.getSuccessful(RoleConvert.INSTANCE.convert(roleService.get(id)));
+        return Result.ok(RoleConvert.INSTANCE.convert(roleService.get(id)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:role:remove')")
     public Result<?> removeRole(@PathVariable("id") Long id) {
         roleService.remove(id);
-        return Result.getSuccessful();
+        return Result.ok();
     }
 
     @GetMapping("/simple")
@@ -68,13 +68,13 @@ public class RoleController {
         // 获得角色列表，只要开启状态 且 过滤 超级管理员
         List<Role> list = roleService.getList(enabled.status())
                 .stream().filter(role -> role.getId() > N_1).toList();
-        return Result.getSuccessful(RoleConvert.INSTANCE.convert(list));
+        return Result.ok(RoleConvert.INSTANCE.convert(list));
     }
 
     @GetMapping("/{roleId}/menu")
     @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
     public Result<Set<Long>> getRoleMenus(@PathVariable("roleId") Long roleId) {
-        return Result.getSuccessful(permissionService.getRoleMenuIds(roleId));
+        return Result.ok(permissionService.getRoleMenuIds(roleId));
     }
 
     @PostMapping("/{roleId}/menu")
@@ -82,6 +82,6 @@ public class RoleController {
     public Result<?> assignRoleMenus(@PathVariable("roleId") Long roleId, @Valid @RequestBody PermissionAssignRoleMenuReqVO reqVO) {
         reqVO.setRoleId(roleId);
         permissionService.assignRoleMenu(reqVO.getRoleId(), reqVO.getMenuIds());
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 }

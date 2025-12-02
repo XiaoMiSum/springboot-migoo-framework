@@ -9,16 +9,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 /**
  * 全局响应结果（ResponseBody）处理器
- * <p>
- * 不同于在网上看到的很多文章，会选择自动将 Controller 返回结果包上 {@link Result}，
- * 在 onemall 中，是 Controller 在返回时，主动自己包上 {@link Result}。
- * 原因是，GlobalResponseBodyHandler 本质上是 AOP，它不应该改变 Controller 返回的数据结构
  */
 @ControllerAdvice
 public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
+
+
+    private final I18NMessage i18n;
+
+    public GlobalResponseBodyHandler(I18NMessage i18n) {
+        this.i18n = i18n;
+    }
 
     @Override
     @SuppressWarnings("NullableProblems") // 避免 IDEA 警告
@@ -35,7 +39,11 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
         // 记录 Controller 结果
-        WebFrameworkUtils.setResult(((ServletServerHttpRequest) request).getServletRequest(), (Result<?>) body);
+        Result<?> result = (Result<?>) body;
+        WebFrameworkUtils.setResult(((ServletServerHttpRequest) request).getServletRequest(), result);
+        if (result.getCode() == 0) {
+            result.setMsg(i18n.getMessage(result.getMsg()));
+        }
         return body;
     }
 

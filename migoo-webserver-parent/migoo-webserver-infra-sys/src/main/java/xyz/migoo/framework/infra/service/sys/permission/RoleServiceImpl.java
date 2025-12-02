@@ -72,7 +72,7 @@ public class RoleServiceImpl implements RoleService {
         roleList.forEach(sysRoleDO -> builder.put(sysRoleDO.getId(), sysRoleDO));
         roleCache = builder.build();
         assert !roleList.isEmpty(); // 断言，避免告警
-        maxUpdateTime = roleList.stream().max(Comparator.comparing(Role::getUpdateTime)).get().getUpdateTime();
+        maxUpdateTime = roleList.stream().max(Comparator.comparing(Role::getUpdatedAt)).get().getUpdatedAt();
         log.info("[initLocalCache][初始化 Role 数量为 {}]", roleList.size());
     }
 

@@ -28,13 +28,13 @@ public class SmsLogController {
     @PreAuthorize("@ss.hasPermission('developer:sms:log:query')")
     public Result<PageResult<SmsLogRespVO>> getSmsLogPage(@Valid SmsLogPageReqVO pageVO) {
         PageResult<SmsLogDO> pageResult = smsLogService.getSmsLogPage(pageVO);
-        return Result.getSuccessful(SmsLogConvert.INSTANCE.convertPage(pageResult));
+        return Result.ok(SmsLogConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:sms:log:query')")
     public Result<SmsLogRespVO> getData(@PathVariable("id") Long id) {
-        return Result.getSuccessful(SmsLogConvert.INSTANCE.convert(smsLogService.getData(id)));
+        return Result.ok(SmsLogConvert.INSTANCE.convert(smsLogService.getData(id)));
     }
 
 }

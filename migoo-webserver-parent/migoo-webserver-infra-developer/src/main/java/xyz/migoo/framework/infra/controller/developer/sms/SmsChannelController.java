@@ -24,35 +24,35 @@ public class SmsChannelController {
     @PostMapping
     @PreAuthorize("@ss.hasPermission('developer:sms:channel:add')")
     public Result<Long> createSmsChannel(@Valid @RequestBody SmsChannelCreateReqVO createReqVO) {
-        return Result.getSuccessful(smsChannelService.createSmsChannel(createReqVO));
+        return Result.ok(smsChannelService.createSmsChannel(createReqVO));
     }
 
     @PutMapping
     @PreAuthorize("@ss.hasPermission('developer:sms:channel:update')")
     public Result<Boolean> updateSmsChannel(@Valid @RequestBody SmsChannelUpdateReqVO updateReqVO) {
         smsChannelService.updateSmsChannel(updateReqVO);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:sms:channel:remove')")
     public Result<Boolean> deleteSmsChannel(@PathVariable("id") Long id) {
         smsChannelService.deleteSmsChannel(id);
-        return Result.getSuccessful(true);
+        return Result.ok(true);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('developer:sms:channel:query')")
     public Result<SmsChannelRespVO> getSmsChannel(@PathVariable("id") Long id) {
         SmsChannelDO smsChannel = smsChannelService.getSmsChannel(id);
-        return Result.getSuccessful(SmsChannelConvert.INSTANCE.convert(smsChannel));
+        return Result.ok(SmsChannelConvert.INSTANCE.convert(smsChannel));
     }
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:sms:channel:query')")
     public Result<PageResult<SmsChannelRespVO>> getSmsChannelPage(@Valid SmsChannelPageReqVO pageVO) {
         PageResult<SmsChannelDO> pageResult = smsChannelService.getSmsChannelPage(pageVO);
-        return Result.getSuccessful(SmsChannelConvert.INSTANCE.convertPage(pageResult));
+        return Result.ok(SmsChannelConvert.INSTANCE.convertPage(pageResult));
     }
 
     @GetMapping("/simple")
@@ -60,7 +60,7 @@ public class SmsChannelController {
         List<SmsChannelDO> list = smsChannelService.getSmsChannelList();
         // 排序后，返回给前端
         list.sort(Comparator.comparing(SmsChannelDO::getId));
-        return Result.getSuccessful(SmsChannelConvert.INSTANCE.convertList03(list));
+        return Result.ok(SmsChannelConvert.INSTANCE.convertList03(list));
     }
 
 }

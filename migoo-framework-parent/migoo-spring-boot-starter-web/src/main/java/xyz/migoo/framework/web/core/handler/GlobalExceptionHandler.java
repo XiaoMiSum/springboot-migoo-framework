@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result<?> httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException t) {
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, t.getContentType()));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, t.getContentType()));
     }
 
     /**
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
     public Result<?> missingServletRequestParameterHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getParameterName()));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getParameterName()));
     }
 
     /**
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public Result<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getMessage()));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, ex.getMessage()));
     }
 
     /**
@@ -122,7 +122,7 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, String.join(",", errors)));
     }
 
     /**
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
     public Result<?> constraintViolationExceptionHandler(HttpServletRequest request, ConstraintViolationException ex) {
         ConstraintViolation<?> constraintViolation = ex.getConstraintViolations().iterator().next();
         var message = i18n.getMessage(BAD_REQUEST.msg());
-        return Result.getError(BAD_REQUEST.code(), String.format("%s:%s", message, constraintViolation.getMessage()));
+        return Result.error(BAD_REQUEST.code(), String.format("%s:%s", message, constraintViolation.getMessage()));
     }
 
     /**
@@ -155,7 +155,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ValidationException.class)
     public Result<?> validationException(HttpServletRequest request, ValidationException ex) {
         // 无法拼接明细的错误信息，因为 Dubbo Consumer 抛出 ValidationException 异常时，是直接的字符串信息，且人类不可读
-        return Result.getError(BAD_REQUEST);
+        return Result.error(BAD_REQUEST);
     }
 
     /**
@@ -168,7 +168,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public Result<?> noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
         var message = i18n.getMessage(NOT_FOUND.msg());
-        return Result.getError(NOT_FOUND.code(), String.format("%s:%s", message, ex.getRequestURL()));
+        return Result.error(NOT_FOUND.code(), String.format("%s:%s", message, ex.getRequestURL()));
     }
 
     /**
@@ -179,7 +179,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Result<?> httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
         var message = i18n.getMessage(METHOD_NOT_ALLOWED.msg());
-        return Result.getError(METHOD_NOT_ALLOWED.code(), String.format("%s:%s", message, ex.getMethod()));
+        return Result.error(METHOD_NOT_ALLOWED.code(), String.format("%s:%s", message, ex.getMethod()));
     }
 
     /**
@@ -190,7 +190,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = SocketRuntimeException.class)
     public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
         var message = i18n.getMessage(SOCKET_TIME_OUT.msg());
-        return Result.getError(SOCKET_TIME_OUT.code(), message);
+        return Result.error(SOCKET_TIME_OUT.code(), message);
     }
 
     /**
@@ -201,7 +201,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ServiceException.class)
     public Result<?> serviceExceptionHandler(HttpServletRequest request, ServiceException ex) {
         var message = i18n.getMessage(ex.getMessage());
-        return Result.getError(ex.getCode(), message);
+        return Result.error(ex.getCode(), message);
     }
 
     /**
@@ -213,7 +213,7 @@ public class GlobalExceptionHandler {
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
         var message = i18n.getMessage(INTERNAL_SERVER_ERROR.msg());
-        return Result.getError(INTERNAL_SERVER_ERROR.code(), message);
+        return Result.error(INTERNAL_SERVER_ERROR.code(), message);
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {

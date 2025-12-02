@@ -29,14 +29,14 @@ public class JobLogController {
     @PreAuthorize("@ss.hasPermission('developer:job:query')")
     public Result<JobLogRespVO> getJobLog(@PathVariable("id") Long id) {
         JobLogDO jobLog = jobLogService.getJobLog(id);
-        return Result.getSuccessful(JobLogConvert.INSTANCE.convert(jobLog));
+        return Result.ok(JobLogConvert.INSTANCE.convert(jobLog));
     }
 
     @GetMapping
     @PreAuthorize("@ss.hasPermission('developer:job:query')")
     public Result<PageResult<JobLogRespVO>> getJobLogPage(@Valid JobLogPageReqVO pageVO) {
         PageResult<JobLogDO> pageResult = jobLogService.getJobLogPage(pageVO);
-        return Result.getSuccessful(JobLogConvert.INSTANCE.convertPage(pageResult));
+        return Result.ok(JobLogConvert.INSTANCE.convertPage(pageResult));
     }
 
 }

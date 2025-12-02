@@ -23,7 +23,7 @@ public class AreaController {
     public Result<List<AreaNodeRespVO>> getAreaTree() {
         Area area = AreaUtils.getArea(Area.ID_CHINA);
         Assert.notNull(area, "获取不到中国");
-        return Result.getSuccessful(BeanUtils.toBean(area.getChildren(), AreaNodeRespVO.class));
+        return Result.ok(BeanUtils.toBean(area.getChildren(), AreaNodeRespVO.class));
     }
 
 }

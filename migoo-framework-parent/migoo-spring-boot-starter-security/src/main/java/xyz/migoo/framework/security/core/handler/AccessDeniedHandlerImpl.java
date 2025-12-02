@@ -33,7 +33,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         log.warn("[commence][访问 URL({}) 时，用户({}) 权限不够]", request.getRequestURI(),
                 SecurityFrameworkUtils.getLoginUserId(), e);
         // 返回 403
-        ServletUtils.writeJSON(response, Result.getError(FORBIDDEN));
+        ServletUtils.writeJSON(response, Result.error(FORBIDDEN));
     }
 
 }

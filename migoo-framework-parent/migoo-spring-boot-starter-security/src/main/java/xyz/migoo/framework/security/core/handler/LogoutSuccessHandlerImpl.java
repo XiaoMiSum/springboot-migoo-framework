@@ -30,7 +30,7 @@ public record LogoutSuccessHandlerImpl(SecurityProperties securityProperties,
             securityFrameworkService.clean(token);
         }
         // 返回成功
-        ServletUtils.writeJSON(response, Result.getSuccessful());
+        ServletUtils.writeJSON(response, Result.ok());
     }
 
 }

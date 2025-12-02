@@ -19,7 +19,7 @@ public interface FileMapper extends BaseMapperX<FileDO> {
         return selectPage(reqVO, new LambdaQueryWrapperX<FileDO>()
                 .likeIfPresent(FileDO::getPath, reqVO.getPath())
                 .likeIfPresent(FileDO::getType, reqVO.getType())
-                .betweenIfPresent(FileDO::getCreateTime, reqVO.getCreateTime())
+                .betweenIfPresent(FileDO::getCreatedAt, reqVO.getCreateTime())
                 .orderByDesc(FileDO::getId));
     }
 
