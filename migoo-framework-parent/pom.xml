@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.3.8</version>
+    <version>1.3.9</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -36,7 +36,6 @@
     </developers>
 
     <modules>
-        <module>migoo-spring-boot-starter-ai</module>
         <module>migoo-spring-boot-starter-common</module>
         <module>migoo-spring-boot-starter-job</module>
         <module>migoo-spring-boot-starter-mq</module>
@@ -49,8 +48,8 @@
     </modules>
 
     <properties>
-        <revision>1.3.8</revision>
-        <framework.revision>1.3.8</framework.revision>
+        <revision>1.3.9</revision>
+        <framework.revision>1.3.9</framework.revision>
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
         <compiler.version>3.13.0</compiler.version>
