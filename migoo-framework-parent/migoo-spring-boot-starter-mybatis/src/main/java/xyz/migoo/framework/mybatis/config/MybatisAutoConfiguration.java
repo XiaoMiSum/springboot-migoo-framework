@@ -1,6 +1,7 @@
 package xyz.migoo.framework.mybatis.config;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.incrementer.*;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +17,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
+import xyz.migoo.framework.mybatis.core.handler.UTCLocalDateTimeHandler;
+
+import java.time.LocalDateTime;
 
 /**
  * @author xiaomi
@@ -34,6 +39,17 @@ public class MybatisAutoConfiguration {
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return mybatisPlusInterceptor;
     }
+
+    @Bean
+    public ConfigurationCustomizer mybatisConfigurationCustomizer() {
+        return configuration -> {
+            // 为所有 LocalDateTime 注册同一个 Handler
+            TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+            registry.register(LocalDateTime.class, UTCLocalDateTimeHandler.class);
+        };
+
+    }
+
 
     @Bean
     public MetaObjectHandler defaultMetaObjectHandler() {

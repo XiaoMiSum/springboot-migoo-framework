@@ -7,6 +7,8 @@ import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import static java.time.ZoneOffset.UTC;
+
 /**
  * 通用参数填充实现类
  * <p>
@@ -19,16 +21,20 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?> baseDO) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
             // 创建时间为空，则以当前时间为插入时间
-            baseDO.setCreatedAt(Objects.isNull(baseDO.getCreatedAt()) ? LocalDateTime.now() : baseDO.getCreatedAt());
-            baseDO.setIsDeleted(false);
+            LocalDateTime now = LocalDateTime.now(UTC);
+            this.strictInsertFill(metaObject, "created_at", LocalDateTime.class, now);
+            this.strictInsertFill(metaObject, "updated_at", LocalDateTime.class, now);
+            this.strictInsertFill(metaObject, "is_deleted", Boolean.class, false);
         }
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        // 默认以当前时间为更新时间
-        setFieldValByName("updatedAt", LocalDateTime.now(), metaObject);
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
+            // 默认以当前时间为更新时间
+            setFieldValByName("updatedAt", LocalDateTime.now(), metaObject);
+        }
     }
 }
