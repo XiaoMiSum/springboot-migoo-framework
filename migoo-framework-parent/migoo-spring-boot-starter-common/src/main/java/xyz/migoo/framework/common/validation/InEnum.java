@@ -26,7 +26,7 @@ public @interface InEnum {
      */
     Class<? extends IntArrayValuable> value();
 
-    String message() default "必须在指定范围 {value}";
+    String message() default "{validation.values.range.invalid}";
 
     Class<?>[] groups() default {};
 

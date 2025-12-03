@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 )
 public @interface Password {
 
-    String message() default "不能使用弱密码";
+    String message() default "{validation.password.strength.invalid}";
 
     Class<?>[] groups() default {};
 

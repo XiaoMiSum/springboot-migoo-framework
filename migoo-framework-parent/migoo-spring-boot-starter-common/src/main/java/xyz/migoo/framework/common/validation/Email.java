@@ -24,7 +24,7 @@ import java.lang.annotation.*;
 )
 public @interface Email {
 
-    String message() default "邮箱地址格式不正确";
+    String message() default "{validation.email.format.invalid}";
 
     Class<?>[] groups() default {};
 

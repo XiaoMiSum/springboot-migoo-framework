@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 )
 public @interface Mobile {
 
-    String message() default "手机号格式不正确";
+    String message() default "{validation.mobile.phone.number.format.invalid}";
 
     Class<?>[] groups() default {};
 
