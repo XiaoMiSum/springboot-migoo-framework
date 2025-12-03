@@ -39,6 +39,20 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return this;
     }
 
+    public LambdaQueryWrapperX<T> likeLeftIfPresent(SFunction<T, ?> column, String val) {
+        if (StringUtils.hasText(val)) {
+            return (LambdaQueryWrapperX<T>) super.likeLeft(column, val);
+        }
+        return this;
+    }
+
+    public LambdaQueryWrapperX<T> likeRightIfPresent(SFunction<T, ?> column, String val) {
+        if (StringUtils.hasText(val)) {
+            return (LambdaQueryWrapperX<T>) super.likeRight(column, val);
+        }
+        return this;
+    }
+
     public LambdaQueryWrapperX<T> inIfPresent(SFunction<T, ?> column, Collection<?> values) {
         if (!CollectionUtils.isEmpty(values)) {
             return (LambdaQueryWrapperX<T>) super.in(column, values);
@@ -328,6 +342,11 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
         return this;
     }
 
+    @Override
+    public LambdaQueryWrapperX<T> or(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.or(condition, consumer);
+        return this;
+    }
 
     @Override
     public LambdaQueryWrapperX<T> and(boolean condition) {
@@ -337,7 +356,13 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
     @Override
     public LambdaQueryWrapperX<T> and(Consumer<LambdaQueryWrapper<T>> consumer) {
-        super.or(consumer);
+        super.and(consumer);
+        return this;
+    }
+
+    @Override
+    public LambdaQueryWrapperX<T> and(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
+        super.and(consumer);
         return this;
     }
 
