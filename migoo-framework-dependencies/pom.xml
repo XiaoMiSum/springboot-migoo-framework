@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>xyz.migoo.springboot</groupId>
-    <version>1.3.9</version>
+    <version>1.3.10</version>
     <artifactId>migoo-framework-dependencies</artifactId>
     <packaging>pom</packaging>
     <name>migoo-framework-dependencies</name>
@@ -35,7 +35,7 @@
     </developers>
 
     <properties>
-        <migoo.version>1.3.9</migoo.version>
+        <migoo.version>1.3.10</migoo.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>3.5.7</spring.boot.version>
         <!-- DB 相关 -->
@@ -53,25 +53,10 @@
         <zxing.version>3.5.3</zxing.version>
         <bcprov.version>1.78.1</bcprov.version>
         <lombok.version>1.18.38</lombok.version>
-        <minio.version>8.5.17</minio.version>
-        <tika.version>2.9.2</tika.version>
         <fastjson.version>2.0.57</fastjson.version>
         <ip2region.version>2.7.0</ip2region.version>
+        <caffeine.version>3.2.3</caffeine.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
-
-        <!-- 三方 SDK -->
-        <aliyun-core.version>4.7.6</aliyun-core.version>
-        <aliyun.ecs.version>5.0.18</aliyun.ecs.version>
-        <aliyun.rds.version>6.0.4</aliyun.rds.version>
-        <aliyun-sms.version>2.2.1</aliyun-sms.version>
-
-        <alipay.sdk.version>4.40.202.ALL</alipay.sdk.version>
-        <alipay.sdk.v3.version>3.1.38.ALL</alipay.sdk.v3.version>
-        <wechat-pay.version>0.2.17</wechat-pay.version>
-
-        <tencent-cvm.version>3.1.1348</tencent-cvm.version>
-        <tencent-cdb.version>3.1.1354</tencent-cdb.version>
-        <tencent-sms.version>3.1.1281</tencent-sms.version>
 
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
@@ -173,27 +158,6 @@
                 <version>${migoo.version}</version>
             </dependency>
 
-            <!-- 定时任务相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-job</artifactId>
-                <version>${migoo.version}</version>
-            </dependency>
-
-            <!-- 短信相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-sms</artifactId>
-                <version>${migoo.version}</version>
-            </dependency>
-
-            <!-- OSS相关 -->
-            <dependency>
-                <groupId>xyz.migoo.springboot</groupId>
-                <artifactId>migoo-spring-boot-starter-oss</artifactId>
-                <version>${migoo.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -205,11 +169,13 @@
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-jdk8</artifactId> <!-- use mapstruct-jdk8 for Java 8 or higher -->
                 <version>${mapstruct.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
@@ -256,67 +222,10 @@
                 <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
                 <version>${jjwt.version}</version>
             </dependency>
-
-            <!-- 阿里云SDK -->
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>alibabacloud-ecs20140526</artifactId>
-                <version>${aliyun.ecs.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>alibabacloud-rds20140815</artifactId>
-                <version>${aliyun.rds.version}</version>
-            </dependency>
-
-            <!-- 腾讯云SDK -->
-            <dependency>
-                <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java-cvm</artifactId>
-                <version>${tencent-cvm.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java-cdb</artifactId>
-                <version>${tencent-cdb.version}</version>
-            </dependency>
-
-            <!-- 支付宝SDK -->
-            <dependency>
-                <groupId>com.alipay.sdk</groupId>
-                <artifactId>alipay-sdk-java</artifactId>
-                <version>${alipay.sdk.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alipay.sdk</groupId>
-                <artifactId>alipay-sdk-java-v3</artifactId>
-                <version>${alipay.sdk.v3.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
-            </dependency>
-
-            <!-- 微信支付 -->
-            <dependency>
-                <groupId>com.github.wechatpay-apiv3</groupId>
-                <artifactId>wechatpay-java</artifactId>
-                <version>${wechat-pay.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>${minio.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId> <!-- 文件客户端：文件类型的识别 -->
-                <version>${tika.version}</version>
             </dependency>
 
             <dependency>
@@ -331,34 +240,12 @@
                 <version>${ip2region.version}</version>
             </dependency>
 
-            <!-- SMS SDK begin -->
+            <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
             <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>aliyun-java-sdk-core</artifactId>
-                <version>${aliyun-core.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>opentracing-api</artifactId>
-                        <groupId>io.opentracing</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>opentracing-util</artifactId>
-                        <groupId>io.opentracing</groupId>
-                    </exclusion>
-                </exclusions>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.aliyun</groupId>
-                <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-                <version>${aliyun-sms.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.tencentcloudapi</groupId>
-                <artifactId>tencentcloud-sdk-java-sms</artifactId>
-                <version>${tencent-sms.version}</version>
-            </dependency>
-            <!-- SMS SDK end -->
         </dependencies>
     </dependencyManagement>
 

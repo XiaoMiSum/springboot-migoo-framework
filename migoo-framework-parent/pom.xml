@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.3.9</version>
+    <version>1.3.10</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -37,19 +37,16 @@
 
     <modules>
         <module>migoo-spring-boot-starter-common</module>
-        <module>migoo-spring-boot-starter-job</module>
         <module>migoo-spring-boot-starter-mq</module>
         <module>migoo-spring-boot-starter-mybatis</module>
-        <module>migoo-spring-boot-starter-oss</module>
         <module>migoo-spring-boot-starter-redis</module>
         <module>migoo-spring-boot-starter-security</module>
-        <module>migoo-spring-boot-starter-sms</module>
         <module>migoo-spring-boot-starter-web</module>
     </modules>
 
     <properties>
-        <revision>1.3.9</revision>
-        <framework.revision>1.3.9</framework.revision>
+        <revision>1.3.10</revision>
+        <framework.revision>1.3.10</framework.revision>
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
         <compiler.version>3.13.0</compiler.version>
@@ -57,7 +54,6 @@
         <javadoc.version>3.11.2</javadoc.version>
         <surefire.version>3.5.2</surefire.version>
         <gpg-plugin.version>3.2.7</gpg-plugin.version>
-        <dependency.version>3.8.1</dependency.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
