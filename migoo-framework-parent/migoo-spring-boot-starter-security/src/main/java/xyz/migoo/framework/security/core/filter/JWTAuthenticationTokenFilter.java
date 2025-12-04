@@ -49,7 +49,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
             String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
             if (StrUtil.isNotBlank(token)) {
                 // 验证 token 有效性
-                var authUserDetails = authService.verify(token);
+                var authUserDetails = authService.verifyToken(token);
                 // 设置当前用户
                 if (authUserDetails != null) {
                     SecurityFrameworkUtils.setLoginUser(authUserDetails, request);

@@ -11,22 +11,37 @@ import xyz.migoo.framework.security.core.service.dto.Authenticated;
  */
 public interface SecurityAuthFrameworkService<T extends AuthUserDetails<T>> extends UserDetailsService {
 
+    /**
+     * 用户认证
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 认证信息
+     */
     Authenticated<T> authenticate(String username, String password);
 
     /**
-     * 校验 token 的有效性，并获取用户信息
+     * 校验 accessToken 的有效性，并获取用户信息
      * 通过后，刷新 token 的过期时间
      *
-     * @param token token
+     * @param accessToken accessToken
      * @return 用户信息
      */
-    T verify(String token);
+    T verifyToken(String accessToken);
 
     /**
-     * 基于 token 清理登录
+     * 刷新 token
      *
-     * @param token token
+     * @param refreshToken refreshToken
+     * @return 认证信息
      */
-    void clean(String token);
+    Authenticated<T> refreshToken(String refreshToken);
+
+    /**
+     * 基于 accessToken 清理登录
+     *
+     * @param accessToken token
+     */
+    void clean(String accessToken);
 
 }
