@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.migoo.framework.web.config.XssProperties;
@@ -14,7 +15,6 @@ import java.io.IOException;
 /**
  * Xss 过滤器
  * <p>
- * 对 Xss 不了解的胖友，可以看看 http://www.iocoder.cn/Fight/The-new-girl-asked-me-why-AJAX-requests-are-not-secure-I-did-not-answer/
  *
  * @author xiaomi
  */
@@ -31,13 +31,13 @@ public class XssFilter extends OncePerRequestFilter {
     private final PathMatcher pathMatcher;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
         filterChain.doFilter(new XssRequestWrapper(request), response);
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         // 如果关闭，则不过滤
         if (!properties.isEnable()) {
             return true;

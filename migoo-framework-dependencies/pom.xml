@@ -37,9 +37,9 @@
     <properties>
         <migoo.version>1.3.10</migoo.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>3.5.7</spring.boot.version>
+        <spring.boot.version>4.0.0</spring.boot.version>
         <!-- DB 相关 -->
-        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <redisson.version>3.35.0</redisson.version>
         <durid.version>1.2.24</durid.version>
         <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
@@ -50,10 +50,9 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <hutool.version>5.8.41</hutool.version>
         <guava.version>33.4.6-jre</guava.version>
-        <zxing.version>3.5.3</zxing.version>
         <bcprov.version>1.78.1</bcprov.version>
-        <lombok.version>1.18.38</lombok.version>
-        <fastjson.version>2.0.57</fastjson.version>
+        <lombok.version>1.18.42</lombok.version>
+        <fastjson.version>2.0.60</fastjson.version>
         <ip2region.version>2.7.0</ip2region.version>
         <caffeine.version>3.2.3</caffeine.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
@@ -118,7 +117,7 @@
 
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
@@ -192,12 +191,6 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.zxing</groupId>
-                <artifactId>core</artifactId>
-                <version>${zxing.version}</version>
             </dependency>
 
             <dependency>
