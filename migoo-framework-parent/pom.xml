@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.3.11</version>
+    <version>1.3.12</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -45,8 +45,8 @@
     </modules>
 
     <properties>
-        <revision>1.3.11</revision>
-        <framework.revision>1.3.11</framework.revision>
+        <revision>1.3.12</revision>
+        <framework.revision>1.3.12</framework.revision>
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
         <compiler.version>3.13.0</compiler.version>

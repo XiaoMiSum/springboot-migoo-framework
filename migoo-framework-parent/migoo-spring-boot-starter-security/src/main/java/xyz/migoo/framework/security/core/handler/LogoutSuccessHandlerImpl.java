@@ -25,7 +25,7 @@ public record LogoutSuccessHandlerImpl(SecurityProperties securityProperties,
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 执行退出
-        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getToken().getHeaderName());
+        String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getAuthorization().getHeaderName());
         if (StrUtil.isNotBlank(token)) {
             securityFrameworkService.clean(token);
         }

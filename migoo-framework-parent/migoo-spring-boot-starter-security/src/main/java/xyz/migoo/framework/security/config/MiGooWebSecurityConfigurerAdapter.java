@@ -63,7 +63,7 @@ public class MiGooWebSecurityConfigurerAdapter {
     @Resource
     private LogoutSuccessHandler logoutSuccessHandler;
     /**
-     * Token 认证过滤器 Bean
+     * Authorization 认证过滤器 Bean
      */
     @Resource
     private JWTAuthenticationTokenFilter authenticationTokenFilter;

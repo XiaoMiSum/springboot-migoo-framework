@@ -23,11 +23,11 @@ public class SecurityFrameworkUtils {
     }
 
     /**
-     * 从请求中，获得认证 Token
+     * 从请求中，获得认证 Authorization
      *
      * @param request 请求
-     * @param header  认证 Token 对应的 Header 名字
-     * @return 认证 Token
+     * @param header  认证 Authorization 对应的 Header 名字
+     * @return 认证 Authorization
      */
     public static String obtainAuthorization(HttpServletRequest request, String header) {
         return obtainAuthorization(request.getHeader(header));
