@@ -106,4 +106,12 @@ public class JsonUtils {
         }
     }
 
+    public static <T> T convert(Object obj, Class<T> clazz) {
+        return objectMapper.convertValue(obj, clazz);
+    }
+
+    public static <T> T convert(Object obj, TypeReference<T> type) {
+        return objectMapper.convertValue(obj, type);
+    }
+
 }
