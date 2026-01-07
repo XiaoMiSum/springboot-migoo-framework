@@ -85,7 +85,16 @@ public class JsonUtils {
         }
     }
 
+    @Deprecated(since = "1.2.0", forRemoval = true)
     public static JsonNode readTree(String text) {
+        try {
+            return objectMapper.readTree(text);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static JsonNode toJSON(String text) {
         try {
             return objectMapper.readTree(text);
         } catch (JsonProcessingException e) {
@@ -98,8 +107,7 @@ public class JsonUtils {
             return null;
         }
         try {
-            JsonNode treeNode = objectMapper.readTree(text);
-            JsonNode pathNode = treeNode.path(path);
+            JsonNode pathNode = objectMapper.readTree(text).path(path);
             return objectMapper.readValue(pathNode.toString(), clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
