@@ -113,13 +113,19 @@ public class JsonUtils {
             throw new RuntimeException(e);
         }
     }
-
-    public static <T> T convert(Object obj, Class<T> clazz) {
-        return objectMapper.convertValue(obj, clazz);
+    
+    public static <T> T convert(Object object, Class<T> clazz) {
+        if (object == null) {
+            return null;
+        }
+        return objectMapper.convertValue(object, clazz);
     }
 
-    public static <T> T convert(Object obj, TypeReference<T> type) {
-        return objectMapper.convertValue(obj, type);
+    public static <T> T convert(Object object, TypeReference<T> typeReference) {
+        if (object == null) {
+            return null;
+        }
+        return objectMapper.convertValue(object, typeReference);
     }
 
 }
