@@ -5,10 +5,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
@@ -22,6 +25,7 @@ import xyz.migoo.framework.web.i18n.I18NMessage;
 import java.io.IOException;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
+import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * JWT 过滤器，验证 token 的有效性
@@ -29,8 +33,8 @@ import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstant
  *
  * @author xiaomi
  */
-@AllArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
@@ -42,18 +46,26 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
     private final I18NMessage i18NMessage;
 
     @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        // 检查当前请求是否匹配 permitAllUrls 中的任何 URL
+        return securityProperties.getPermitAllUrls().stream()
+                .anyMatch(pattern -> PathPatternRequestMatcher.withDefaults().matcher(pattern).matches(request));
+    }
+
+    @Override
     @SuppressWarnings("NullableProblems")
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
             String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getAuthorization().getHeaderName());
-            if (StrUtil.isNotBlank(token)) {
-                // 验证 token 有效性
-                var authUserDetails = authService.verifyToken(token);
-                // 设置当前用户
-                if (authUserDetails != null) {
-                    SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
-                }
+            if (StrUtil.isBlankIfStr(token)) {
+                throw ServiceExceptionUtil.get(UNAUTHORIZED);
+            }
+            // 验证 token 有效性
+            var authUserDetails = authService.verifyToken(token);
+            // 设置当前用户
+            if (authUserDetails != null) {
+                SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
             }
         } catch (Throwable ex) {
             Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)

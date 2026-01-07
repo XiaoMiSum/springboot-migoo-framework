@@ -109,10 +109,8 @@ public class MiGooWebSecurityConfigurerAdapter {
                 .exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
                 // 登出
                 .logout(logout -> logout.logoutUrl(properties.getLogoutUrl()).logoutSuccessHandler(logoutSuccessHandler))
-
                 // 设置每个请求的权限 ①：配置的可以任意访问的url
-                .authorizeHttpRequests(requests -> requests.requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll()
-                )
+                .authorizeHttpRequests(requests -> requests.requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll())
                 // 设置每个请求的权限 ②：兜底规则，必须认证
                 .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
                 // 添加 JWT Filter
