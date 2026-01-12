@@ -7,9 +7,12 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
+
+import java.util.Objects;
 
 /**
  * 全局响应结果（ResponseBody）处理器
@@ -41,7 +44,9 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
         // 记录 Controller 结果
         Result<?> result = (Result<?>) body;
         WebFrameworkUtils.setResult(((ServletServerHttpRequest) request).getServletRequest(), result);
-        result.setMsg(i18n.getMessage(result.getMsg()));
+        if (Objects.equals(result.getCode(), GlobalErrorCodeConstants.SUCCESS.code())) {
+            result.setMsg(i18n.getMessage(result.getMsg()));
+        }
         return body;
     }
 
