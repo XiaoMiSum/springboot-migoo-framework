@@ -41,9 +41,7 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
         // 记录 Controller 结果
         Result<?> result = (Result<?>) body;
         WebFrameworkUtils.setResult(((ServletServerHttpRequest) request).getServletRequest(), result);
-        if (result.getCode() == 0) {
-            result.setMsg(i18n.getMessage(result.getMsg()));
-        }
+        result.setMsg(i18n.getMessage(result.getMsg()));
         return body;
     }
 
