@@ -100,7 +100,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * Token 认证过滤器 Bean
+     * Authorization 认证过滤器 Bean
      */
     @Bean
     public JWTAuthenticationTokenFilter authenticationTokenFilter(SecurityAuthFrameworkService<? extends AuthUserDetails<?>> securityFrameworkService,

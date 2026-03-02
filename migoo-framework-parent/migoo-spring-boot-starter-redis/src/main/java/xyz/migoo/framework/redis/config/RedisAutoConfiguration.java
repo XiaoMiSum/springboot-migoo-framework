@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author xiaomi
@@ -34,6 +37,19 @@ public class RedisAutoConfiguration {
         // 使用 JSON 序列化方式（库是 Jackson ），序列化 VALUE 。
         template.setValueSerializer(RedisSerializer.json());
         template.setHashValueSerializer(RedisSerializer.json());
+
+        // 创建 ObjectMapper，JavaTimeModule 已经在 Jackson 3.x 中内置
+        ObjectMapper objectMapper = JsonMapper.builder()
+                .build();
+
+        // 使用 GenericJackson2JsonRedisSerializer 进行序列化
+        GenericJacksonJsonRedisSerializer serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
+
+        template.setKeySerializer(RedisSerializer.string());
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
         return template;
     }
 }

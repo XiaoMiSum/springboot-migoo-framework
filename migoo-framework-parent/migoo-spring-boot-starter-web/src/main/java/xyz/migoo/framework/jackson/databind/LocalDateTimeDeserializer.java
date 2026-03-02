@@ -1,26 +1,30 @@
 package xyz.migoo.framework.jackson.databind;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import cn.hutool.core.date.DatePattern;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
- * * LocalDateTime反序列化规则
- * * <p>
- * * 会将毫秒级时间戳反序列化为LocalDateTime
- *
  * @author xiaomi
- * Created on 2021/11/21 13:58
+ * Created on 2022/5/27 20:59
  */
-public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
+public class LocalDateTimeDeserializer extends StdDeserializer<LocalDateTime> {
+    public LocalDateTimeDeserializer() {
+        super(LocalDateTime.class);
+    }
 
     @Override
-    public LocalDateTime deserialize(JsonParser p, DeserializationContext context) throws IOException {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(p.getValueAsLong()), ZoneId.systemDefault());
+    public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) {
+        String dateString = p.getString();
+        if (dateString == null || dateString.trim().isEmpty()) {
+            return null;
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN);
+        return LocalDateTime.parse(dateString, formatter);
     }
 }

@@ -18,8 +18,8 @@ public class GlobalErrorCodeConstants {
     // ========== 客户端错误段 ==========
 
     public static final ErrorCode BAD_REQUEST = ErrorCode.of(400, "common.request.bad");
-    public static final ErrorCode UNAUTHORIZED = ErrorCode.of(401, "common.authentication.failure");
-    public static final ErrorCode INVALID_AUTHORIZED = ErrorCode.of(401, "common.authentication.invalid");
+    public static final ErrorCode UNAUTHORIZED = ErrorCode.of(401, "common.authorization.failure");
+    public static final ErrorCode INVALID_AUTHORIZED = ErrorCode.of(401, "common.authorization.invalid");
     public static final ErrorCode FORBIDDEN = ErrorCode.of(403, "common.permission.miss");
     public static final ErrorCode NOT_FOUND = ErrorCode.of(404, "common.not.found");
     public static final ErrorCode METHOD_NOT_ALLOWED = ErrorCode.of(405, "common.request.method.bad");

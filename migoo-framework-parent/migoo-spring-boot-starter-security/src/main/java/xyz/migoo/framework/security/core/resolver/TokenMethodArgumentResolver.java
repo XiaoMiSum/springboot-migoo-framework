@@ -29,7 +29,7 @@ public class TokenMethodArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container, NativeWebRequest request, WebDataBinderFactory binder) throws Exception {
-        var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getToken().getHeaderName());
+        var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getAuthorization().getHeaderName());
         if (StrUtil.isNotBlank(token)) {
             return token;
         }

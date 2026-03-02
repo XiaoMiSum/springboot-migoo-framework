@@ -18,65 +18,64 @@ import java.util.List;
 public class SecurityProperties {
 
     /**
-     * token 验证用户登录状态
+     * authorization 验证用户登录状态
      */
-    @NotNull(message = "token Token不能为空")
-    private Token token = new Token();
+    @NotNull(message = "authorization 不能为空")
+    private Authorization authorization = new Authorization();
 
     /**
      * 登出url
      */
-    @NotEmpty(message = "passwordSecret 密码加密密钥不能为空")
+    @NotEmpty(message = "password-secret 密码加密密钥不能为空")
     private String passwordSecret;
 
     /**
      * 登出url
      */
-    @NotEmpty(message = "logoutUrl 登出url地址不能为空")
+    @NotEmpty(message = "logoutU-url 登出url地址不能为空")
     private String logoutUrl;
 
     /**
      * 用户可以任意访问的url
      */
-
-    @NotNull(message = "permitAllUrls 允许任意访问的url不能为空")
+    @NotNull(message = "permit-all-urls 允许任意访问的url不能为空")
     private List<String> permitAllUrls = Lists.newArrayList();
 
     @Validated
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Token {
+    public static class Authorization {
 
         /**
          * HTTP 请求时，访问令牌的请求 Header
          */
-        @NotEmpty(message = "headerName token请求头名称不能为空")
+        @NotEmpty(message = "headerName 请求头名称不能为空")
         private String headerName = "Authorization";
 
         /**
-         * Session 过期时间
+         * access token 过期时间
          * <p>
-         * 当 User 用户超过当前时间未操作，则 Session 会过期
+         * 默认 30 分钟
          */
-        @NotNull(message = "timeout Session过期时间不能为空")
-        private Duration timeout = Duration.ofMinutes(30);
+        @NotNull(message = "access-authorization-expires 不能为空")
+        private Duration accessTokenExpires = Duration.ofMinutes(30);
 
         /**
-         * Token 秘钥
+         * token 秘钥
          */
-        @NotEmpty(message = "Token 秘钥不能为空")
-        private String secret;
+        @NotEmpty(message = "secret-key 不能为空")
+        private String secretKey;
 
         /**
-         * Token 刷新的过期时间
+         * Authorization 刷新的过期时间
          * <p>
          * 默认 7 天
          */
-        @NotNull(message = "refreshTimeout Token刷新的过期时间不能为空")
-        private Duration refreshTimeout = Duration.ofDays(7);
+        @NotNull(message = "refresh-authorization-expires 不能为空")
+        private Duration refreshTokenExpires = Duration.ofDays(7);
         /**
-         * Token 刷新的请求 Header
+         * Authorization 刷新的请求 Header
          * <p>
          * 默认：X-Refresh-Token
          */
