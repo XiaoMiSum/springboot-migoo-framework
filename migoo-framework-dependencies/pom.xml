@@ -56,6 +56,10 @@
         <ip2region.version>2.7.0</ip2region.version>
         <caffeine.version>3.2.3</caffeine.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+        <jdom.version>2.0.6.1</jdom.version>
+        <jsoup.version>1.22.1</jsoup.version>
+        <wechat-pay.version>0.2.17</wechat-pay.version>
+        <alipay.sdk.v3.version>3.1.70.ALL</alipay.sdk.v3.version>
 
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
@@ -231,6 +235,34 @@
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
+            <dependency>
+                <groupId>org.jdom</groupId>
+                <artifactId>jdom2</artifactId>
+                <version>${jdom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
+            </dependency>
+
+            <!-- 微信支付 -->
+            <dependency>
+                <groupId>com.github.wechatpay-apiv3</groupId>
+                <artifactId>wechatpay-java</artifactId>
+                <version>${wechat-pay.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.alipay.sdk</groupId>
+                <artifactId>alipay-sdk-java-v3</artifactId>
+                <version>${alipay.sdk.v3.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
