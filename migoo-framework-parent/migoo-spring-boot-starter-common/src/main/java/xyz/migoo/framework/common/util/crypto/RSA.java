@@ -2,6 +2,7 @@ package xyz.migoo.framework.common.util.crypto;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
+import com.google.common.base.Strings;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 
@@ -61,30 +62,29 @@ public class RSA {
         }
     }
 
-    public static void verify(String content, String sign, String publicKey) {
-        verify(content, sign, publicKey, NONE_WITH_RSA);
+    public static boolean verify(String content, String sign, String publicKey) {
+        return verify(content, sign, publicKey, NONE_WITH_RSA);
     }
 
-    public static void verify(String content, String sign, PublicKey publicKey) {
-        verify(content, sign, publicKey, NONE_WITH_RSA);
+    public static boolean verify(String content, String sign, PublicKey publicKey) {
+        return verify(content, sign, publicKey, NONE_WITH_RSA);
     }
 
-    public static void verify(String content, String sign, String publicKey, String algorithm) {
-        verify(content, sign, toPublicKey(publicKey), algorithm);
+    public static boolean verify(String content, String sign, String publicKey, String algorithm) {
+        return verify(content, sign, toPublicKey(publicKey), algorithm);
     }
 
-    public static void verify(String content, String sign, PublicKey publicKey, String algorithm) {
-        boolean result;
+    public static boolean verify(String content, String sign, PublicKey publicKey, String algorithm) {
+        if (Strings.isNullOrEmpty(sign)) {
+            return false;
+        }
         try {
             java.security.Signature signature = java.security.Signature.getInstance(algorithm);
             signature.initVerify(publicKey);
             signature.update(content.getBytes(StandardCharsets.UTF_8));
-            result = signature.verify(Base64.decode(sign));
+            return signature.verify(Base64.decode(sign));
         } catch (Exception e) {
             throw ServiceExceptionUtil.get(-1, "签名验证异常");
-        }
-        if (!result) {
-            throw ServiceExceptionUtil.get(-1, "签名验证失败");
         }
     }
 

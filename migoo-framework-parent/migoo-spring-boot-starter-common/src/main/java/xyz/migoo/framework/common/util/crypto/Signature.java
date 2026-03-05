@@ -3,7 +3,6 @@ package xyz.migoo.framework.common.util.crypto;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.google.common.collect.Lists;
-import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -52,7 +51,7 @@ public class Signature {
         List<String> ignoreKeyList = Lists.newArrayList(ignoreFields);
         ignoreKeyList.add("sign");
         ignoreKeyList.add("signature");
-        final Map<String, ?> filter =  data.entrySet().stream()
+        final Map<String, ?> filter = data.entrySet().stream()
                 .filter(entry -> !StrUtil.isBlankIfStr(entry.getValue()) && !ignoreKeyList.contains(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         List<String> kvs = new TreeSet<>(filter.keySet()).stream()
@@ -137,57 +136,54 @@ public class Signature {
      * @param data         待验证的数据
      * @param ignoreFields 忽略的key
      */
-    public static void verifySign(Map<String, ?> data, String... ignoreFields) {
+    public static boolean verifySign(Map<String, ?> data, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySign(data, (String) data.remove("sign"), ignoreFields);
+        return verifySign(data, (String) data.remove("sign"), ignoreFields);
     }
 
-    public static void verifySign(Map<String, ?> data, String sign, String... ignoreFields) {
+    public static boolean verifySign(Map<String, ?> data, String sign, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySign(data, sign, "", ignoreFields);
+        return verifySign(data, sign, "", ignoreFields);
     }
 
-    public static void verifySign(Map<String, ?> data, String sign, String secretKey, String... ignoreFields) {
+    public static boolean verifySign(Map<String, ?> data, String sign, String secretKey, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySign(data, sign, secretKey, "appKey", ignoreFields);
+        return verifySign(data, sign, secretKey, "appKey", ignoreFields);
     }
 
-    public static void verifySign(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String... ignoreFields) {
+    public static boolean verifySign(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySign(data, sign, secretKey, secretKeyName, "&", ignoreFields);
+        return verifySign(data, sign, secretKey, secretKeyName, "&", ignoreFields);
     }
 
-    public static void verifySign(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
+    public static boolean verifySign(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        if (!getSign(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign)) {
-            throw ServiceExceptionUtil.get(-1, "来源数据签名验证失败");
-        }
+        if (StrUtil.isBlank(sign)) return false;
+        return getSign(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign);
     }
 
-    public static void verifySignUpper(Map<String, ?> data, String... ignoreFields) {
+    public static boolean verifySignUpper(Map<String, ?> data, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySignUpper(data, (String) data.remove("sign"), ignoreFields);
+        return verifySignUpper(data, (String) data.remove("sign"), ignoreFields);
     }
 
-    public static void verifySignUpper(Map<String, ?> data, String sign, String... ignoreFields) {
+    public static boolean verifySignUpper(Map<String, ?> data, String sign, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySignUpper(data, sign, "", ignoreFields);
+        return verifySignUpper(data, sign, "", ignoreFields);
     }
 
-    public static void verifySignUpper(Map<String, ?> data, String sign, String secretKey, String... ignoreFields) {
+    public static boolean verifySignUpper(Map<String, ?> data, String sign, String secretKey, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySignUpper(data, sign, secretKey, "appKey", ignoreFields);
+        return verifySignUpper(data, sign, secretKey, "appKey", ignoreFields);
     }
 
-    public static void verifySignUpper(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String... ignoreFields) {
+    public static boolean verifySignUpper(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        verifySignUpper(data, sign, secretKey, secretKeyName, "&", ignoreFields);
+        return verifySignUpper(data, sign, secretKey, secretKeyName, "&", ignoreFields);
     }
 
-    public static void verifySignUpper(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
+    public static boolean verifySignUpper(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        if (!getSignUpper(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign)) {
-            throw ServiceExceptionUtil.get(-1, "来源数据签名验证失败");
-        }
+        return getSignUpper(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign);
     }
 }
