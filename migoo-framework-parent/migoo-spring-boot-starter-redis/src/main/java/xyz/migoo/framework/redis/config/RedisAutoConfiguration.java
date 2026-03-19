@@ -8,7 +8,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -28,7 +27,7 @@ public class RedisAutoConfiguration {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         // 创建 RedisTemplate 对象
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        var template = new RedisTemplate<String, Object>();
         // 设置 RedisConnection 工厂。😈 它就是实现多种 Java Redis 客户端接入的秘密工厂。感兴趣的胖友，可以自己去撸下。
         template.setConnectionFactory(factory);
         // 使用 String 序列化方式，序列化 KEY 。
@@ -39,11 +38,10 @@ public class RedisAutoConfiguration {
         template.setHashValueSerializer(RedisSerializer.json());
 
         // 创建 ObjectMapper，JavaTimeModule 已经在 Jackson 3.x 中内置
-        ObjectMapper objectMapper = JsonMapper.builder()
-                .build();
+        var objectMapper = JsonMapper.builder().build();
 
         // 使用 GenericJackson2JsonRedisSerializer 进行序列化
-        GenericJacksonJsonRedisSerializer serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
+        var serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
 
         template.setKeySerializer(RedisSerializer.string());
         template.setValueSerializer(serializer);
