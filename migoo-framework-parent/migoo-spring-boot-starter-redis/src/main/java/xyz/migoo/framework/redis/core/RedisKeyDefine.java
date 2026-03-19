@@ -1,6 +1,5 @@
 package xyz.migoo.framework.redis.core;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import tools.jackson.core.type.TypeReference;
 import xyz.migoo.framework.common.util.json.JsonUtils;
@@ -106,80 +105,6 @@ public class RedisKeyDefine<T> {
      */
     public long getTimeoutMillis() {
         return hasTimeout() ? timeout.toMillis() : 0;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public enum KeyTypeEnum {
-
-        /**
-         * String 类型
-         */
-        STRING("String"),
-
-        /**
-         * List 类型
-         */
-        LIST("List"),
-
-        /**
-         * Hash 类型
-         */
-        HASH("Hash"),
-
-        /**
-         * Set 类型
-         */
-        SET("Set"),
-
-        /**
-         * Sorted Set 类型
-         */
-        ZSET("Sorted Set"),
-
-        /**
-         * Stream 类型
-         */
-        STREAM("Stream"),
-
-        /**
-         * Pub/Sub 类型
-         */
-        PUBSUB("Pub/Sub");
-
-        /**
-         * 类型名称
-         */
-        private final String type;
-
-    }
-
-    // ==================== 枚举类 ====================
-
-    @Getter
-    @AllArgsConstructor
-    public enum TimeoutTypeEnum {
-
-        /**
-         * 永不超时
-         */
-        FOREVER(1),
-
-        /**
-         * 动态超时（在操作时指定）
-         */
-        DYNAMIC(2),
-
-        /**
-         * 固定超时（通过 timeout 字段指定）
-         */
-        FIXED(3);
-
-        /**
-         * 类型编码
-         */
-        private final Integer type;
-
     }
 
     /**
