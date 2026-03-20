@@ -3,6 +3,7 @@ package xyz.migoo.framework.mq.core.pubsub;
 import cn.hutool.core.util.TypeUtil;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
@@ -12,11 +13,14 @@ import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * @author xiaomi
- * Created on 2021/11/21 14:15
+ * Redis Pub/Sub 消息监听器抽象基类
+ *
+ * @param <T> 消息类型
  */
+@Slf4j
 public abstract class AbstractChannelMessageListener<T extends AbstractChannelMessage> implements MessageListener {
 
     /**
@@ -52,10 +56,16 @@ public abstract class AbstractChannelMessageListener<T extends AbstractChannelMe
     @Override
     public final void onMessage(Message message, byte[] bytes) {
         T messageObj = JsonUtils.parseObject(message.getBody(), messageType);
+        Objects.requireNonNull(messageObj, "解析消息失败，消息内容为空");
         try {
             consumeMessageBefore(messageObj);
             // 消费消息
             this.onMessage(messageObj);
+            log.debug("[onMessage][消费Channel消息成功] channel={}, messageId={}", channel, messageObj.getMessageId());
+        } catch (Exception e) {
+            log.error("[onMessage][消费Channel消息失败] channel={}, messageId={}", channel, messageObj.getMessageId(), e);
+            consumeMessageError(messageObj, e);
+            // Pub/Sub 模式不支持重试，仅记录日志
         } finally {
             consumeMessageAfter(messageObj);
         }
@@ -83,18 +93,27 @@ public abstract class AbstractChannelMessageListener<T extends AbstractChannelMe
     }
 
     private void consumeMessageBefore(AbstractMessage message) {
-        assert redisMQTemplate != null;
+        Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
         List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
         // 正序
         interceptors.forEach(interceptor -> interceptor.consumeMessageBefore(message));
     }
 
     private void consumeMessageAfter(AbstractMessage message) {
-        assert redisMQTemplate != null;
+        Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
         List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
         // 倒序
         for (int i = interceptors.size() - 1; i >= 0; i--) {
             interceptors.get(i).consumeMessageAfter(message);
+        }
+    }
+
+    private void consumeMessageError(AbstractMessage message, Throwable throwable) {
+        Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
+        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
+        // 倒序
+        for (int i = interceptors.size() - 1; i >= 0; i--) {
+            interceptors.get(i).consumeMessageError(message, throwable);
         }
     }
 }

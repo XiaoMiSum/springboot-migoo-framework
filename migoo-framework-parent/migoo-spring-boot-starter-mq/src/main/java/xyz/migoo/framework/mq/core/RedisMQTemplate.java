@@ -2,6 +2,7 @@ package xyz.migoo.framework.mq.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import java.util.List;
  * Redis MQ 操作模板类
  *
  */
+@Slf4j
 @AllArgsConstructor
 public class RedisMQTemplate {
 
@@ -39,6 +41,10 @@ public class RedisMQTemplate {
             sendMessageBefore(message);
             // 发送消息
             redisTemplate.convertAndSend(message.getChannel(), JsonUtils.toJsonString(message));
+        } catch (Exception e) {
+            log.error("[send][发送Channel消息失败] channel={}, messageId={}", message.getChannel(), message.getMessageId(), e);
+            sendMessageError(message, e);
+            throw e;
         } finally {
             sendMessageAfter(message);
         }
@@ -57,6 +63,10 @@ public class RedisMQTemplate {
             return redisTemplate.opsForStream().add(StreamRecords.newRecord()
                     .ofObject(JsonUtils.toJsonString(message)) // 设置内容
                     .withStreamKey(message.getChannel())); // 设置 stream key
+        } catch (Exception e) {
+            log.error("[send][发送Stream消息失败] stream={}, messageId={}", message.getChannel(), message.getMessageId(), e);
+            sendMessageError(message, e);
+            throw e;
         } finally {
             sendMessageAfter(message);
         }
@@ -80,6 +90,13 @@ public class RedisMQTemplate {
         // 倒序
         for (int i = interceptors.size() - 1; i >= 0; i--) {
             interceptors.get(i).sendMessageAfter(message);
+        }
+    }
+
+    private void sendMessageError(AbstractMessage message, Throwable throwable) {
+        // 倒序
+        for (int i = interceptors.size() - 1; i >= 0; i--) {
+            interceptors.get(i).sendMessageError(message, throwable);
         }
     }
 
