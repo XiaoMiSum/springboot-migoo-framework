@@ -25,8 +25,6 @@ public class RedisKeyDefine<T> {
      * 支持动态参数，使用 {@link String#format(String, Object...)} 格式，如："user:%s:info"
      */
     private final String keyTemplate;
-
-
     /**
      * Value 类型
      * <p>
@@ -34,13 +32,14 @@ public class RedisKeyDefine<T> {
      * 对于简单类型，可以直接使用 {@link Class}；对于复杂泛型类型，使用 {@link TypeReference}。
      */
     private final TypeReference<T> valueType;
-
-
     /**
      * 过期时间
      */
     private final Duration timeout;
-
+    /**
+     * 过期类型
+     */
+    private final TimeoutType timeoutType;
     /**
      * 备注
      */
@@ -54,6 +53,7 @@ public class RedisKeyDefine<T> {
         this.keyTemplate = Objects.requireNonNull(builder.keyTemplate, "keyTemplate must not be null");
         this.valueType = Objects.requireNonNull(builder.valueType, "valueType must not be null");
         this.timeout = builder.timeout != null ? builder.timeout : Duration.ZERO;
+        this.timeoutType = builder.timeoutType != null ? builder.timeoutType : TimeoutType.FIXED;
     }
 
     /**
@@ -65,8 +65,6 @@ public class RedisKeyDefine<T> {
     public static <T> Builder<T> builder() {
         return new Builder<>();
     }
-
-    // ==================== 业务方法 ====================
 
     /**
      * 格式化键，将参数填充到键模板中
@@ -83,6 +81,8 @@ public class RedisKeyDefine<T> {
         return String.format(keyTemplate, args);
     }
 
+    // ==================== 业务方法 ====================
+
     public T parse(String json) {
         return JsonUtils.parseObject(json, valueType);
     }
@@ -90,13 +90,29 @@ public class RedisKeyDefine<T> {
     /**
      * 检查是否设置了超时时间
      *
-     * @return 如果 timeoutType 为 FIXED 且 timeout 大于 0，返回 true
+     * @return 如果 timeoutType 不为 PERMANENT 且 timeout 大于 0，返回 true
      */
     public boolean hasTimeout() {
-        return !timeout.isZero() && !timeout.isNegative();
+        return timeoutType != TimeoutType.PERMANENT && !timeout.isZero() && !timeout.isNegative();
     }
 
-    // ==================== Builder 模式 ====================
+    /**
+     * 检查是否为固定过期时间类型
+     *
+     * @return 如果是 FIXED 类型返回 true
+     */
+    public boolean isFixedTimeout() {
+        return timeoutType == TimeoutType.FIXED;
+    }
+
+    /**
+     * 检查是否为动态过期时间类型
+     *
+     * @return 如果是 DYNAMIC 类型返回 true
+     */
+    public boolean isDynamicTimeout() {
+        return timeoutType == TimeoutType.DYNAMIC;
+    }
 
     /**
      * 获取超时时间（毫秒）
@@ -105,6 +121,26 @@ public class RedisKeyDefine<T> {
      */
     public long getTimeoutMillis() {
         return hasTimeout() ? timeout.toMillis() : 0;
+    }
+
+    // ==================== Builder 模式 ====================
+
+    /**
+     * 过期类型枚举
+     */
+    public enum TimeoutType {
+        /**
+         * 永久有效，不设置过期时间
+         */
+        PERMANENT,
+        /**
+         * 固定过期时间，仅在首次设置时设置过期时间
+         */
+        FIXED,
+        /**
+         * 动态过期时间，每次设置都重新计算过期时间
+         */
+        DYNAMIC
     }
 
     /**
@@ -117,6 +153,7 @@ public class RedisKeyDefine<T> {
         private String keyTemplate;
         private TypeReference<T> valueType;
         private Duration timeout = Duration.ZERO;
+        private TimeoutType timeoutType = TimeoutType.PERMANENT;
 
         public Builder<T> memo(String memo) {
             this.memo = memo;
@@ -165,6 +202,41 @@ public class RedisKeyDefine<T> {
 
         public Builder<T> timeoutDays(long days) {
             this.timeout = Duration.ofDays(days);
+            return this;
+        }
+
+        /**
+         * 设置过期类型为永久有效
+         */
+        public Builder<T> permanent() {
+            this.timeoutType = TimeoutType.PERMANENT;
+            this.timeout = Duration.ZERO;
+            return this;
+        }
+
+        /**
+         * 设置过期类型为固定过期时间（仅首次设置时生效）
+         */
+        public Builder<T> fixedTimeout() {
+            this.timeoutType = TimeoutType.FIXED;
+            return this;
+        }
+
+        /**
+         * 设置过期类型为动态过期时间（每次设置都重新计算）
+         */
+        public Builder<T> dynamicTimeout() {
+            this.timeoutType = TimeoutType.DYNAMIC;
+            return this;
+        }
+
+        /**
+         * 设置过期类型
+         *
+         * @param timeoutType 过期类型
+         */
+        public Builder<T> timeoutType(TimeoutType timeoutType) {
+            this.timeoutType = timeoutType;
             return this;
         }
 

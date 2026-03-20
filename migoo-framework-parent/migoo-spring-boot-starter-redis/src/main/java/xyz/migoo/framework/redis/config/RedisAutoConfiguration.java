@@ -8,7 +8,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ser.std.ToStringSerializer;
+
+import java.math.BigDecimal;
 
 /**
  * @author xiaomi
@@ -37,8 +44,18 @@ public class RedisAutoConfiguration {
         template.setValueSerializer(RedisSerializer.json());
         template.setHashValueSerializer(RedisSerializer.json());
 
+        var ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType(Object.class) // 允许反序列化为任何 Object 的子类型，可根据需要放宽限制
+                .build();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
         // 创建 ObjectMapper，JavaTimeModule 已经在 Jackson 3.x 中内置
-        var objectMapper = JsonMapper.builder().build();
+        var objectMapper = JsonMapper.builder()
+                .activateDefaultTyping(ptv, DefaultTyping.NON_FINAL)
+                .addModule(module)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
+
 
         // 使用 GenericJackson2JsonRedisSerializer 进行序列化
         var serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
