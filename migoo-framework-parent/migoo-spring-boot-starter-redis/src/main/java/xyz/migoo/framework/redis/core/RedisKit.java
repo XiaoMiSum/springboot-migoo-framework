@@ -2,16 +2,37 @@ package xyz.migoo.framework.redis.core;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class RedisKit {
 
+    /**
+     * 释放锁的 Lua 脚本
+     * KEYS[1]: 锁的 key
+     * ARGV[1]: 锁的值（标识）
+     * 返回: 1-释放成功, 0-释放失败
+     */
+    private static final String UNLOCK_SCRIPT = """
+            if redis.call('get', KEYS[1]) == ARGV[1] then
+                return redis.call('del', KEYS[1])
+            else
+                return 0
+            end
+            """;
+
+    // ==================== Lua 脚本 ====================
     private final RedisTemplate<String, Object> redisTemplate;
+
+    // ==================== String 操作 ====================
 
     /**
      * 获取缓存值
@@ -89,6 +110,42 @@ public class RedisKit {
     }
 
     /**
+     * 仅在 key 不存在时设置值
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param value 缓存值
+     * @param args  模板参数
+     * @param <V>   值类型
+     * @return true-设置成功, false-key已存在
+     */
+    public <V> boolean setIfAbsent(RedisKeyDefine<V> key, V value, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Boolean success;
+        if (key.hasTimeout()) {
+            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value, key.getTimeout());
+        } else {
+            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value);
+        }
+        return Boolean.TRUE.equals(success);
+    }
+
+    /**
+     * 仅在 key 不存在时设置值（带自定义过期时间）
+     *
+     * @param key     RedisKeyDefine 定义
+     * @param value   缓存值
+     * @param timeout 过期时间
+     * @param args    模板参数
+     * @param <V>     值类型
+     * @return true-设置成功, false-key已存在
+     */
+    public <V> boolean setIfAbsent(RedisKeyDefine<V> key, V value, Duration timeout, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value, timeout);
+        return Boolean.TRUE.equals(success);
+    }
+
+    /**
      * 删除缓存
      *
      * @param key  RedisKeyDefine 定义
@@ -119,5 +176,223 @@ public class RedisKit {
      */
     public boolean expire(RedisKeyDefine<?> key, long timeout, Object... args) {
         return Boolean.TRUE.equals(redisTemplate.expire(key.formatKey(args), timeout, TimeUnit.MILLISECONDS));
+    }
+
+    // ==================== 分布式锁操作 ====================
+
+    /**
+     * 尝试获取分布式锁
+     * <p>
+     * 使用 Redis SET NX EX 命令实现
+     *
+     * @param lockKey   锁的 key
+     * @param lockValue 锁的值（建议使用 UUID）
+     * @param timeout   锁的过期时间
+     * @return true-获取成功, false-获取失败
+     */
+    public boolean tryLock(String lockKey, String lockValue, Duration timeout) {
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, timeout);
+        return Boolean.TRUE.equals(success);
+    }
+
+    /**
+     * 尝试获取分布式锁（使用 RedisKeyDefine）
+     *
+     * @param lockKey   锁的 key 定义
+     * @param lockValue 锁的值（建议使用 UUID）
+     * @param args      模板参数
+     * @return true-获取成功, false-获取失败
+     */
+    public boolean tryLock(RedisKeyDefine<?> lockKey, String lockValue, Object... args) {
+        String formattedKey = lockKey.formatKey(args);
+        Duration timeout = lockKey.hasTimeout() ? lockKey.getTimeout() : Duration.ofSeconds(30);
+        return tryLock(formattedKey, lockValue, timeout);
+    }
+
+    /**
+     * 释放分布式锁
+     * <p>
+     * 使用 Lua 脚本确保原子性：只有锁的持有者才能释放锁
+     *
+     * @param lockKey   锁的 key
+     * @param lockValue 锁的值（必须与获取时一致）
+     * @return true-释放成功, false-释放失败（锁不存在或不是当前线程持有）
+     */
+    public boolean unlock(String lockKey, String lockValue) {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+        script.setScriptText(UNLOCK_SCRIPT);
+        script.setResultType(Long.class);
+        Long result = redisTemplate.execute(script, Collections.singletonList(lockKey), lockValue);
+        return Long.valueOf(1L).equals(result);
+    }
+
+    /**
+     * 释放分布式锁（使用 RedisKeyDefine）
+     *
+     * @param lockKey   锁的 key 定义
+     * @param lockValue 锁的值（必须与获取时一致）
+     * @param args      模板参数
+     * @return true-释放成功, false-释放失败
+     */
+    public boolean unlock(RedisKeyDefine<?> lockKey, String lockValue, Object... args) {
+        return unlock(lockKey.formatKey(args), lockValue);
+    }
+
+
+    // ==================== Sorted Set 操作 ====================
+
+    /**
+     * 向有序集合添加成员
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param member 成员
+     * @param score  分数
+     * @param args   模板参数
+     * @return true-添加成功, false-成员已存在且分数未改变
+     */
+    public boolean zadd(RedisKeyDefine<?> key, Object member, double score, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Boolean added = redisTemplate.opsForZSet().add(formattedKey, member, score);
+        return Boolean.TRUE.equals(added);
+    }
+
+    /**
+     * 从有序集合移除成员
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param member 成员
+     * @param args   模板参数
+     * @return 移除的成员数量
+     */
+    public long zrem(RedisKeyDefine<?> key, Object member, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForZSet().remove(formattedKey, member);
+        return removed != null ? removed : 0;
+    }
+
+    /**
+     * 从有序集合移除多个成员
+     *
+     * @param key     RedisKeyDefine 定义
+     * @param members 成员数组
+     * @param args    模板参数
+     * @return 移除的成员数量
+     */
+    public long zrem(RedisKeyDefine<?> key, Object[] members, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForZSet().remove(formattedKey, members);
+        return removed != null ? removed : 0;
+    }
+
+    /**
+     * 获取有序集合的成员排名（从低到高，0开始）
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param member 成员
+     * @param args   模板参数
+     * @return 排名，如果不存在返回 null
+     */
+    public Long zrank(RedisKeyDefine<?> key, Object member, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForZSet().rank(formattedKey, member);
+    }
+
+    /**
+     * 获取有序集合的成员排名（从高到低，0开始）
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param member 成员
+     * @param args   模板参数
+     * @return 排名，如果不存在返回 null
+     */
+    public Long zrevrank(RedisKeyDefine<?> key, Object member, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForZSet().reverseRank(formattedKey, member);
+    }
+
+    /**
+     * 获取有序集合指定范围的成员（从低到高）
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param start 开始位置（0开始）
+     * @param end   结束位置（-1表示到最后）
+     * @param args  模板参数
+     * @return 成员集合
+     */
+    public Set<Object> zrange(RedisKeyDefine<?> key, long start, long end, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForZSet().range(formattedKey, start, end);
+    }
+
+    /**
+     * 获取有序集合指定范围的成员（从高到低）
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param start 开始位置（0开始）
+     * @param end   结束位置（-1表示到最后）
+     * @param args  模板参数
+     * @return 成员集合
+     */
+    public Set<Object> zrevrange(RedisKeyDefine<?> key, long start, long end, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForZSet().reverseRange(formattedKey, start, end);
+    }
+
+    /**
+     * 获取有序集合的成员数量
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 成员数量
+     */
+    public long zcard(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long count = redisTemplate.opsForZSet().size(formattedKey);
+        return count != null ? count : 0;
+    }
+
+    /**
+     * 获取有序集合中指定分数范围的成员数量
+     *
+     * @param key      RedisKeyDefine 定义
+     * @param minScore 最小分数
+     * @param maxScore 最大分数
+     * @param args     模板参数
+     * @return 成员数量
+     */
+    public long zcount(RedisKeyDefine<?> key, double minScore, double maxScore, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long count = redisTemplate.opsForZSet().count(formattedKey, minScore, maxScore);
+        return count != null ? count : 0;
+    }
+
+    /**
+     * 删除有序集合中指定排名范围的成员
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param start 开始位置
+     * @param end   结束位置
+     * @param args  模板参数
+     * @return 删除的成员数量
+     */
+    public long zremrangeByRank(RedisKeyDefine<?> key, long start, long end, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForZSet().removeRange(formattedKey, start, end);
+        return removed != null ? removed : 0;
+    }
+
+    /**
+     * 删除有序集合中指定分数范围的成员
+     *
+     * @param key      RedisKeyDefine 定义
+     * @param minScore 最小分数
+     * @param maxScore 最大分数
+     * @param args     模板参数
+     * @return 删除的成员数量
+     */
+    public long zremrangeByScore(RedisKeyDefine<?> key, double minScore, double maxScore, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForZSet().removeRangeByScore(formattedKey, minScore, maxScore);
+        return removed != null ? removed : 0;
     }
 }
