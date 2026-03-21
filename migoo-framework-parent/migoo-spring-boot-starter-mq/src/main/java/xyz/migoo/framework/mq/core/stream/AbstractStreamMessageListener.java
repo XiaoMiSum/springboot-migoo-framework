@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
+import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
@@ -102,6 +103,12 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
                     streamKey, messageObj.getMessageId(), message.getId());
             // 消费成功后删除消息（可选，保留一段时间用于追踪）
             redisTemplate.opsForStream().delete(message);
+        } catch (IdempotentMessageInterceptor.MessageAlreadyConsumedException e) {
+            // 消息已被消费，直接 ACK 并跳过
+            redisTemplate.opsForStream().acknowledge(group, message);
+            redisTemplate.opsForStream().delete(message);
+            log.info("[onMessage][消息已被其他消费者处理，跳过] stream={}, messageId={}, status={}",
+                    streamKey, messageObj.getMessageId(), e.getStatus());
         } catch (Exception e) {
             log.error("[onMessage][消费Stream消息失败] stream={}, messageId={}, recordId={}, retryCount={}/{}",
                     streamKey, messageObj.getMessageId(), message.getId(), retryCount, maxRetry, e);

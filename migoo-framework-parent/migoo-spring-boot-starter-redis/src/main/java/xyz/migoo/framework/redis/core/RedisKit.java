@@ -178,6 +178,55 @@ public class RedisKit {
         return Boolean.TRUE.equals(redisTemplate.expire(key.formatKey(args), timeout, TimeUnit.MILLISECONDS));
     }
 
+    // ==================== 原子计数操作 ====================
+
+    /**
+     * 原子递增（+1）
+     * <p>
+     * 如果 key 不存在，初始化为 0 后再递增
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 递增后的值
+     */
+    public long increment(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long value = redisTemplate.opsForValue().increment(formattedKey);
+        return value != null ? value : 0;
+    }
+
+    /**
+     * 原子递增（指定增量）
+     * <p>
+     * 如果 key 不存在，初始化为 0 后再递增
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param delta 递增值
+     * @param args  模板参数
+     * @return 递增后的值
+     */
+    public Long increment(RedisKeyDefine<?> key, long delta, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
+        return value != null ? value : 0;
+    }
+
+    /**
+     * 原子递减（指定减量）
+     * <p>
+     * 如果 key 不存在，初始化为 0 后再递减
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param delta 减少值
+     * @param args  模板参数
+     * @return 递减后的值
+     */
+    public long decrement(RedisKeyDefine<?> key, long delta, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
+        return value != null ? value : 0;
+    }
+
     // ==================== 分布式锁操作 ====================
 
     /**

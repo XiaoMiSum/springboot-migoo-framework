@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -13,10 +15,12 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
+import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import xyz.migoo.framework.mq.core.stream.AbstractStreamMessageListener;
@@ -30,6 +34,7 @@ import java.util.List;
  * 支持 Redis Pub/Sub（广播模式）和 Redis Stream（集群消费模式）
  */
 @AutoConfigureAfter(RedisAutoConfiguration.class)
+@EnableConfigurationProperties(MQProperties.class)
 @Slf4j
 public class MQAutoConfiguration {
 
@@ -41,6 +46,23 @@ public class MQAutoConfiguration {
      */
     private static String buildConsumerName() {
         return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+    }
+
+    /**
+     * 创建消息幂等性拦截器
+     * <p>
+     * 基于 Redis SETNX 实现分布式环境下的消息去重
+     *
+     * @param stringRedisTemplate Redis 字符串操作模板
+     * @param properties          MQ 配置属性
+     * @return 幂等拦截器
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "migoo.mq.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
+    public IdempotentMessageInterceptor idempotentMessageInterceptor(StringRedisTemplate stringRedisTemplate,
+                                                                      MQProperties properties) {
+        log.info("[idempotentMessageInterceptor][创建消息幂等拦截器，过期时间={}]", properties.getIdempotent().getExpireTime());
+        return new IdempotentMessageInterceptor(stringRedisTemplate, properties.getIdempotent().getExpireTime());
     }
 
     /**

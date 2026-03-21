@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -26,6 +27,7 @@ import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
 @Configuration
 @EnableConfigurationProperties({XssProperties.class})
+@ComponentScan("xyz.migoo.framework")
 public class MiGooWebAutoConfiguration {
 
     /**
