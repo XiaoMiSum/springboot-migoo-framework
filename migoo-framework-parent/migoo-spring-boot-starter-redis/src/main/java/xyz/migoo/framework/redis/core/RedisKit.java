@@ -205,7 +205,23 @@ public class RedisKit {
      * @param args  模板参数
      * @return 递增后的值
      */
-    public Long increment(RedisKeyDefine<?> key, long delta, Object... args) {
+    public Double increment(RedisKeyDefine<?> key, Double delta, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Double value = redisTemplate.opsForValue().increment(formattedKey, delta);
+        return value != null ? value : 0;
+    }
+
+    /**
+     * 原子递增（指定增量）
+     * <p>
+     * 如果 key 不存在，初始化为 0 后再递增
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param delta 递增值
+     * @param args  模板参数
+     * @return 递增后的值
+     */
+    public Long increment(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
         Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
         return value != null ? value : 0;
@@ -221,7 +237,7 @@ public class RedisKit {
      * @param args  模板参数
      * @return 递减后的值
      */
-    public long decrement(RedisKeyDefine<?> key, long delta, Object... args) {
+    public long decrement(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
         Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
         return value != null ? value : 0;
