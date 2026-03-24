@@ -2,8 +2,10 @@ package xyz.migoo.framework.redis.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
@@ -23,8 +25,7 @@ import java.math.BigDecimal;
  */
 @Configuration
 @Slf4j
-@AutoConfigureBefore(name = {"org.redisson.spring.starter.RedissonAutoConfiguration",
-        "org.redisson.spring.starter.RedissonAutoConfigurationV2"})
+@AutoConfigureBefore(DataRedisAutoConfiguration.class)
 public class RedisAutoConfiguration {
 
 
@@ -32,6 +33,7 @@ public class RedisAutoConfiguration {
      * 创建 RedisTemplate Bean，使用 JSON 序列化方式
      */
     @Bean
+    @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         // 创建 RedisTemplate 对象
         var template = new RedisTemplate<String, Object>();

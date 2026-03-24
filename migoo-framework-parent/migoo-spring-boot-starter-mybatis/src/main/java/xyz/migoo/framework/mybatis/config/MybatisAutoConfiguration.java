@@ -27,9 +27,7 @@ import java.time.LocalDateTime;
  */
 @Configuration
 @AutoConfiguration(before = MybatisPlusAutoConfiguration.class)
-@MapperScan(value = {"${migoo.framework.package-name}", "${migoo.framework.biz-package-name}"}
-        , annotationClass = Mapper.class,
-        lazyInitialization = "${mybatis.lazy-initialization:false}")
+@MapperScan(value = {"xyz.migoo.framework.*"}, annotationClass = Mapper.class, lazyInitialization = "${mybatis.lazy-initialization:false}")
 public class MybatisAutoConfiguration {
 
     @Bean

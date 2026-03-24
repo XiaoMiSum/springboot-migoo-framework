@@ -43,7 +43,7 @@
         <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <redisson.version>4.2.0</redisson.version>
         <jsqlparser.version>5.3</jsqlparser.version>
-        <mybatis-plus-join.version>1.4.13</mybatis-plus-join.version>
+        <mybatis-plus-join.version>1.5.6</mybatis-plus-join.version>
 
         <!-- 工具类相关 -->
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -53,6 +53,7 @@
         <lombok.version>1.18.38</lombok.version>
         <fastjson.version>2.0.57</fastjson.version>
         <jackson.version>3.1.0</jackson.version>
+        <jackson2.version>2.21.2</jackson2.version>
         <ip2region.version>2.7.0</ip2region.version>
         <caffeine.version>3.2.3</caffeine.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
@@ -80,6 +81,13 @@
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson2.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

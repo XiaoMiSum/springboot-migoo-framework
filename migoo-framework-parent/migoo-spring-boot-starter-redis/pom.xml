@@ -55,8 +55,8 @@
 
         <!-- DB 相关 -->
         <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
             <type>jar</type>
         </dependency>
     </dependencies>
