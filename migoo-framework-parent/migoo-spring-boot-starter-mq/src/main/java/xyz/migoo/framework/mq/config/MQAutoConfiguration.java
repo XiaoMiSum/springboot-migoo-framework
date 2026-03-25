@@ -60,7 +60,7 @@ public class MQAutoConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "migoo.mq.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
     public IdempotentMessageInterceptor idempotentMessageInterceptor(StringRedisTemplate stringRedisTemplate,
-                                                                      MQProperties properties) {
+                                                                     MQProperties properties) {
         log.info("[idempotentMessageInterceptor][创建消息幂等拦截器，过期时间={}]", properties.getIdempotent().getExpireTime());
         return new IdempotentMessageInterceptor(stringRedisTemplate, properties.getIdempotent().getExpireTime());
     }
@@ -171,16 +171,20 @@ public class MQAutoConfiguration {
             redisTemplate.opsForStream().createGroup(streamKey, group);
             log.info("[createConsumerGroup][创建消费者组成功] stream={}, group={}", streamKey, group);
         } catch (RedisSystemException e) {
-            // BUSYGROUP Consumer Group name already exists
-            String message = e.getMessage();
-            if (message != null && message.contains("BUSYGROUP")) {
-                log.debug("[createConsumerGroup][消费者组已存在] stream={}, group={}", streamKey, group);
+            // 从 cause 中获取原始异常消息
+            Throwable cause = e.getCause();
+            String rootMessage = (cause != null) ? cause.getMessage() : e.getMessage();
+
+            if (rootMessage != null && rootMessage.contains("BUSYGROUP")) {
+                // BUSYGROUP Consumer Group name already exists - 这是正常情况，通常发生在应用重启时
+                log.warn("[createConsumerGroup][消费者组已存在] stream={}, group={}", streamKey, group);
             } else {
-                log.warn("[createConsumerGroup][创建消费者组异常] stream={}, group={}, error={}",
-                        streamKey, group, message);
+                log.error("[createConsumerGroup][创建消费者组异常] stream={}, group={}, error={}",
+                        streamKey, group, rootMessage, e);
             }
         } catch (Exception e) {
-            log.error("[createConsumerGroup][创建消费者组失败] stream={}, group={}", streamKey, group, e);
+            log.error("[createConsumerGroup][创建消费者组失败] stream={}, group={}, errorType={}, errorMessage={}",
+                    streamKey, group, e.getClass().getSimpleName(), e.getMessage(), e);
         }
     }
 }
