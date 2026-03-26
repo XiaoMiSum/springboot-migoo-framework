@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.web.core.wrapper.CachedBodyHttpServletRequest;
 
 import java.io.IOException;
 
@@ -22,8 +22,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws IOException, ServletException {
         try {
-            var wrappedRequest = new ContentCachingRequestWrapper(request, -1);
-            wrappedRequest.getInputStream().readAllBytes();
+            var wrappedRequest = new CachedBodyHttpServletRequest(request);
             filterChain.doFilter(wrappedRequest, response);
         } catch (IOException e) {
             // 如果读取失败 则直接使用原始请求
