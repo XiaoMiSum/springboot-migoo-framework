@@ -23,8 +23,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         try {
             var wrappedRequest = new ContentCachingRequestWrapper(request, -1);
-            // 主动触发读取，确保内容被缓存（即使后续没有其他地方读取）
-            wrappedRequest.getInputStream();
+            wrappedRequest.getInputStream().readAllBytes();
             filterChain.doFilter(wrappedRequest, response);
         } catch (IOException e) {
             // 如果读取失败 则直接使用原始请求
