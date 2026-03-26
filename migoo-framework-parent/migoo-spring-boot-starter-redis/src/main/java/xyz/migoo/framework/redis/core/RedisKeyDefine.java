@@ -153,7 +153,7 @@ public class RedisKeyDefine<T> {
         private String keyTemplate;
         private TypeReference<T> valueType;
         private Duration timeout = Duration.ZERO;
-        private TimeoutType timeoutType = TimeoutType.PERMANENT;
+        private TimeoutType timeoutType;
 
         public Builder<T> memo(String memo) {
             this.memo = memo;
