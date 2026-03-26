@@ -19,9 +19,17 @@ import java.io.IOException;
 public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws IOException, ServletException {
-        filterChain.doFilter(new ContentCachingRequestWrapper(request, -1), response);
+        try {
+            var wrappedRequest = new ContentCachingRequestWrapper(request, -1);
+            // 主动触发读取，确保内容被缓存（即使后续没有其他地方读取）
+            wrappedRequest.getInputStream();
+            filterChain.doFilter(wrappedRequest, response);
+        } catch (IOException e) {
+            // 如果读取失败 则直接使用原始请求
+            filterChain.doFilter(request, response);
+        }
     }
 
     @Override

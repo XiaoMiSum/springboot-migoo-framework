@@ -2,13 +2,11 @@ package xyz.migoo.framework.web.config;
 
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -16,7 +14,6 @@ import org.springframework.web.servlet.LocaleResolver;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
 import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
-import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 import xyz.migoo.framework.web.i18n.I18NLocaleResolver;
@@ -26,7 +23,6 @@ import static java.lang.Thread.ofVirtual;
 import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
 @Configuration
-@EnableConfigurationProperties({XssProperties.class})
 @ComponentScan("xyz.migoo.framework")
 public class MiGooWebAutoConfiguration {
 
@@ -83,14 +79,6 @@ public class MiGooWebAutoConfiguration {
     @Bean
     public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
         return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
-    }
-
-    /**
-     * 创建 XssFilter Bean，解决 Xss 安全问题
-     */
-    @Bean
-    public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
-        return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
     }
 
     @Bean
