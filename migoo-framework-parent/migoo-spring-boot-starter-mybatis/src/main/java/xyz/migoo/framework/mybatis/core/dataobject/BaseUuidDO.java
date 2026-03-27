@@ -18,15 +18,15 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuppressWarnings("unchecked")
-public abstract class BaseUuidDO<T, SELF extends BaseUuidDO<T, SELF>> extends BaseDO {
+public abstract class BaseUuidDO<SELF extends BaseUuidDO<SELF>> extends BaseDO {
 
     /**
      * 重写 id 字段，指定使用 UUID 策略
      */
     @TableId(type = IdType.ASSIGN_UUID)
-    private T id;
+    private String id;
 
-    public SELF setId(T id) {
+    public SELF setId(String id) {
         this.id = id;
         return (SELF) this;
     }
