@@ -2,7 +2,6 @@ package xyz.migoo.framework.mybatis.core.dataobject;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -16,11 +15,7 @@ import java.time.LocalDateTime;
  * @author xiaomi
  */
 @Data
-@SuppressWarnings("unchecked")
-public class BaseDO<T, SELF extends BaseDO<T, SELF>> implements Serializable {
-
-    @TableId
-    private T id;
+public abstract class BaseDO implements Serializable {
 
     /**
      * 创建时间
@@ -41,10 +36,5 @@ public class BaseDO<T, SELF extends BaseDO<T, SELF>> implements Serializable {
     @TableField(fill = FieldFill.INSERT)
 
     private Boolean isDeleted;
-
-    public SELF setId(T id) {
-        this.id = id;
-        return (SELF) this;
-    }
 
 }

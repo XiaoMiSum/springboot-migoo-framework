@@ -184,6 +184,11 @@ public class RedisKit {
      * 原子递增（+1）
      * <p>
      * 如果 key 不存在，初始化为 0 后再递增
+     * 如果 RedisKeyDefine 设置了过期时间，会根据过期类型自动处理：
+     * <ul>
+     *   <li>FIXED：仅在 key 不存在或已过期时设置过期时间，后续操作不修改</li>
+     *   <li>DYNAMIC：每次都重新设置过期时间</li>
+     * </ul>
      *
      * @param key  RedisKeyDefine 定义
      * @param args 模板参数
@@ -191,14 +196,40 @@ public class RedisKit {
      */
     public long increment(RedisKeyDefine<?> key, Object... args) {
         String formattedKey = key.formatKey(args);
+            
+        if (!key.hasTimeout()) {
+            Long value = redisTemplate.opsForValue().increment(formattedKey);
+            return value != null ? value : 0;
+        }
+            
+        // 有过期时间，先执行原子递增
         Long value = redisTemplate.opsForValue().increment(formattedKey);
-        return value != null ? value : 0;
+        long result = value != null ? value : 0;
+            
+        // 根据过期类型设置过期时间
+        if (key.isFixedTimeout()) {
+            // FIXED 模式：仅在 key 刚创建时设置过期时间
+            Long ttl = redisTemplate.getExpire(formattedKey);
+            if (ttl != null && ttl == -2) {
+                redisTemplate.expire(formattedKey, key.getTimeout());
+            }
+        } else {
+            // DYNAMIC 模式：每次都重新设置过期时间
+            redisTemplate.expire(formattedKey, key.getTimeout());
+        }
+            
+        return result;
     }
 
     /**
      * 原子递增（指定增量）
      * <p>
      * 如果 key 不存在，初始化为 0 后再递增
+     * 如果 RedisKeyDefine 设置了过期时间，会根据过期类型自动处理：
+     * <ul>
+     *   <li>FIXED：仅在 key 不存在或已过期时设置过期时间，后续操作不修改</li>
+     *   <li>DYNAMIC：每次都重新设置过期时间</li>
+     * </ul>
      *
      * @param key   RedisKeyDefine 定义
      * @param delta 递增值
@@ -207,14 +238,40 @@ public class RedisKit {
      */
     public Double increment(RedisKeyDefine<?> key, Double delta, Object... args) {
         String formattedKey = key.formatKey(args);
+            
+        if (!key.hasTimeout()) {
+            Double value = redisTemplate.opsForValue().increment(formattedKey, delta);
+            return value != null ? value : 0;
+        }
+            
+        // 有过期时间，先执行原子递增
         Double value = redisTemplate.opsForValue().increment(formattedKey, delta);
-        return value != null ? value : 0;
+        double result = value != null ? value : 0;
+            
+        // 根据过期类型设置过期时间
+        if (key.isFixedTimeout()) {
+            // FIXED 模式：仅在 key 刚创建时设置过期时间
+            Long ttl = redisTemplate.getExpire(formattedKey);
+            if (ttl != null && ttl == -2) {
+                redisTemplate.expire(formattedKey, key.getTimeout());
+            }
+        } else {
+            // DYNAMIC 模式：每次都重新设置过期时间
+            redisTemplate.expire(formattedKey, key.getTimeout());
+        }
+            
+        return result;
     }
 
     /**
      * 原子递增（指定增量）
      * <p>
      * 如果 key 不存在，初始化为 0 后再递增
+     * 如果 RedisKeyDefine 设置了过期时间，会根据过期类型自动处理：
+     * <ul>
+     *   <li>FIXED：仅在 key 不存在或已过期时设置过期时间，后续操作不修改</li>
+     *   <li>DYNAMIC：每次都重新设置过期时间</li>
+     * </ul>
      *
      * @param key   RedisKeyDefine 定义
      * @param delta 递增值
@@ -223,14 +280,40 @@ public class RedisKit {
      */
     public Long increment(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
+            
+        if (!key.hasTimeout()) {
+            Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
+            return value != null ? value : 0;
+        }
+            
+        // 有过期时间，先执行原子递增
         Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
-        return value != null ? value : 0;
+        long result = value != null ? value : 0;
+            
+        // 根据过期类型设置过期时间
+        if (key.isFixedTimeout()) {
+            // FIXED 模式：仅在 key 刚创建时设置过期时间
+            Long ttl = redisTemplate.getExpire(formattedKey);
+            if (ttl != null && ttl == -2) {
+                redisTemplate.expire(formattedKey, key.getTimeout());
+            }
+        } else {
+            // DYNAMIC 模式：每次都重新设置过期时间
+            redisTemplate.expire(formattedKey, key.getTimeout());
+        }
+            
+        return result;
     }
 
     /**
      * 原子递减（指定减量）
      * <p>
      * 如果 key 不存在，初始化为 0 后再递减
+     * 如果 RedisKeyDefine 设置了过期时间，会根据过期类型自动处理：
+     * <ul>
+     *   <li>FIXED：仅在 key 不存在或已过期时设置过期时间，后续操作不修改</li>
+     *   <li>DYNAMIC：每次都重新设置过期时间</li>
+     * </ul>
      *
      * @param key   RedisKeyDefine 定义
      * @param delta 减少值
@@ -239,8 +322,29 @@ public class RedisKit {
      */
     public long decrement(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
+            
+        if (!key.hasTimeout()) {
+            Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
+            return value != null ? value : 0;
+        }
+            
+        // 有过期时间，先执行原子递减
         Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
-        return value != null ? value : 0;
+        long result = value != null ? value : 0;
+            
+        // 根据过期类型设置过期时间
+        if (key.isFixedTimeout()) {
+            // FIXED 模式：仅在 key 刚创建时设置过期时间
+            Long ttl = redisTemplate.getExpire(formattedKey);
+            if (ttl != null && ttl == -2) {
+                redisTemplate.expire(formattedKey, key.getTimeout());
+            }
+        } else {
+            // DYNAMIC 模式：每次都重新设置过期时间
+            redisTemplate.expire(formattedKey, key.getTimeout());
+        }
+            
+        return result;
     }
 
     // ==================== 分布式锁操作 ====================

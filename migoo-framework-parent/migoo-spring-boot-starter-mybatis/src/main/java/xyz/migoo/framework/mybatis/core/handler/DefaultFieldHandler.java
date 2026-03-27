@@ -19,7 +19,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
             // 创建时间为空，则以当前时间为插入时间
             LocalDateTime now = LocalDateTime.now();
             this.setFieldValByName("createdAt", now, metaObject);
@@ -30,7 +30,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
             // 默认以当前时间为更新时间
 
             setFieldValByName("updatedAt", LocalDateTime.now(), metaObject);
