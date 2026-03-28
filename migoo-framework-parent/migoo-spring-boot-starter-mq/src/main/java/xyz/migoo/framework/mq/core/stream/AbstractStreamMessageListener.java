@@ -39,7 +39,7 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
      * 消息类型
      */
     private final Class<T> messageType;
-    
+
     /**
      * Redis Channel
      */
@@ -162,7 +162,7 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
             // 重试：增加重试次数并重新发送到 Stream
             messageObj.addHeader("retry-count", String.valueOf(retryCount + 1));
             try {
-                redisTemplate.opsForStream().add(org.springframework.data.redis.connection.stream.StreamRecords.newRecord()
+                redisTemplate.opsForStream().add(StreamRecords.newRecord()
                         .ofObject(JsonUtils.toJsonString(messageObj))
                         .withStreamKey(streamKey));
                 log.info("[handleConsumeError][消息重试] stream={}, messageId={}, retryCount={}",

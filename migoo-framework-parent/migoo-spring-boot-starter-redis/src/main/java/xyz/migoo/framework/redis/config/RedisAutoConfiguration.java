@@ -8,16 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import tools.jackson.databind.DefaultTyping;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.databind.ser.std.ToStringSerializer;
-
-import java.math.BigDecimal;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * @author xiaomi
@@ -42,29 +34,15 @@ public class RedisAutoConfiguration {
         // 使用 String 序列化方式，序列化 KEY 。
         template.setKeySerializer(RedisSerializer.string());
         template.setHashKeySerializer(RedisSerializer.string());
-        // 使用 JSON 序列化方式（库是 Jackson ），序列化 VALUE 。
-        template.setValueSerializer(RedisSerializer.json());
-        template.setHashValueSerializer(RedisSerializer.json());
 
-        var ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfBaseType(Object.class) // 允许反序列化为任何 Object 的子类型，可根据需要放宽限制
-                .build();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(BigDecimal.class, ToStringSerializer.instance);
-        // 创建 ObjectMapper，JavaTimeModule 已经在 Jackson 3.x 中内置
-        var objectMapper = JsonMapper.builder()
-                .activateDefaultTyping(ptv, DefaultTyping.NON_FINAL)
-                .addModule(module)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .build();
+        // 使用 String 序列化器，手动通过 Jackson 进行 JSON 序列化
+        // 优点：存储的是纯 JSON 字符串，无类型元数据，Redis CLI 可读
+        // 缺点：读取时需要手动反序列化（通过 RedisKit/JsonUtils 处理）
+        var serializer = new StringRedisSerializer();
 
-
-        // 使用 GenericJackson2JsonRedisSerializer 进行序列化
-        var serializer = new GenericJacksonJsonRedisSerializer(objectMapper);
-
-        template.setKeySerializer(RedisSerializer.string());
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
+        template.setStringSerializer(serializer);
 
         template.afterPropertiesSet();
         return template;

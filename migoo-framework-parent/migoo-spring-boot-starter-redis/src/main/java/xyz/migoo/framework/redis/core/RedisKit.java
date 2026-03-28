@@ -90,23 +90,25 @@ public class RedisKit {
      */
     public <V> void set(RedisKeyDefine<V> key, V value, Object... args) {
         var formattedKey = key.formatKey(args);
+        // 序列化为 JSON 字符串存储
+        String jsonValue = JsonUtils.toJsonString(value);
         if (!key.hasTimeout()) {
             // 永久有效，不设置过期时间
-            redisTemplate.opsForValue().set(formattedKey, value);
+            redisTemplate.opsForValue().set(formattedKey, jsonValue);
             return;
         }
 
         if (key.isFixedTimeout()) {
             // 固定过期时间：仅当 key 不存在时才设置过期时间
             var exists = redisTemplate.hasKey(formattedKey);
-            redisTemplate.opsForValue().set(formattedKey, value);
+            redisTemplate.opsForValue().set(formattedKey, jsonValue);
             if (!Boolean.TRUE.equals(exists)) {
                 redisTemplate.expire(formattedKey, key.getTimeout());
             }
             return;
         }
         // 动态过期时间：每次设置都重新计算过期时间
-        redisTemplate.opsForValue().set(formattedKey, value, key.getTimeout());
+        redisTemplate.opsForValue().set(formattedKey, jsonValue, key.getTimeout());
     }
 
     /**
@@ -120,11 +122,13 @@ public class RedisKit {
      */
     public <V> boolean setIfAbsent(RedisKeyDefine<V> key, V value, Object... args) {
         String formattedKey = key.formatKey(args);
+        // 序列化为 JSON 字符串存储
+        String jsonValue = JsonUtils.toJsonString(value);
         Boolean success;
         if (key.hasTimeout()) {
-            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value, key.getTimeout());
+            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, jsonValue, key.getTimeout());
         } else {
-            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value);
+            success = redisTemplate.opsForValue().setIfAbsent(formattedKey, jsonValue);
         }
         return Boolean.TRUE.equals(success);
     }
@@ -141,7 +145,9 @@ public class RedisKit {
      */
     public <V> boolean setIfAbsent(RedisKeyDefine<V> key, V value, Duration timeout, Object... args) {
         String formattedKey = key.formatKey(args);
-        Boolean success = redisTemplate.opsForValue().setIfAbsent(formattedKey, value, timeout);
+        // 序列化为 JSON 字符串存储
+        String jsonValue = JsonUtils.toJsonString(value);
+        Boolean success = redisTemplate.opsForValue().setIfAbsent(formattedKey, jsonValue, timeout);
         return Boolean.TRUE.equals(success);
     }
 
