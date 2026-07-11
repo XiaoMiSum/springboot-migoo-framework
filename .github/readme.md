@@ -3,7 +3,7 @@
 ## 前提条件
 
 1. 已在 [Sonatype Central Portal](https://central.sonatype.org/) 注册账号
-2. 已创建 Namespace (io.github.xiaomisum)
+2. 已创建 Namespace (xyz.migoo)
 3. 已生成 GPG 密钥
 
 ## GitHub Secrets 配置
@@ -44,7 +44,8 @@ Sonatype Central Portal 的密码（在 Central Portal 中生成的 token）
 
 ## 发布流程
 
-**重要：** `migoo-framework-dependencies` 和 `migoo-framework-parent` 是独立项目，必须先发布 `migoo-framework-dependencies`，再发布 `migoo-framework-parent`。
+**重要：** `migoo-framework-dependencies` 和 `migoo-framework-parent` 是独立项目，必须先发布
+`migoo-framework-dependencies`，再发布 `migoo-framework-parent`。
 
 ### 第一步：发布 migoo-framework-dependencies
 
