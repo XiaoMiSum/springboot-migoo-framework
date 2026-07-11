@@ -1,0 +1,83 @@
+# 发布 migoo-framework-parent 及其子模块到 Maven Central
+name: Publish Parent
+
+on:
+  release:
+    types: [created]
+    paths:
+      - 'migoo-framework-parent/**'
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号 (可选,默认使用 pom.xml 中的版本)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Import GPG Key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Display Version
+        run: |
+          cd migoo-framework-parent
+          echo "Current version: $(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "Will update to version: ${{ inputs.version }}"
+          fi
+
+      - name: Update Version (if provided)
+        if: inputs.version != ''
+        run: mvn versions:set -pl migoo-framework-parent -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
+
+      - name: Build with Tests
+        run: mvn clean verify -pl migoo-framework-parent -am
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+
+      - name: Publish to Maven Central
+        run: mvn deploy -pl migoo-framework-parent -P release --settings .github/settings.xml -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Publication Summary
+        if: success()
+        run: |
+          VERSION=$(cd migoo-framework-parent && mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "✅ migoo-framework-parent published successfully!"
+          echo "📦 Version: $VERSION"
+          echo "🔗 Check Maven Central: https://repo.maven.apache.org/maven2/xyz/migoo/springboot/migoo-framework-parent/$VERSION/"
+          echo "🔗 Check Sonatype Portal: https://central.sonatype.com/publishing/deployments"
+
+      - name: Publication Failed
+        if: failure()
+        run: |
+          echo "❌ Publication failed! Please check the logs above."
+          echo "Common issues:"
+          echo "  - GPG key issues (check secrets.GPG_PRIVATE_KEY and secrets.GPG_PASSPHRASE)"
+          echo "  - Authentication issues (check secrets.MAVEN_USERNAME and secrets.MAVEN_PASSWORD)"
+          echo "  - Version already exists"
+          echo "  - migoo-framework-dependencies not published yet (publish dependencies first)"
