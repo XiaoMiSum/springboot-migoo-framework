@@ -4,8 +4,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jspecify.annotations.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.web.core.wrapper.CachedBodyHttpServletRequest;
 
 import java.io.IOException;
 
@@ -17,13 +19,19 @@ import java.io.IOException;
 public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws IOException, ServletException {
-        filterChain.doFilter(new CacheRequestBodyWrapper(request), response);
+        try {
+            var wrappedRequest = new CachedBodyHttpServletRequest(request);
+            filterChain.doFilter(wrappedRequest, response);
+        } catch (IOException e) {
+            // 如果读取失败 则直接使用原始请求
+            filterChain.doFilter(request, response);
+        }
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         // 只处理 json 请求内容
         return !ServletUtils.isJsonRequest(request);
     }

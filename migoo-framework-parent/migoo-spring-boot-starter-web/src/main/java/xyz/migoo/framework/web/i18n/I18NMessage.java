@@ -14,10 +14,14 @@ public class I18NMessage {
     private MessageSource messageSource;
 
     public String getMessage(String messageKey, String... dynamicValues) {
-        return messageSource.getMessage(messageKey, dynamicValues, LocaleContextHolder.getLocale());
+        return getMessage(messageKey, LocaleContextHolder.getLocale(), dynamicValues);
     }
 
     public String getMessage(String messageKey, Locale locale, String... dynamicValues) {
-        return messageSource.getMessage(messageKey, dynamicValues, locale);
+        try {
+            return messageSource.getMessage(messageKey, dynamicValues, locale);
+        } catch (Exception e) {
+            return messageKey;
+        }
     }
 }

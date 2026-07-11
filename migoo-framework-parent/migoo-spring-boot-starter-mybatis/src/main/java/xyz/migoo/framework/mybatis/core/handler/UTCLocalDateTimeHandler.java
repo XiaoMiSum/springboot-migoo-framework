@@ -11,8 +11,6 @@ import java.time.ZoneOffset;
 
 public class UTCLocalDateTimeHandler extends BaseTypeHandler<LocalDateTime> {
 
-    private static final ZoneId UTC = ZoneId.of("UTC");
-
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i,
                                     LocalDateTime parameter, JdbcType jdbcType) throws SQLException {

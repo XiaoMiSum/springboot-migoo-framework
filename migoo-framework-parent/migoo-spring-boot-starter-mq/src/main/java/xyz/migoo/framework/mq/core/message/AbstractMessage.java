@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Redis 消息抽象基类
@@ -14,9 +15,19 @@ import java.util.Map;
 public abstract class AbstractMessage {
 
     /**
+     * 消息唯一标识，用于幂等性处理
+     */
+    private String messageId;
+
+    /**
      * 头
      */
     private Map<String, String> headers = new HashMap<>();
+
+    public AbstractMessage() {
+        // 自动生成消息ID
+        this.messageId = UUID.randomUUID().toString();
+    }
 
     public String getHeader(String key) {
         return headers.get(key);

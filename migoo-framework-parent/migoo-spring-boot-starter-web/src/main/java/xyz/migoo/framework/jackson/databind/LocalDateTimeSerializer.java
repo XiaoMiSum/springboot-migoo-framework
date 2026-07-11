@@ -1,25 +1,28 @@
 package xyz.migoo.framework.jackson.databind;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import cn.hutool.core.date.DatePattern;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
- * LocalDateTime序列化规则
- * <p>
- * 会将LocalDateTime序列化为毫秒级时间戳
- *
  * @author xiaomi
- * Created on 2021/11/21 14:00
+ * Created on 2022/5/27 20:59
  */
-public class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
+public class LocalDateTimeSerializer extends StdSerializer<LocalDateTime> {
+
+    public LocalDateTimeSerializer() {
+        super(LocalDateTime.class);
+    }
 
     @Override
-    public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeNumber(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+    public void serialize(LocalDateTime value, JsonGenerator gen, SerializationContext provider) throws JacksonException {
+        if (value != null) {
+            gen.writeString(value.format(DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN)));
+        }
     }
 }

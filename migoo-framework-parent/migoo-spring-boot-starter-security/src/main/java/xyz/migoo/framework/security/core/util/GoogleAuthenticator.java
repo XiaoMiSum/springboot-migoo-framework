@@ -2,13 +2,13 @@ package xyz.migoo.framework.security.core.util;
 
 import cn.hutool.core.codec.Base32;
 import lombok.SneakyThrows;
-import org.apache.tomcat.util.codec.binary.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 
 /**
@@ -18,23 +18,18 @@ import java.security.SecureRandom;
 public class GoogleAuthenticator {
 
     private final static GoogleAuthenticator GOOGLE_AUTHENTICATOR = new GoogleAuthenticator();
-
-    private GoogleAuthenticator() {
-    }
-
     /**
      * taken from Google pam docs - we probably don't need to mess with these
      */
 
     private static final int SECRET_SIZE = 10;
-
     private static final String SEED = "g8GjEvTbW5oVSV7avLBdwIHqGlUYNzKFI7izOF8GwLDVKs2m0QN7vxRs2im5MDaNCWGmcD2rvcZx";
-
     private static final String RANDOM_NUMBER_ALGORITHM = "SHA1PRNG";
-
     private static final int SCRATCH_CODE_LENGTH = 8;
-
     private static final int BYTES_PER_SCRATCH_CODE = 4;
+
+    private GoogleAuthenticator() {
+    }
 
     /**
      * enter the code shown on device. Edit this and run it fast before the code expires!
@@ -52,7 +47,7 @@ public class GoogleAuthenticator {
     @SneakyThrows
     public static String generateSecretKey() {
         SecureRandom sr = SecureRandom.getInstance(RANDOM_NUMBER_ALGORITHM);
-        sr.setSeed(Base64.decodeBase64(SEED));
+        sr.setSeed(Base64.getDecoder().decode(SEED));
         return Base32.encode(sr.generateSeed(SECRET_SIZE));
     }
 

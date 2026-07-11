@@ -3,7 +3,8 @@ package xyz.migoo.framework.web.i18n;
 import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Locale;
@@ -11,14 +12,14 @@ import java.util.Locale;
 public class I18NLocaleResolver implements LocaleResolver {
 
     @Override
-    public @NonNull Locale resolveLocale(HttpServletRequest httpServletRequest) {
+    public @NullMarked Locale resolveLocale(HttpServletRequest request) {
         //获取请求中的语言参数
-        var language = httpServletRequest.getHeader("Accept-Language");
+        var language = request.getHeader("Accept-Language");
         return StrUtil.isNotBlank(language) ? Locale.of(language) : Locale.getDefault();
     }
 
     @Override
-    public void setLocale(@NonNull HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Locale locale) {
+    public void setLocale(@NonNull HttpServletRequest request, HttpServletResponse response, Locale locale) {
 
     }
 }

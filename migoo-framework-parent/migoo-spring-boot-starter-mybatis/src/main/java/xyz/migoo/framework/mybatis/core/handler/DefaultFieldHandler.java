@@ -3,9 +3,11 @@ package xyz.migoo.framework.mybatis.core.handler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
+import xyz.migoo.framework.mybatis.core.dataobject.BaseUuidDO;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 通用参数填充实现类
@@ -19,20 +21,24 @@ public class DefaultFieldHandler implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
             // 创建时间为空，则以当前时间为插入时间
             LocalDateTime now = LocalDateTime.now();
             this.setFieldValByName("createdAt", now, metaObject);
             this.setFieldValByName("updatedAt", now, metaObject);
             this.setFieldValByName("isDeleted", false, metaObject);
         }
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseUuidDO<?>) {
+            // 设置 uuid
+            this.setFieldValByName("id", UUID.randomUUID().toString(), metaObject);
+        }
+
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO<?, ?>) {
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseDO) {
             // 默认以当前时间为更新时间
-
             setFieldValByName("updatedAt", LocalDateTime.now(), metaObject);
         }
     }

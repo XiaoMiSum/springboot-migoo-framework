@@ -1,7 +1,7 @@
 package xyz.migoo.framework.mybatis.core.handler;
 
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
-import com.fasterxml.jackson.core.type.TypeReference;
+import tools.jackson.core.type.TypeReference;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class JsonLongSetTypeHandler extends AbstractJsonTypeHandler<Object> {
 
-    private static final TypeReference<Set<Long>> TYPE_REFERENCE = new TypeReference<>() {
+    private static final TypeReference<Set<Long>> TYPE_REFERENCE = new TypeReference<Set<Long>>() {
     };
 
     public JsonLongSetTypeHandler(Class<?> type) {

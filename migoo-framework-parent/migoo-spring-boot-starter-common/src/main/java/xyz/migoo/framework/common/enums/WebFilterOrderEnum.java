@@ -19,8 +19,6 @@ public interface WebFilterOrderEnum {
 
     int API_ACCESS_LOG_FILTER = -104; // 需要保证在 RequestBodyCacheFilter 后面
 
-    int XSS_FILTER = -103;  // 需要保证在 RequestBodyCacheFilter 后面
-
     // Spring Security Filter 默认为 -100，可见 SecurityProperties 配置属性类
 
     int DEMO_FILTER = Integer.MAX_VALUE;

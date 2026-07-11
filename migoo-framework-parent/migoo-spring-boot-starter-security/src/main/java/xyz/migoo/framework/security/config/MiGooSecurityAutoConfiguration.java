@@ -23,7 +23,6 @@ import xyz.migoo.framework.security.core.resolver.AuthUserMethodArgumentResolver
 import xyz.migoo.framework.security.core.resolver.TokenMethodArgumentResolver;
 import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
 import xyz.migoo.framework.security.core.service.SecurityAuthenticatorService;
-import xyz.migoo.framework.web.config.WebProperties;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
@@ -57,11 +56,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      */
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AuthenticatorInterceptor(SpringUtil.getBean(SecurityAuthenticatorService.class)))
-                .addPathPatterns(api());
-    }
-
-    private String api() {
-        return SpringUtil.getBean(WebProperties.class).getApiPrefix() + "/**";
+                .addPathPatterns("/**");
     }
 
     /**

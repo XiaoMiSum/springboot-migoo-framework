@@ -4,16 +4,24 @@ import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import xyz.migoo.framework.mq.core.RedisMQTemplate;
+import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
+import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import xyz.migoo.framework.mq.core.stream.AbstractStreamMessageListener;
 import xyz.migoo.framework.redis.config.RedisAutoConfiguration;
@@ -21,10 +29,12 @@ import xyz.migoo.framework.redis.config.RedisAutoConfiguration;
 import java.util.List;
 
 /**
- * @author xiaomi
- * Created on 2021/11/21 14:13
+ * MQ 自动配置类
+ * <p>
+ * 支持 Redis Pub/Sub（广播模式）和 Redis Stream（集群消费模式）
  */
 @AutoConfigureAfter(RedisAutoConfiguration.class)
+@EnableConfigurationProperties(MQProperties.class)
 @Slf4j
 public class MQAutoConfiguration {
 
@@ -39,17 +49,57 @@ public class MQAutoConfiguration {
     }
 
     /**
+     * 创建消息幂等性拦截器
+     * <p>
+     * 基于 Redis SETNX 实现分布式环境下的消息去重
+     *
+     * @param stringRedisTemplate Redis 字符串操作模板
+     * @param properties          MQ 配置属性
+     * @return 幂等拦截器
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "migoo.mq.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
+    public IdempotentMessageInterceptor idempotentMessageInterceptor(StringRedisTemplate stringRedisTemplate,
+                                                                     MQProperties properties) {
+        log.info("[idempotentMessageInterceptor][创建消息幂等拦截器，过期时间={}]", properties.getIdempotent().getExpireTime());
+        return new IdempotentMessageInterceptor(stringRedisTemplate, properties.getIdempotent().getExpireTime());
+    }
+
+    /**
+     * 创建 RedisMQTemplate Bean
+     *
+     * @param redisTemplate Redis 操作模板
+     * @param interceptors  消息拦截器列表（可选）
+     * @return RedisMQTemplate
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public RedisMQTemplate redisMQTemplate(RedisTemplate<String, ?> redisTemplate,
+                                           @org.springframework.beans.factory.annotation.Autowired(required = false) List<RedisMessageInterceptor> interceptors) {
+        RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
+        if (interceptors != null && !interceptors.isEmpty()) {
+            interceptors.forEach(template::addInterceptor);
+            log.info("[redisMQTemplate][注册 {} 个消息拦截器]", interceptors.size());
+        }
+        return template;
+    }
+
+    /**
      * 创建 Redis Pub/Sub 广播消费的容器
      */
     @Bean(initMethod = "start", destroyMethod = "stop")
     @ConditionalOnBean(AbstractChannelMessageListener.class)
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory, List<AbstractChannelMessageListener<?>> listeners) {
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory,
+                                                                       List<AbstractChannelMessageListener<?>> listeners,
+                                                                       RedisMQTemplate redisMQTemplate) {
         // 创建 RedisMessageListenerContainer 对象
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         // 设置 RedisConnection 工厂。
         container.setConnectionFactory(factory);
         // 添加监听器
         listeners.forEach(listener -> {
+            // 注入 RedisMQTemplate
+            listener.setRedisMQTemplate(redisMQTemplate);
             container.addMessageListener(listener, new ChannelTopic(listener.getChannel()));
             log.info("[redisMessageListenerContainer][注册 Channel({}) 对应的监听器({})]",
                     listener.getChannel(), listener.getClass().getName());
@@ -65,7 +115,9 @@ public class MQAutoConfiguration {
     @Bean(initMethod = "start", destroyMethod = "stop")
     @ConditionalOnBean(AbstractStreamMessageListener.class)
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
-            RedisTemplate<String, Object> redisTemplate, List<AbstractStreamMessageListener<?>> listeners) {
+            RedisTemplate<String, Object> redisTemplate,
+            List<AbstractStreamMessageListener<?>> listeners,
+            RedisMQTemplate redisMQTemplate) {
         // 第一步，创建 StreamMessageListenerContainer 容器
         // 创建 options 配置
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> containerOptions =
@@ -81,15 +133,12 @@ public class MQAutoConfiguration {
 
         // 第二步，注册监听器，消费对应的 Stream 主题
         String consumerName = buildConsumerName();
-//        String consumerName = "110";
         listeners.forEach(listener -> {
             // 创建 listener 对应的消费者分组
-            try {
-                redisTemplate.opsForStream().createGroup(listener.getStreamKey(), listener.getGroup());
-            } catch (Exception ignore) {
-            }
-            // 设置 listener 对应的 redisTemplate
+            createConsumerGroup(redisTemplate, listener.getStreamKey(), listener.getGroup());
+            // 设置 listener 对应的 redisTemplate 和 redisMQTemplate
             listener.setRedisTemplate(redisTemplate);
+            listener.setRedisMQTemplate(redisMQTemplate);
             // 创建 Consumer 对象
             Consumer consumer = Consumer.from(listener.getGroup(), consumerName);
             // 设置 Consumer 消费进度，以最小消费进度为准
@@ -102,9 +151,40 @@ public class MQAutoConfiguration {
                     // 默认配置，发生异常就取消消费，显然不符合预期；因此，我们设置为 false
                     .cancelOnError(throwable -> false);
             container.register(builder.build(), listener);
-            log.info("[redisStreamMessageListenerContainer][注册 Stream({}) 对应的监听器({})]",
-                    listener.getStreamKey(), listener.getClass().getName());
+            log.info("[redisStreamMessageListenerContainer][注册 Stream({}) 对应的监听器({}), group={}, consumer={}]",
+                    listener.getStreamKey(), listener.getClass().getName(), listener.getGroup(), consumerName);
         });
         return container;
+    }
+
+    /**
+     * 创建消费者分组
+     * <p>
+     * 如果分组已存在，则忽略异常；如果是其他异常，记录错误日志
+     *
+     * @param redisTemplate Redis 操作模板
+     * @param streamKey     Stream Key
+     * @param group         消费者组名
+     */
+    private void createConsumerGroup(RedisTemplate<String, ?> redisTemplate, String streamKey, String group) {
+        try {
+            redisTemplate.opsForStream().createGroup(streamKey, group);
+            log.info("[createConsumerGroup][创建消费者组成功] stream={}, group={}", streamKey, group);
+        } catch (RedisSystemException e) {
+            // 从 cause 中获取原始异常消息
+            Throwable cause = e.getCause();
+            String rootMessage = (cause != null) ? cause.getMessage() : e.getMessage();
+
+            if (rootMessage != null && rootMessage.contains("BUSYGROUP")) {
+                // BUSYGROUP Consumer Group name already exists - 这是正常情况，通常发生在应用重启时
+                log.warn("[createConsumerGroup][消费者组已存在] stream={}, group={}", streamKey, group);
+            } else {
+                log.error("[createConsumerGroup][创建消费者组异常] stream={}, group={}, error={}",
+                        streamKey, group, rootMessage, e);
+            }
+        } catch (Exception e) {
+            log.error("[createConsumerGroup][创建消费者组失败] stream={}, group={}, errorType={}, errorMessage={}",
+                    streamKey, group, e.getClass().getSimpleName(), e.getMessage(), e);
+        }
     }
 }

@@ -1,26 +1,19 @@
 package xyz.migoo.framework.web.config;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
+import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
 import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
-import xyz.migoo.framework.web.core.filter.XssFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 import xyz.migoo.framework.web.i18n.I18NLocaleResolver;
@@ -30,11 +23,9 @@ import static java.lang.Thread.ofVirtual;
 import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
 
 @Configuration
-@EnableConfigurationProperties({WebProperties.class, XssProperties.class})
-public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
+@ComponentScan("xyz.migoo.framework")
+public class MiGooWebAutoConfiguration {
 
-    @Resource
-    private WebProperties webProperties;
     /**
      * 应用名
      */
@@ -47,15 +38,6 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        AntPathMatcher antPathMatcher = new AntPathMatcher(".");
-        // 设置 API 前缀，仅仅匹配 controller 包下的 **.controller.**
-        configurer.addPathPrefix(webProperties.getApiPrefix(), clazz -> webProperties.isOnlyRest() ?
-                clazz.isAnnotationPresent(RestController.class)
-                        && antPathMatcher.match(webProperties.getControllerPackage(), clazz.getPackage().getName()) :
-                antPathMatcher.match(webProperties.getControllerPackage(), clazz.getPackage().getName()));
-    }
 
     @Bean
     public LocaleResolver I18NLocaleResolver() {
@@ -97,14 +79,6 @@ public class MiGooWebAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
         return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
-    }
-
-    /**
-     * 创建 XssFilter Bean，解决 Xss 安全问题
-     */
-    @Bean
-    public FilterRegistrationBean<XssFilter> xssFilter(XssProperties properties, PathMatcher pathMatcher) {
-        return createFilterBean(new XssFilter(properties, pathMatcher), WebFilterOrderEnum.XSS_FILTER);
     }
 
     @Bean

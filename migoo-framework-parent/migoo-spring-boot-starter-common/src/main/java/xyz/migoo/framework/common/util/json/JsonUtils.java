@@ -2,14 +2,13 @@ package xyz.migoo.framework.common.util.json;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,28 +19,18 @@ import java.util.List;
  */
 public class JsonUtils {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .build();
 
-    static {
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        objectMapper.registerModule(new JavaTimeModule());
-    }
-
-    /**
-     * 初始化 objectMapper 属性
-     * <p>
-     * 通过这样的方式，使用 Spring 创建的 ObjectMapper Bean
-     *
-     * @param objectMapper ObjectMapper 对象
-     */
-    public static void init(ObjectMapper objectMapper) {
-        JsonUtils.objectMapper = objectMapper;
-    }
 
     public static String toJsonString(Object object) {
         try {
+            if (object == null) {
+                return "{}";
+            }
             return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -52,7 +41,7 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -63,15 +52,18 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(bytes, clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
+        if (StrUtil.isEmpty(text)) {
+            return null;
+        }
         try {
             return objectMapper.readValue(text, typeReference);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -82,24 +74,18 @@ public class JsonUtils {
         }
         try {
             return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated(since = "1.2.0", forRemoval = true)
-    public static JsonNode readTree(String text) {
-        try {
-            return objectMapper.readTree(text);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static JsonNode toJSON(String text) {
         try {
+            if (StrUtil.isEmpty(text)) {
+                return null;
+            }
             return objectMapper.readTree(text);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
@@ -111,11 +97,11 @@ public class JsonUtils {
         try {
             JsonNode pathNode = objectMapper.readTree(text).path(path);
             return objectMapper.readValue(pathNode.toString(), clazz);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static <T> T convert(Object object, Class<T> clazz) {
         if (object == null) {
             return null;

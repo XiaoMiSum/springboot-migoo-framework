@@ -1,9 +1,7 @@
 package xyz.migoo.framework.security.config;
 
 import jakarta.annotation.Resource;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,7 +28,6 @@ import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
  * @author xiaomi
  */
 @Configuration
-@AutoConfigureOrder(SecurityProperties.DEFAULT_FILTER_ORDER)
 @EnableMethodSecurity(securedEnabled = true)
 public class MiGooWebSecurityConfigurerAdapter {
 
