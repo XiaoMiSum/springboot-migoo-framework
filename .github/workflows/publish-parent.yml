@@ -66,14 +66,26 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
 
-      - name: Publish Sub-modules to Maven Central
-        run: |
-          if [ "${{ inputs.skip_parent }}" = "true" ]; then
-            mvn deploy -pl '!migoo-framework-parent' -P release --settings ../.github/settings.xml -DskipTests
-          else
-            mvn deploy -P release --settings ../.github/settings.xml -DskipTests
-          fi
+      - name: Publish All to Maven Central
+        if: inputs.skip_parent != true
+        run: mvn deploy -P release --settings ../.github/settings.xml -DskipTests
         working-directory: migoo-framework-parent
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Publish Sub-modules Only to Maven Central
+        if: inputs.skip_parent == true
+        run: |
+          mvn deploy \
+            -pl migoo-framework-parent/migoo-spring-boot-starter-common \
+            ,migoo-framework-parent/migoo-spring-boot-starter-mq \
+            ,migoo-framework-parent/migoo-spring-boot-starter-mybatis \
+            ,migoo-framework-parent/migoo-spring-boot-starter-redis \
+            ,migoo-framework-parent/migoo-spring-boot-starter-security \
+            ,migoo-framework-parent/migoo-spring-boot-starter-web \
+            -P release --settings .github/settings.xml -DskipTests
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
