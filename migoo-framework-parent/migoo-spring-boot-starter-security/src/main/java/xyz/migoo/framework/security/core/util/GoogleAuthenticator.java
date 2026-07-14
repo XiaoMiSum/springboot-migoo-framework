@@ -28,7 +28,25 @@ public class GoogleAuthenticator {
     private static final int SCRATCH_CODE_LENGTH = 8;
     private static final int BYTES_PER_SCRATCH_CODE = 4;
 
+    /**
+     * TOTP 时间窗口大小，默认 3（即前后各 3 个窗口 = ±90秒）
+     * 可通过 {@link #setWindowSize(int)} 调整
+     */
+    private static volatile int windowSize = 3;
+
     private GoogleAuthenticator() {
+    }
+
+    /**
+     * 设置 TOTP 时间窗口大小
+     *
+     * @param size 窗口大小（1-17），默认 3
+     */
+    public static void setWindowSize(int size) {
+        if (size < 1 || size > 17) {
+            throw new IllegalArgumentException("windowSize must be between 1 and 17, got: " + size);
+        }
+        windowSize = size;
     }
 
     /**
@@ -58,11 +76,8 @@ public class GoogleAuthenticator {
         long t = (timeMsec / 1000L) / 30L;
         // Window is used to check codes generated in the near past.
         // You can use this value to tune how far you're willing to go.
-        /*
-         * default 3 - max 17 (from google docs)最多可偏移的时间
-         */
-        int windowSize = 3;
-        for (int i = -windowSize; i <= windowSize; ++i) {
+        int size = windowSize;
+        for (int i = -size; i <= size; ++i) {
             if (verifyCode(decodedKey, t + i) == code) {
                 return true;
             }
