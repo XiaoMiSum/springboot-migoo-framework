@@ -12,8 +12,8 @@ import xyz.migoo.framework.mq.core.message.AbstractMessage;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessage;
 import xyz.migoo.framework.mq.core.stream.AbstractStreamMessage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Redis MQ 操作模板类
@@ -29,7 +29,7 @@ public class RedisMQTemplate {
      * 拦截器数组
      */
     @Getter
-    private final List<RedisMessageInterceptor> interceptors = new ArrayList<>();
+    private final List<RedisMessageInterceptor> interceptors = new CopyOnWriteArrayList<>();
 
     /**
      * 发送 Redis 消息，基于 Redis pub/sub 实现
