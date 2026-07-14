@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(
-        validatedBy = {EmailValidator.class}
+        validatedBy = {PasswordValidator.class}
 )
 public @interface Password {
 
