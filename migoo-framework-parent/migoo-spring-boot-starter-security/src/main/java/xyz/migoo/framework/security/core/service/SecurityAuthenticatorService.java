@@ -19,7 +19,7 @@ public class SecurityAuthenticatorService {
     public void verify(HttpServletRequest request) {
         String code = request.getParameter("_code");
         var authUserDetails = SecurityFrameworkUtils.getLoginUser();
-        assert Objects.nonNull(authUserDetails);
+        Objects.requireNonNull(authUserDetails, "用户未登录，无法进行 2FA 校验");
         if (!authUserDetails.isRequiredVerifyAuthenticator()) {
             return;
         }
