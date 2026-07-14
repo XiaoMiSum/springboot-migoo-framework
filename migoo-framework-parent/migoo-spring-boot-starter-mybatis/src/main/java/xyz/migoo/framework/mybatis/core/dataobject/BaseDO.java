@@ -34,7 +34,6 @@ public abstract class BaseDO implements Serializable {
      */
     @TableLogic
     @TableField(fill = FieldFill.INSERT)
-
     private Boolean isDeleted;
 
 }

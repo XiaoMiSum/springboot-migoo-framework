@@ -1,13 +1,13 @@
 package xyz.migoo.framework.mybatis.core.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.apache.ibatis.reflection.MetaObject;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseDO;
 import xyz.migoo.framework.mybatis.core.dataobject.BaseUuidDO;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * 通用参数填充实现类
@@ -30,7 +30,7 @@ public class DefaultFieldHandler implements MetaObjectHandler {
         }
         if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseUuidDO<?>) {
             // 设置 uuid
-            this.setFieldValByName("id", UUID.randomUUID().toString(), metaObject);
+            this.setFieldValByName("id", UuidCreator.getTimeOrderedEpoch(), metaObject);
         }
 
     }

@@ -1,9 +1,10 @@
 package xyz.migoo.framework.mybatis.core.dataobject;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.UUID;
 
 /**
  * 基础实体对象 - 使用 UUID 作为主键
@@ -23,10 +24,10 @@ public abstract class BaseUuidDO<SELF extends BaseUuidDO<SELF>> extends BaseDO {
     /**
      * 重写 id 字段，指定使用 UUID 策略
      */
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId()
+    private UUID id;
 
-    public SELF setId(String id) {
+    public SELF setId(UUID id) {
         this.id = id;
         return (SELF) this;
     }
