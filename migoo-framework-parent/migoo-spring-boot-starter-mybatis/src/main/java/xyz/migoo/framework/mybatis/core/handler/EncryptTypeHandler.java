@@ -22,7 +22,7 @@ public class EncryptTypeHandler extends BaseTypeHandler<String> {
 
     private static final String ENCRYPTOR_PROPERTY_NAME = "mybatis-plus.encryptor.password";
 
-    private static AES aes;
+    private static volatile AES aes;
 
     private static String decrypt(String value) {
         if (value == null) {
@@ -38,7 +38,7 @@ public class EncryptTypeHandler extends BaseTypeHandler<String> {
         return getEncryptor().encryptBase64(rawValue);
     }
 
-    private static AES getEncryptor() {
+    private static synchronized AES getEncryptor() {
         if (aes != null) {
             return aes;
         }
