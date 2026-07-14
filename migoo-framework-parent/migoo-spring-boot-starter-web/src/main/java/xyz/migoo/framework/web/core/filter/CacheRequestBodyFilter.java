@@ -18,9 +18,25 @@ import java.io.IOException;
  */
 public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
+    /**
+     * 最大缓存 body 大小：10MB
+     */
+    private static final int MAX_CACHE_BODY_SIZE = 10 * 1024 * 1024;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws IOException, ServletException {
+        // 超大请求跳过缓存，防止 OOM
+        String contentLength = request.getHeader("Content-Length");
+        if (contentLength != null) {
+            try {
+                if (Long.parseLong(contentLength) > MAX_CACHE_BODY_SIZE) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
         try {
             var wrappedRequest = new CachedBodyHttpServletRequest(request);
             filterChain.doFilter(wrappedRequest, response);
