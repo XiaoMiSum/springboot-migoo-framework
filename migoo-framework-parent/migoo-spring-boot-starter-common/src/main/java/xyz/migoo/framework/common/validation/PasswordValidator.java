@@ -9,13 +9,13 @@ import java.util.regex.Pattern;
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
 
-    private static final Pattern password = Pattern.compile("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[_@#$!]).{6,32}$");
+    private static final Pattern password = Pattern.compile("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[_@#$!]).{8,32}$");
 
 
     public void initialize(Password annotation) {
     }
 
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return !StrUtil.isEmpty(value) && value.length() >= 8 && password.matcher(value).matches();
+        return !StrUtil.isEmpty(value) && password.matcher(value).matches();
     }
 }
