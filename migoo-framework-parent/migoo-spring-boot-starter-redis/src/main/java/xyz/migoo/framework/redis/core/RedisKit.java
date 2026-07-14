@@ -29,6 +29,88 @@ public class RedisKit {
             end
             """;
 
+    /**
+     * 递增 + FIXED 过期（仅 key 不存在时设置）Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCR_FIXED_SCRIPT = """
+            local v = redis.call('INCR', KEYS[1])
+            if redis.call('TTL', KEYS[1]) == -2 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
+            return v
+            """;
+
+    /**
+     * 递增 + DYNAMIC 过期（每次重设）Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCR_DYNAMIC_SCRIPT = """
+            local v = redis.call('INCR', KEYS[1])
+            redis.call('EXPIRE', KEYS[1], ARGV[1])
+            return v
+            """;
+
+    /**
+     * 递增指定增量 + FIXED 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 增量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCRBY_FIXED_SCRIPT = """
+            local v = redis.call('INCRBYFLOAT', KEYS[1], ARGV[1])
+            if redis.call('TTL', KEYS[1]) == -2 then
+                redis.call('EXPIRE', KEYS[1], ARGV[2])
+            end
+            return v
+            """;
+
+    /**
+     * 递增指定增量 + DYNAMIC 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 增量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCRBY_DYNAMIC_SCRIPT = """
+            local v = redis.call('INCRBYFLOAT', KEYS[1], ARGV[1])
+            redis.call('EXPIRE', KEYS[1], ARGV[2])
+            return v
+            """;
+
+    /**
+     * 递减 + FIXED 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 减量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递减后的值
+     */
+    private static final String DECRBY_FIXED_SCRIPT = """
+            local v = redis.call('DECRBY', KEYS[1], ARGV[1])
+            if redis.call('TTL', KEYS[1]) == -2 then
+                redis.call('EXPIRE', KEYS[1], ARGV[2])
+            end
+            return v
+            """;
+
+    /**
+     * 递减 + DYNAMIC 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 减量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递减后的值
+     */
+    private static final String DECRBY_DYNAMIC_SCRIPT = """
+            local v = redis.call('DECRBY', KEYS[1], ARGV[1])
+            redis.call('EXPIRE', KEYS[1], ARGV[2])
+            return v
+            """;
+
     // ==================== Lua 脚本 ====================
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -202,29 +284,17 @@ public class RedisKit {
      */
     public long increment(RedisKeyDefine<?> key, Object... args) {
         String formattedKey = key.formatKey(args);
-            
+
         if (!key.hasTimeout()) {
             Long value = redisTemplate.opsForValue().increment(formattedKey);
             return value != null ? value : 0;
         }
-            
-        // 有过期时间，先执行原子递增
-        Long value = redisTemplate.opsForValue().increment(formattedKey);
-        long result = value != null ? value : 0;
-            
-        // 根据过期类型设置过期时间
-        if (key.isFixedTimeout()) {
-            // FIXED 模式：仅在 key 刚创建时设置过期时间
-            Long ttl = redisTemplate.getExpire(formattedKey);
-            if (ttl != null && ttl == -2) {
-                redisTemplate.expire(formattedKey, key.getTimeout());
-            }
-        } else {
-            // DYNAMIC 模式：每次都重新设置过期时间
-            redisTemplate.expire(formattedKey, key.getTimeout());
-        }
-            
-        return result;
+
+        long seconds = key.getTimeout().getSeconds();
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>(
+                key.isFixedTimeout() ? INCR_FIXED_SCRIPT : INCR_DYNAMIC_SCRIPT, Long.class);
+        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey), String.valueOf(seconds));
+        return result != null ? result : 0;
     }
 
     /**
@@ -244,29 +314,18 @@ public class RedisKit {
      */
     public Double increment(RedisKeyDefine<?> key, Double delta, Object... args) {
         String formattedKey = key.formatKey(args);
-            
+
         if (!key.hasTimeout()) {
             Double value = redisTemplate.opsForValue().increment(formattedKey, delta);
             return value != null ? value : 0;
         }
-            
-        // 有过期时间，先执行原子递增
-        Double value = redisTemplate.opsForValue().increment(formattedKey, delta);
-        double result = value != null ? value : 0;
-            
-        // 根据过期类型设置过期时间
-        if (key.isFixedTimeout()) {
-            // FIXED 模式：仅在 key 刚创建时设置过期时间
-            Long ttl = redisTemplate.getExpire(formattedKey);
-            if (ttl != null && ttl == -2) {
-                redisTemplate.expire(formattedKey, key.getTimeout());
-            }
-        } else {
-            // DYNAMIC 模式：每次都重新设置过期时间
-            redisTemplate.expire(formattedKey, key.getTimeout());
-        }
-            
-        return result;
+
+        long seconds = key.getTimeout().getSeconds();
+        DefaultRedisScript<Double> script = new DefaultRedisScript<>(
+                key.isFixedTimeout() ? INCRBY_FIXED_SCRIPT : INCRBY_DYNAMIC_SCRIPT, Double.class);
+        Double result = redisTemplate.execute(script, Collections.singletonList(formattedKey),
+                String.valueOf(delta), String.valueOf(seconds));
+        return result != null ? result : 0;
     }
 
     /**
@@ -286,29 +345,17 @@ public class RedisKit {
      */
     public Long increment(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
-            
+
         if (!key.hasTimeout()) {
             Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
             return value != null ? value : 0;
         }
-            
-        // 有过期时间，先执行原子递增
-        Long value = redisTemplate.opsForValue().increment(formattedKey, delta);
-        long result = value != null ? value : 0;
-            
-        // 根据过期类型设置过期时间
-        if (key.isFixedTimeout()) {
-            // FIXED 模式：仅在 key 刚创建时设置过期时间
-            Long ttl = redisTemplate.getExpire(formattedKey);
-            if (ttl != null && ttl == -2) {
-                redisTemplate.expire(formattedKey, key.getTimeout());
-            }
-        } else {
-            // DYNAMIC 模式：每次都重新设置过期时间
-            redisTemplate.expire(formattedKey, key.getTimeout());
-        }
-            
-        return result;
+
+        long seconds = key.getTimeout().getSeconds();
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>(
+                key.isFixedTimeout() ? INCR_FIXED_SCRIPT : INCR_DYNAMIC_SCRIPT, Long.class);
+        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey), String.valueOf(seconds));
+        return result != null ? result : 0;
     }
 
     /**
@@ -328,29 +375,18 @@ public class RedisKit {
      */
     public long decrement(RedisKeyDefine<?> key, Long delta, Object... args) {
         String formattedKey = key.formatKey(args);
-            
+
         if (!key.hasTimeout()) {
             Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
             return value != null ? value : 0;
         }
-            
-        // 有过期时间，先执行原子递减
-        Long value = redisTemplate.opsForValue().decrement(formattedKey, delta);
-        long result = value != null ? value : 0;
-            
-        // 根据过期类型设置过期时间
-        if (key.isFixedTimeout()) {
-            // FIXED 模式：仅在 key 刚创建时设置过期时间
-            Long ttl = redisTemplate.getExpire(formattedKey);
-            if (ttl != null && ttl == -2) {
-                redisTemplate.expire(formattedKey, key.getTimeout());
-            }
-        } else {
-            // DYNAMIC 模式：每次都重新设置过期时间
-            redisTemplate.expire(formattedKey, key.getTimeout());
-        }
-            
-        return result;
+
+        long seconds = key.getTimeout().getSeconds();
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>(
+                key.isFixedTimeout() ? DECRBY_FIXED_SCRIPT : DECRBY_DYNAMIC_SCRIPT, Long.class);
+        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey),
+                String.valueOf(delta), String.valueOf(seconds));
+        return result != null ? result : 0;
     }
 
     // ==================== 分布式锁操作 ====================
