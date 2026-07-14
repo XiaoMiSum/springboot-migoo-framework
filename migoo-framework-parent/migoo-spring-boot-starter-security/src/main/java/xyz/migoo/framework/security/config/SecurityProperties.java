@@ -24,7 +24,7 @@ public class SecurityProperties {
     private Authorization authorization = new Authorization();
 
     /**
-     * 登出url
+     * 密码加密密钥
      */
     @NotEmpty(message = "password-secret 密码加密密钥不能为空")
     private String passwordSecret;
