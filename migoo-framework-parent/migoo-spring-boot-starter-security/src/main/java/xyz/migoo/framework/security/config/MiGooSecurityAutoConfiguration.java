@@ -63,16 +63,16 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * 认证失败处理类 Bean
      */
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        return new AuthenticationEntryPointImpl();
+    public AuthenticationEntryPoint authenticationEntryPoint(I18NMessage i18n) {
+        return new AuthenticationEntryPointImpl(i18n);
     }
 
     /**
      * 权限不够处理器 Bean
      */
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new AccessDeniedHandlerImpl();
+    public AccessDeniedHandler accessDeniedHandler(I18NMessage i18n) {
+        return new AccessDeniedHandlerImpl(i18n);
     }
 
     /**

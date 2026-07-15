@@ -3,6 +3,7 @@ package xyz.migoo.framework.security.core.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -10,6 +11,7 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
+import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.io.IOException;
 
@@ -23,8 +25,11 @@ import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstant
  * @author xiaomi
  */
 @Slf4j
+@RequiredArgsConstructor
 @SuppressWarnings("JavadocReference")
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
+
+    private final I18NMessage i18n;
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e)
@@ -33,7 +38,8 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         log.warn("[commence][访问 URL({}) 时，用户({}) 权限不够]", request.getRequestURI(),
                 SecurityFrameworkUtils.getLoginUserId(), e);
         // 返回 403
-        ServletUtils.writeJSON(response, Result.error(FORBIDDEN));
+        var message = i18n.getMessage(FORBIDDEN.msg());
+        ServletUtils.writeJSON(response, Result.error(FORBIDDEN.code(), message));
     }
 
 }
