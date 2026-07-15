@@ -130,7 +130,22 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <artifactId>hutool-core</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-crypto</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-socket</artifactId>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-system</artifactId>
             <type>jar</type>
         </dependency>
 

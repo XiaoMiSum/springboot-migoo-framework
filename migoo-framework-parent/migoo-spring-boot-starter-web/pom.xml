@@ -53,6 +53,12 @@
             <type>jar</type>
         </dependency>
 
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-socket</artifactId>
+            <type>jar</type>
+        </dependency>
+
         <!-- Web 相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
