@@ -14,6 +14,7 @@ import org.springframework.web.servlet.LocaleResolver;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
 import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
+import xyz.migoo.framework.web.core.filter.TraceIdFilter;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
 import xyz.migoo.framework.web.i18n.I18NLocaleResolver;
@@ -79,6 +80,14 @@ public class MiGooWebAutoConfiguration {
     @Bean
     public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
         return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
+    }
+
+    /**
+     * 创建 TraceIdFilter Bean，MDC traceId 关联日志
+     */
+    @Bean
+    public FilterRegistrationBean<TraceIdFilter> traceIdFilter() {
+        return createFilterBean(new TraceIdFilter(), WebFilterOrderEnum.TRACE_FILTER);
     }
 
     @Bean
