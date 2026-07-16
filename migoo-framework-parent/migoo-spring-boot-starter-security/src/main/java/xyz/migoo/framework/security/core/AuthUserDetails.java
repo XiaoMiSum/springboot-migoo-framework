@@ -3,10 +3,12 @@ package xyz.migoo.framework.security.core;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -18,7 +20,11 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @SuppressWarnings("unchecked")
-public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub>> implements UserDetails {
+public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub, ID>, ID> implements UserDetails {
+    /**
+     * 用户编号
+     */
+    private ID id;
     /**
      * 用户姓名
      */
@@ -38,51 +44,64 @@ public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub>> implemen
      */
     private boolean enabled;
 
-    private String securityCode;
+    private Collection<? extends GrantedAuthority> authorities;
 
-    private boolean requiredVerifyAuthenticator;
+    private String totpSecret;
 
-    private boolean requiredBindAuthenticator;
+    private boolean twoFactorEnabled;
+
+    private boolean twoFactorBound;
 
     private Map<String, Object> attrs;
+
 
     public AuthUserDetails() {
     }
 
-    public abstract Object getId();
+    public Sub setId(ID id) {
+        this.id = id;
+        return (Sub) this;
+    }
 
     public Sub setName(String name) {
         this.name = name;
         return (Sub) this;
     }
 
-    public Sub setSecurityCode(String securityCode) {
-        this.securityCode = securityCode;
-        return (Sub) this;
-    }
-
-    public Sub setRequiredVerifyAuthenticator(boolean requiredVerifyAuthenticator) {
-        this.requiredVerifyAuthenticator = requiredVerifyAuthenticator;
-        return (Sub) this;
-    }
-
-    public Sub setRequiredBindAuthenticator(boolean requiredBindAuthenticator) {
-        this.requiredBindAuthenticator = requiredBindAuthenticator;
-        return (Sub) this;
-    }
-
-    public Sub etAttrs(Map<String, Object> attrs) {
+    public Sub setAttrs(Map<String, Object> attrs) {
         this.attrs = attrs;
         return (Sub) this;
     }
 
     @Override
     @JsonIgnore
+    @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities != null ? authorities : Collections.emptyList();
+    }
+
+    public Sub setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+        return (Sub) this;
+    }
+
+    public Sub setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+        return (Sub) this;
+    }
+
+    public Sub setTwoFactorEnabled(boolean twoFactorEnabled) {
+        this.twoFactorEnabled = twoFactorEnabled;
+        return (Sub) this;
+    }
+
+    public Sub setTwoFactorBound(boolean twoFactorBound) {
+        this.twoFactorBound = twoFactorBound;
+        return (Sub) this;
     }
 
     @Override
+    @NonNull
     public String getUsername() {
         return username;
     }
