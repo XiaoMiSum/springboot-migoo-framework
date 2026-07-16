@@ -1,6 +1,5 @@
 package xyz.migoo.framework.jackson.databind;
 
-import cn.hutool.core.date.DatePattern;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.std.StdDeserializer;
@@ -13,6 +12,9 @@ import java.time.format.DateTimeFormatter;
  * Created on 2022/5/27 20:59
  */
 public class LocalDateTimeDeserializer extends StdDeserializer<LocalDateTime> {
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public LocalDateTimeDeserializer() {
         super(LocalDateTime.class);
     }
@@ -24,7 +26,6 @@ public class LocalDateTimeDeserializer extends StdDeserializer<LocalDateTime> {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN);
-        return LocalDateTime.parse(dateString, formatter);
+        return LocalDateTime.parse(dateString, FORMATTER);
     }
 }

@@ -1,8 +1,5 @@
 package xyz.migoo.framework.web.core.handler;
 
-import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.socket.SocketRuntimeException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -25,11 +22,14 @@ import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
+import xyz.migoo.framework.common.util.ExceptionUtils;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
             case ValidationException e -> validationException(request, e);
             case NoHandlerFoundException e -> noHandlerFoundExceptionHandler(request, e);
             case HttpRequestMethodNotSupportedException e -> httpRequestMethodNotSupportedExceptionHandler(request, e);
-            case SocketRuntimeException e -> socketRuntimeExceptionHandler(request, e);
+            case IOException e -> socketRuntimeExceptionHandler(request, e);
             case ServiceException e -> serviceExceptionHandler(request, e);
             default -> defaultExceptionHandler(request, t);
         };
@@ -187,8 +187,8 @@ public class GlobalExceptionHandler {
      * <p>
      * 例如说，请求连接超时、响应数据读取超时。
      */
-    @ExceptionHandler(value = SocketRuntimeException.class)
-    public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, SocketRuntimeException ex) {
+    @ExceptionHandler(value = IOException.class)
+    public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, IOException ex) {
         var message = i18n.getMessage(SOCKET_TIME_OUT.msg());
         return Result.error(SOCKET_TIME_OUT.code(), message);
     }
@@ -232,9 +232,9 @@ public class GlobalExceptionHandler {
     private void initExceptionLog(ApiErrorLog errorLog, HttpServletRequest request, Throwable e) {
         // 设置异常字段
         errorLog.setExceptionName(e.getClass().getName());
-        errorLog.setExceptionMessage(ExceptionUtil.getMessage(e));
-        errorLog.setExceptionRootCauseMessage(ExceptionUtil.getRootCauseMessage(e));
-        errorLog.setExceptionStackTrace(ExceptionUtil.stacktraceToString(e));
+        errorLog.setExceptionMessage(ExceptionUtils.getMessage(e));
+        errorLog.setExceptionRootCauseMessage(ExceptionUtils.getRootCauseMessage(e));
+        errorLog.setExceptionStackTrace(ExceptionUtils.stacktraceToString(e));
         StackTraceElement[] stackTraceElements = e.getStackTrace();
         Assert.notEmpty(stackTraceElements, "异常 stackTraceElements 不能为空");
         StackTraceElement stackTraceElement = stackTraceElements[0];
@@ -245,9 +245,9 @@ public class GlobalExceptionHandler {
         // 设置其它字段
         errorLog.setApplicationName(applicationName);
         errorLog.setRequestUrl(request.getRequestURI());
-        Map<String, Object> requestParams = MapUtil.<String, Object>builder()
-                .put("query", ServletUtils.getParamMap(request))
-                .put("body", ServletUtils.getBody(request)).build();
+        Map<String, Object> requestParams = new HashMap<>();
+        requestParams.put("query", ServletUtils.getParamMap(request));
+        requestParams.put("body", ServletUtils.getBody(request));
         errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserIp(ServletUtils.getClientIP(request));

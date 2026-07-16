@@ -1,7 +1,7 @@
 package xyz.migoo.framework.security.core.util;
 
-import cn.hutool.core.codec.Base32;
 import lombok.SneakyThrows;
+import xyz.migoo.framework.common.util.Base32;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

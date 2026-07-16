@@ -1,10 +1,11 @@
 package xyz.migoo.framework.common.util.crypto;
 
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import com.google.common.collect.Lists;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,12 +53,12 @@ public class Signature {
         ignoreKeyList.add("sign");
         ignoreKeyList.add("signature");
         final Map<String, ?> filter = data.entrySet().stream()
-                .filter(entry -> !StrUtil.isBlankIfStr(entry.getValue()) && !ignoreKeyList.contains(entry.getKey()))
+                .filter(entry -> !isBlankIfStr(entry.getValue()) && !ignoreKeyList.contains(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         List<String> kvs = new TreeSet<>(filter.keySet()).stream()
                 .map(key -> "%s=%s".formatted(key, filter.get(key)))
                 .collect(Collectors.toList());
-        return StrUtil.join(delimiter, kvs);
+        return String.join(delimiter.toString(), kvs);
     }
 
     public static String getSign(String source) {
@@ -73,11 +74,11 @@ public class Signature {
     }
 
     public static String getSign(String source, String secretKey, String secretKeyName, CharSequence delimiter) {
-        if (StrUtil.isNotBlank(secretKey)) {
-            source += StrUtil.isNotBlank(delimiter) ? delimiter : "";
-            source += StrUtil.isNotBlank(secretKeyName) ? secretKeyName + "=" + secretKey : secretKey;
+        if (StringUtils.hasText(secretKey)) {
+            source += StringUtils.hasText(delimiter) ? delimiter : "";
+            source += StringUtils.hasText(secretKeyName) ? secretKeyName + "=" + secretKey : secretKey;
         }
-        return DigestUtil.md5Hex(source);
+        return md5Hex(source);
     }
 
     public static String getSignUpper(String source) {
@@ -158,7 +159,7 @@ public class Signature {
 
     public static boolean verifySign(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
         // 1 使用 data 生成 sign
-        if (StrUtil.isBlank(sign)) return false;
+        if (!StringUtils.hasText(sign)) return false;
         return getSign(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign);
     }
 
@@ -185,5 +186,39 @@ public class Signature {
     public static boolean verifySignUpper(Map<String, ?> data, String sign, String secretKey, String secretKeyName, String delimiter, String... ignoreFields) {
         // 1 使用 data 生成 sign
         return getSignUpper(data, secretKey, secretKeyName, delimiter, ignoreFields).equals(sign);
+    }
+
+    /**
+     * MD5 哈希
+     */
+    private static String md5Hex(String source) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(source.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : digest) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 algorithm not found", e);
+        }
+    }
+
+    /**
+     * 判断对象是否为空白字符串
+     */
+    private static boolean isBlankIfStr(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (obj instanceof String str) {
+            return str.isBlank();
+        }
+        return false;
     }
 }

@@ -1,6 +1,5 @@
 package xyz.migoo.framework.common.validation;
 
-import cn.hutool.core.util.StrUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -16,6 +15,6 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     }
 
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return !StrUtil.isEmpty(value) && password.matcher(value).matches();
+        return (value != null && !value.isEmpty()) && password.matcher(value).matches();
     }
 }

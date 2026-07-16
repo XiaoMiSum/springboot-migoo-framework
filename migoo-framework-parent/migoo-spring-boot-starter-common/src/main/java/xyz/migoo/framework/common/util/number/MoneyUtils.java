@@ -1,8 +1,5 @@
 package xyz.migoo.framework.common.util.number;
 
-import cn.hutool.core.math.Money;
-import cn.hutool.core.util.NumberUtil;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -67,7 +64,9 @@ public class MoneyUtils {
      * @param roundingMode 舍入模式
      */
     public static BigDecimal calculateRatePrice(Number price, Number rate, int scale, RoundingMode roundingMode) {
-        return NumberUtil.toBigDecimal(price).multiply(NumberUtil.toBigDecimal(rate)) // 乘以
+        BigDecimal priceBD = toBigDecimal(price);
+        BigDecimal rateBD = toBigDecimal(rate);
+        return priceBD.multiply(rateBD) // 乘以
                 .divide(BigDecimal.valueOf(100), scale, roundingMode); // 除以 100
     }
 
@@ -78,7 +77,7 @@ public class MoneyUtils {
      * @return 元
      */
     public static BigDecimal fenToYuan(int fen) {
-        return new Money(0, fen).getAmount();
+        return BigDecimal.valueOf(fen).divide(BigDecimal.valueOf(100), PRICE_SCALE, RoundingMode.HALF_UP);
     }
 
     /**
@@ -90,7 +89,7 @@ public class MoneyUtils {
      * @return 元
      */
     public static String fenToYuanStr(int fen) {
-        return new Money(0, fen).toString();
+        return fenToYuan(fen).toString();
     }
 
     /**
@@ -123,6 +122,22 @@ public class MoneyUtils {
             return null;
         }
         return price.multiply(percent).divide(PERCENT_100, PRICE_SCALE, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Number 转 BigDecimal
+     */
+    private static BigDecimal toBigDecimal(Number number) {
+        if (number == null) {
+            return BigDecimal.ZERO;
+        }
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+        if (number instanceof Integer || number instanceof Long) {
+            return BigDecimal.valueOf(number.longValue());
+        }
+        return BigDecimal.valueOf(number.doubleValue());
     }
 
 }

@@ -1,8 +1,5 @@
 package xyz.migoo.framework.common.util.spring;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.DefaultParameterNameDiscoverer;
@@ -11,9 +8,11 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +50,8 @@ public class SpringExpressionUtils {
      */
     public static Map<String, Object> parseExpressions(ProceedingJoinPoint joinPoint, List<String> expressionStrings) {
         // 如果为空，则不进行解析
-        if (CollUtil.isEmpty(expressionStrings)) {
-            return MapUtil.newHashMap();
+        if (CollectionUtils.isEmpty(expressionStrings)) {
+            return new HashMap<>();
         }
 
         // 第一步，构建解析的上下文 EvaluationContext
@@ -64,7 +63,7 @@ public class SpringExpressionUtils {
         // Spring 的表达式上下文对象
         EvaluationContext context = new StandardEvaluationContext();
         // 给上下文赋值
-        if (ArrayUtil.isNotEmpty(paramNames)) {
+        if (paramNames != null && paramNames.length > 0) {
             Object[] args = joinPoint.getArgs();
             for (int i = 0; i < paramNames.length; i++) {
                 context.setVariable(paramNames[i], args[i]);
@@ -72,7 +71,7 @@ public class SpringExpressionUtils {
         }
 
         // 第二步，逐个参数解析
-        Map<String, Object> result = MapUtil.newHashMap(expressionStrings.size(), true);
+        Map<String, Object> result = new HashMap<>(expressionStrings.size());
         expressionStrings.forEach(key -> {
             Object value = EXPRESSION_PARSER.parseExpression(key).getValue(context);
             result.put(key, value);

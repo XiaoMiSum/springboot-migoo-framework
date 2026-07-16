@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.resolver;
 
-import cn.hutool.core.util.StrUtil;
+import org.springframework.util.StringUtils;
 import jakarta.annotation.Resource;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -43,7 +43,7 @@ public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentReso
         }
         // 兼容无需登录的 url 也可以从 token中获取 user
         var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getAuthorization().getHeaderName());
-        if (StrUtil.isNotBlank(token)) {
+        if (StringUtils.hasText(token)) {
             var authUserDetails = authService.verifyToken(token);
             if (Objects.nonNull(authUserDetails)) {
                 return authUserDetails;

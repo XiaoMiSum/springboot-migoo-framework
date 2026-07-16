@@ -1,8 +1,5 @@
 package xyz.migoo.framework.mybatis.core;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
@@ -11,6 +8,7 @@ import com.google.common.collect.Lists;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
+import xyz.migoo.framework.common.util.string.StrUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +34,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     private String columnToString(SFunction<T, ?> column) {
-        return StrUtil.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return StrUtils.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
     }
 
     public QueryWrapperX<T> limit(int n) {
@@ -71,7 +69,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> inIfPresent(String column, Object... values) {
-        if (!ArrayUtil.isEmpty(values)) {
+        if (values != null && values.length > 0) {
             return (QueryWrapperX<T>) super.in(column, values);
         }
         return this;
@@ -93,7 +91,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> notInIfPresent(String column, Object... values) {
-        if (!ArrayUtil.isEmpty(values)) {
+        if (values != null && values.length > 0) {
             return (QueryWrapperX<T>) super.notIn(column, values);
         }
         return this;
@@ -104,7 +102,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> eqIfPresent(String column, Object val) {
-        if (ObjectUtil.isNotEmpty(val)) {
+        if (val != null) {
             return (QueryWrapperX<T>) super.eq(column, val);
         }
         return this;
@@ -115,7 +113,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> neIfPresent(String column, Object val) {
-        if (ObjectUtil.isNotEmpty(val)) {
+        if (val != null) {
             return (QueryWrapperX<T>) super.ne(column, val);
         }
         return this;

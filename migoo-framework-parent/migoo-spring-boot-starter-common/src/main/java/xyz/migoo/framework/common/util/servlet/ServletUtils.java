@@ -1,11 +1,5 @@
 package xyz.migoo.framework.common.util.servlet;
 
-import cn.hutool.core.exceptions.UtilException;
-import cn.hutool.core.io.IORuntimeException;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Strings;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +9,11 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.NetUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +51,8 @@ public class ServletUtils {
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         // 输出附件
-        IoUtil.write(response.getOutputStream(), false, content);
+        response.getOutputStream().write(content);
+        response.getOutputStream().flush();
     }
 
     /**
@@ -106,7 +103,8 @@ public class ServletUtils {
     }
 
     public static boolean isJsonRequest(ServletRequest request) {
-        return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
+        String contentType = request.getContentType();
+        return contentType != null && contentType.toLowerCase().startsWith(MediaType.APPLICATION_JSON_VALUE);
     }
 
 
@@ -118,32 +116,43 @@ public class ServletUtils {
             writer.write(text);
             writer.flush();
         } catch (IOException e) {
-            throw new UtilException(e);
+            throw new RuntimeException(e);
         } finally {
-            IoUtil.close(writer);
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
     public static byte[] getBodyBytes(ServletRequest request) {
         try {
-            return IoUtil.readBytes(request.getInputStream());
+            InputStream is = request.getInputStream();
+            return is.readAllBytes();
         } catch (IOException e) {
-            throw new IORuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
     public static String getBody(ServletRequest request) {
         try (final BufferedReader reader = request.getReader()) {
-            return IoUtil.read(reader);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
         } catch (IOException e) {
-            throw new IORuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 
     public static Map<String, String> getParamMap(ServletRequest request) {
         Map<String, String> params = new HashMap<>();
         for (Map.Entry<String, String[]> entry : getParams(request).entrySet()) {
-            params.put(entry.getKey(), ArrayUtil.join(entry.getValue(), StrUtil.COMMA));
+            params.put(entry.getKey(), String.join(",", entry.getValue()));
         }
         return params;
     }
@@ -174,8 +183,9 @@ public class ServletUtils {
 
     public static String getClientIP(HttpServletRequest request, String... otherHeaderNames) {
         String[] headers = {"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
-        if (ArrayUtil.isNotEmpty(otherHeaderNames)) {
-            headers = ArrayUtil.addAll(headers, otherHeaderNames);
+        if (otherHeaderNames != null && otherHeaderNames.length > 0) {
+            headers = Arrays.copyOf(headers, headers.length + otherHeaderNames.length);
+            System.arraycopy(otherHeaderNames, 0, headers, headers.length - otherHeaderNames.length, otherHeaderNames.length);
         }
         return getClientIPByHeader(request, headers);
     }
@@ -184,11 +194,11 @@ public class ServletUtils {
         String ip;
         for (String header : headerNames) {
             ip = request.getHeader(header);
-            if (!NetUtil.isUnknown(ip)) {
-                return NetUtil.getMultistageReverseProxyIp(ip);
+            if (!NetUtils.isUnknown(ip)) {
+                return NetUtils.getMultistageReverseProxyIp(ip, null);
             }
         }
         ip = request.getRemoteAddr();
-        return NetUtil.getMultistageReverseProxyIp(ip);
+        return NetUtils.getMultistageReverseProxyIp(ip, null);
     }
 }

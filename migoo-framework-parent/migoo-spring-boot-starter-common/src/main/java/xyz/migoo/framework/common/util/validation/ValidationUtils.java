@@ -1,9 +1,8 @@
 package xyz.migoo.framework.common.util.validation;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.StrUtil;
 import jakarta.validation.*;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Set;
@@ -25,7 +24,7 @@ public class ValidationUtils {
     private final static Pattern PATTERN_EMAIL = Pattern.compile("^\\s*\\w+(?:\\.{0,1}[\\w-]+)*@[a-zA-Z0-9]+(?:[-.][a-zA-Z0-9]+)*\\.[a-zA-Z]+\\s*$");
 
     public static boolean isMobile(String mobile) {
-        return StrUtil.length(mobile) == N_11 && PATTERN_MOBILE.matcher(mobile).matches();
+        return StringUtils.hasText(mobile) && mobile.length() == N_11 && PATTERN_MOBILE.matcher(mobile).matches();
     }
 
     public static boolean isEmail(String email) {
@@ -39,14 +38,14 @@ public class ValidationUtils {
     public static void validate(Object object, Class<?>... groups) {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             Validator validator = factory.getValidator();
-            Assert.notNull(validator);
+            Assert.notNull(validator, "Validator must not be null");
             validate(validator, object, groups);
         }
     }
 
     public static void validate(Validator validator, Object object, Class<?>... groups) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object, groups);
-        if (CollUtil.isNotEmpty(constraintViolations)) {
+        if (!CollectionUtils.isEmpty(constraintViolations)) {
             throw new ConstraintViolationException(constraintViolations);
         }
     }

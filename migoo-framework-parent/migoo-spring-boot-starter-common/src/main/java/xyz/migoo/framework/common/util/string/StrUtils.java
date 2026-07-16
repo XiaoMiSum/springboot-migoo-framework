@@ -1,9 +1,8 @@
 package xyz.migoo.framework.common.util.string;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,20 +17,26 @@ import java.util.stream.Collectors;
  */
 public class StrUtils {
 
+    /**
+     * 截断字符串，超过最大长度时补充 ...
+     */
     public static String maxLength(CharSequence str, int maxLength) {
-        return StrUtil.maxLength(str, maxLength - 3); // -3 的原因，是该方法会补充 ... 恰好
+        if (str == null) {
+            return "";
+        }
+        String s = str.toString();
+        if (s.length() <= maxLength - 3) {
+            return s;
+        }
+        return s.substring(0, maxLength - 3) + "...";
     }
 
     /**
-     * 指定字符串的
-     *
-     * @param str
-     * @param replaceMap
-     * @return
+     * 指定字符串的替换
      */
     public static String replace(String str, Map<String, String> replaceMap) {
-        assert StrUtil.isNotBlank(str);
-        if (ObjectUtil.isEmpty(replaceMap)) {
+        assert StringUtils.hasText(str);
+        if (replaceMap == null || replaceMap.isEmpty()) {
             return str;
         }
         String result = null;
@@ -48,7 +53,7 @@ public class StrUtils {
      * @return 首字母小写
      */
     public static String firstLetter2Lower(String str) {
-        assert StrUtil.isNotBlank(str);
+        assert StringUtils.hasText(str);
         char[] cs = str.toCharArray();
         cs[0] += 32;
         return String.valueOf(cs);
@@ -61,7 +66,7 @@ public class StrUtils {
      * @return 首字母大写
      */
     public static String firstLetter2Updater(String str) {
-        assert StrUtil.isNotBlank(str);
+        assert StringUtils.hasText(str);
         char[] cs = str.toCharArray();
         cs[0] -= 32;
         return String.valueOf(cs);
@@ -76,38 +81,107 @@ public class StrUtils {
      * @since 3.0.6
      */
     public static boolean startWithAny(String str, Collection<String> prefixes) {
-        if (StrUtil.isEmpty(str) || ArrayUtil.isEmpty(prefixes)) {
+        if (!StringUtils.hasText(str) || CollectionUtils.isEmpty(prefixes)) {
             return false;
         }
 
-        for (CharSequence suffix : prefixes) {
-            if (StrUtil.startWith(str, suffix, false)) {
+        for (String prefix : prefixes) {
+            if (str.startsWith(prefix)) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * 分割字符串为 Long 列表
+     */
     public static List<Long> splitToLong(String value, CharSequence separator) {
-        long[] longs = StrUtil.splitToLong(value, separator);
-        return Arrays.stream(longs).boxed().collect(Collectors.toList());
+        if (!StringUtils.hasText(value)) {
+            return List.of();
+        }
+        String[] parts = value.split(separator.toString());
+        return Arrays.stream(parts)
+                .filter(StringUtils::hasText)
+                .mapToLong(Long::parseLong)
+                .boxed()
+                .collect(Collectors.toList());
     }
 
+    /**
+     * 分割字符串为 Integer 列表
+     */
     public static List<Integer> splitToInt(String value, CharSequence separator) {
-        int[] longs = StrUtil.splitToInt(value, separator);
-        return Arrays.stream(longs).boxed().collect(Collectors.toList());
+        if (!StringUtils.hasText(value)) {
+            return List.of();
+        }
+        String[] parts = value.split(separator.toString());
+        return Arrays.stream(parts)
+                .filter(StringUtils::hasText)
+                .mapToInt(Integer::parseInt)
+                .boxed()
+                .collect(Collectors.toList());
     }
 
+    /**
+     * 分割字符串为 Map
+     */
     public static Map<String, String> splitToMap(String value, CharSequence separator1, CharSequence separator2) {
-        List<String> strings = StrUtil.split(value, separator1);
+        if (!StringUtils.hasText(value)) {
+            return Maps.newHashMap();
+        }
+        List<String> strings = Arrays.asList(value.split(separator1.toString()));
         Map<String, String> map = Maps.newHashMap();
         String sep = separator2.toString();
         strings.forEach(item -> {
             int index = item.indexOf(sep);
-            map.put(StrUtil.sub(item, 0, index), (index + 1) == item.length() ? "" :
-                    StrUtil.sub(item, index + 1, item.length()));
+            if (index >= 0) {
+                map.put(item.substring(0, index), (index + 1) == item.length() ? "" :
+                        item.substring(index + 1));
+            }
         });
         return map;
+    }
+
+    /**
+     * 驼峰转下划线
+     *
+     * @param str 驼峰字符串
+     * @return 下划线字符串
+     */
+    public static String toUnderlineCase(String str) {
+        if (!StringUtils.hasText(str)) {
+            return str;
+        }
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) {
+                    result.append('_');
+                }
+                result.append(Character.toLowerCase(c));
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * 判断对象是否为空白字符串
+     *
+     * @param obj 对象
+     * @return 是否为空白
+     */
+    public static boolean isBlankIfStr(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (obj instanceof String str) {
+            return str.isBlank();
+        }
+        return false;
     }
 
 }

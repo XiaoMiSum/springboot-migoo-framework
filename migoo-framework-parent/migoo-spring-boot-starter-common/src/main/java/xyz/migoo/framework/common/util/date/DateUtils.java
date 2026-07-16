@@ -1,8 +1,7 @@
 package xyz.migoo.framework.common.util.date;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
-
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -133,7 +132,10 @@ public class DateUtils {
      * @return 是否
      */
     public static boolean isToday(LocalDateTime date) {
-        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now());
+        if (date == null) {
+            return false;
+        }
+        return ChronoUnit.DAYS.between(date.toLocalDate(), LocalDate.now()) == 0;
     }
 
     /**
@@ -143,7 +145,10 @@ public class DateUtils {
      * @return 是否
      */
     public static boolean isYesterday(LocalDateTime date) {
-        return LocalDateTimeUtil.isSameDay(date, LocalDateTime.now().minusDays(1));
+        if (date == null) {
+            return false;
+        }
+        return ChronoUnit.DAYS.between(date.toLocalDate(), LocalDate.now().minusDays(1)) == 0;
     }
 
 

@@ -1,6 +1,5 @@
 package xyz.migoo.framework.common.util.object;
 
-import cn.hutool.core.bean.BeanUtil;
 import xyz.migoo.framework.common.pojo.PageResult;
 import xyz.migoo.framework.common.util.collection.CollectionUtils;
 
@@ -10,15 +9,28 @@ import java.util.function.Consumer;
 /**
  * Bean 工具类
  * <p>
- * 1. 默认使用 {@link BeanUtil} 作为实现类，虽然不同 bean 工具的性能有差别，但是对绝大多数同学的项目，不用在意这点性能
+ * 1. 默认使用 {@link org.springframework.beans.BeanUtils} 作为实现类
  * 2. 针对复杂的对象转换，可以搜参考 AuthConvert 实现，通过 mapstruct + default 配合实现
  *
  * @author xiaomi
  */
 public class BeanUtils {
 
+    /**
+     * 对象转换
+     */
     public static <T> T toBean(Object source, Class<T> targetClass) {
-        return BeanUtil.toBean(source, targetClass);
+        if (source == null) {
+            return null;
+        }
+        T target;
+        try {
+            target = targetClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create instance of " + targetClass, e);
+        }
+        org.springframework.beans.BeanUtils.copyProperties(source, target);
+        return target;
     }
 
     public static <T> T toBean(Object source, Class<T> targetClass, Consumer<T> peek) {

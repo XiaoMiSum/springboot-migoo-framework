@@ -1,6 +1,5 @@
 package xyz.migoo.framework.mybatis.core;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
@@ -51,7 +50,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     public <X> MPJLambdaWrapperX<T> inIfPresent(SFunction<X, ?> column, Object... values) {
-        if (!ArrayUtil.isEmpty(values)) {
+        if (values != null && values.length > 0) {
             super.in(column, values);
         }
         return this;
@@ -65,7 +64,7 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     public <X> MPJLambdaWrapperX<T> notInIfPresent(SFunction<X, ?> column, Object... values) {
-        if (!ArrayUtil.isEmpty(values)) {
+        if (values != null && values.length > 0) {
             super.notIn(column, values);
         }
         return this;

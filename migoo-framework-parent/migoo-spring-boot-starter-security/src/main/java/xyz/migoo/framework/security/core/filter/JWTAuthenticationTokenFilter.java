@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.filter;
 
-import cn.hutool.core.util.StrUtil;
+import org.springframework.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,7 +58,7 @@ public class JWTAuthenticationTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getAuthorization().getHeaderName());
-            if (StrUtil.isBlankIfStr(token)) {
+            if (!StringUtils.hasText(token)) {
                 throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
             // 验证 token 有效性

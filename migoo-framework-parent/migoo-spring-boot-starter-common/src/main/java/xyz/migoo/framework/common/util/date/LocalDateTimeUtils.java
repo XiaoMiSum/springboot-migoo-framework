@@ -1,8 +1,5 @@
 package xyz.migoo.framework.common.util.date;
 
-import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.hutool.core.date.TemporalUtil;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -64,7 +61,7 @@ public class LocalDateTimeUtils {
         if (startTime == null || endTime == null) {
             return false;
         }
-        return LocalDateTimeUtil.isIn(LocalDateTime.now(), startTime, endTime);
+        return isIn(LocalDateTime.now(), startTime, endTime);
     }
 
     /**
@@ -79,7 +76,7 @@ public class LocalDateTimeUtils {
             return false;
         }
         LocalDate nowDate = LocalDate.now();
-        return LocalDateTimeUtil.isIn(LocalDateTime.now(),
+        return isIn(LocalDateTime.now(),
                 LocalDateTime.of(nowDate, LocalTime.parse(startTime)),
                 LocalDateTime.of(nowDate, LocalTime.parse(endTime)));
     }
@@ -95,7 +92,7 @@ public class LocalDateTimeUtils {
      */
     public static boolean isOverlap(LocalTime startTime1, LocalTime endTime1, LocalTime startTime2, LocalTime endTime2) {
         LocalDate nowDate = LocalDate.now();
-        return LocalDateTimeUtil.isOverlap(LocalDateTime.of(nowDate, startTime1), LocalDateTime.of(nowDate, endTime1),
+        return isOverlap(LocalDateTime.of(nowDate, startTime1), LocalDateTime.of(nowDate, endTime1),
                 LocalDateTime.of(nowDate, startTime2), LocalDateTime.of(nowDate, endTime2));
     }
 
@@ -128,16 +125,16 @@ public class LocalDateTimeUtils {
      * @return 相差天数
      */
     public static Long between(LocalDateTime dateTime) {
-        return LocalDateTimeUtil.between(dateTime, LocalDateTime.now(), ChronoUnit.DAYS);
+        return ChronoUnit.DAYS.between(dateTime, LocalDateTime.now());
     }
 
 
     public static Duration between(LocalDateTime startTimeInclude, LocalDateTime endTimeExclude) {
-        return TemporalUtil.between(startTimeInclude, endTimeExclude);
+        return Duration.between(startTimeInclude, endTimeExclude);
     }
 
     public static long between(LocalDateTime startTimeInclude, LocalDateTime endTimeExclude, ChronoUnit unit) {
-        return TemporalUtil.between(startTimeInclude, endTimeExclude, unit);
+        return unit.between(startTimeInclude, endTimeExclude);
     }
 
     /**
@@ -146,7 +143,7 @@ public class LocalDateTimeUtils {
      * @return 今天
      */
     public static LocalDateTime getToday() {
-        return LocalDateTimeUtil.beginOfDay(LocalDateTime.now());
+        return beginOfDay(LocalDateTime.now());
     }
 
     /**
@@ -155,7 +152,7 @@ public class LocalDateTimeUtils {
      * @return 昨天
      */
     public static LocalDateTime getYesterday() {
-        return LocalDateTimeUtil.beginOfDay(LocalDateTime.now().minusDays(1));
+        return beginOfDay(LocalDateTime.now().minusDays(1));
     }
 
     /**
@@ -174,6 +171,37 @@ public class LocalDateTimeUtils {
      */
     public static LocalDateTime getYear() {
         return LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()).with(LocalTime.MIN);
+    }
+
+    /**
+     * 判断时间是否在指定范围内
+     */
+    public static boolean isIn(LocalDateTime time, LocalDateTime startTime, LocalDateTime endTime) {
+        if (time == null || startTime == null || endTime == null) {
+            return false;
+        }
+        return !time.isBefore(startTime) && !time.isAfter(endTime);
+    }
+
+    /**
+     * 判断两个时间段是否重叠
+     */
+    public static boolean isOverlap(LocalDateTime startTime1, LocalDateTime endTime1,
+                                    LocalDateTime startTime2, LocalDateTime endTime2) {
+        if (startTime1 == null || endTime1 == null || startTime2 == null || endTime2 == null) {
+            return false;
+        }
+        return !startTime1.isAfter(endTime2) && !startTime2.isAfter(endTime1);
+    }
+
+    /**
+     * 获取一天的开始时间
+     */
+    public static LocalDateTime beginOfDay(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        }
+        return dateTime.with(LocalTime.MIN);
     }
 
 }

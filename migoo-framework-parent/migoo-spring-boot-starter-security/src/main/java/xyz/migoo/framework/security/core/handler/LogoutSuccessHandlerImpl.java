@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.handler;
 
-import cn.hutool.core.util.StrUtil;
+import org.springframework.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,7 @@ public record LogoutSuccessHandlerImpl(SecurityProperties securityProperties,
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         // 执行退出
         String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getAuthorization().getHeaderName());
-        if (StrUtil.isNotBlank(token)) {
+        if (StringUtils.hasText(token)) {
             securityFrameworkService.clean(token);
         }
         // 返回成功

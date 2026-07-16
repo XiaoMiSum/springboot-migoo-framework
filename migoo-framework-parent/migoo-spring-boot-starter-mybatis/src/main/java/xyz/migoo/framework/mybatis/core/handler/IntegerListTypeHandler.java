@@ -1,6 +1,5 @@
 package xyz.migoo.framework.mybatis.core.handler;
 
-import cn.hutool.core.collection.CollUtil;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
@@ -24,7 +23,11 @@ public class IntegerListTypeHandler implements TypeHandler<List<Integer>> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, List<Integer> strings, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, CollUtil.join(strings, COMMA));
+        if (strings == null || strings.isEmpty()) {
+            ps.setString(i, "");
+        } else {
+            ps.setString(i, strings.stream().map(String::valueOf).reduce((a, b) -> a + COMMA + b).orElse(""));
+        }
     }
 
     @Override

@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.core.service;
 
-import cn.hutool.core.util.StrUtil;
+import org.springframework.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
@@ -23,7 +23,7 @@ public class SecurityAuthenticatorService {
         if (!authUserDetails.isRequiredVerifyAuthenticator()) {
             return;
         }
-        if ((StrUtil.isBlankIfStr(code)) || !GoogleAuthenticator.verify(authUserDetails.getSecurityCode(), code)) {
+        if ((!StringUtils.hasText(code)) || !GoogleAuthenticator.verify(authUserDetails.getSecurityCode(), code)) {
             throw ServiceExceptionUtil.get(new ErrorCode(999, "2fa.failure"));
         }
     }

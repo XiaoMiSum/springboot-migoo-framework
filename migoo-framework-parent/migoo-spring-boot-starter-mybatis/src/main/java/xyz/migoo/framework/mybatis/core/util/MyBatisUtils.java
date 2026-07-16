@@ -1,6 +1,5 @@
 package xyz.migoo.framework.mybatis.core.util;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -32,7 +31,7 @@ public class MyBatisUtils {
         // 页码 + 数量
         Page<T> page = new Page<>(pageParam.getPageNo(), pageParam.getPageSize());
         // 排序字段
-        if (!CollectionUtil.isEmpty(sortingFields)) {
+        if (sortingFields != null && !sortingFields.isEmpty()) {
             page.addOrder(sortingFields.stream().map(sortingField -> SortField.ORDER_ASC.equals(sortingField.getOrder()) ?
                             OrderItem.asc(sortingField.getField()) : OrderItem.desc(sortingField.getField()))
                     .collect(Collectors.toList()));

@@ -1,6 +1,5 @@
 package xyz.migoo.framework.mq.config;
 
-import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -26,6 +25,7 @@ import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import xyz.migoo.framework.mq.core.stream.AbstractStreamMessageListener;
 import xyz.migoo.framework.redis.config.RedisAutoConfiguration;
 
+import java.net.InetAddress;
 import java.util.List;
 
 /**
@@ -45,7 +45,13 @@ public class MQAutoConfiguration {
      * @return 消费者名字
      */
     private static String buildConsumerName() {
-        return String.format("%s@%d", SystemUtil.getHostInfo().getAddress(), SystemUtil.getCurrentPID());
+        try {
+            String host = InetAddress.getLocalHost().getHostAddress();
+            long pid = ProcessHandle.current().pid();
+            return String.format("%s@%d", host, pid);
+        } catch (Exception e) {
+            return String.format("unknown@%d", ProcessHandle.current().pid());
+        }
     }
 
     /**

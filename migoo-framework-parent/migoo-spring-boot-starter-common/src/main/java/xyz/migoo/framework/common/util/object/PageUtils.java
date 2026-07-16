@@ -1,13 +1,16 @@
 package xyz.migoo.framework.common.util.object;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.func.Func1;
-import cn.hutool.core.lang.func.LambdaUtil;
-import cn.hutool.core.util.ArrayUtil;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import xyz.migoo.framework.common.pojo.PageParam;
 import xyz.migoo.framework.common.pojo.SortField;
 import xyz.migoo.framework.common.pojo.SortablePageParam;
+
+import java.io.Serializable;
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.function.Function;
 
 import static java.util.Collections.singletonList;
 
@@ -29,7 +32,7 @@ public class PageUtils {
      * @param <T>  排序字段所属的类型
      * @return 排序字段
      */
-    public static <T> SortField buildSortingField(Func1<T, ?> func) {
+    public static <T> SortField buildSortingField(Function<T, ?> func) {
         return buildSortingField(func, SortField.ORDER_DESC);
     }
 
@@ -41,10 +44,11 @@ public class PageUtils {
      * @param <T>   排序字段所属的类型
      * @return 排序字段
      */
-    public static <T> SortField buildSortingField(Func1<T, ?> func, String order) {
-        Assert.isTrue(ArrayUtil.contains(ORDER_TYPES, order), String.format("字段的排序类型只能是 %s/%s", ORDER_TYPES));
+    public static <T> SortField buildSortingField(Function<T, ?> func, String order) {
+        Assert.isTrue(Arrays.asList(ORDER_TYPES).contains(order),
+                String.format("字段的排序类型只能是 %s/%s", ORDER_TYPES));
 
-        String fieldName = LambdaUtil.getFieldName(func);
+        String fieldName = getFieldName(func);
         return new SortField(fieldName, order);
     }
 
@@ -56,9 +60,33 @@ public class PageUtils {
      * @param func              排序字段的 Lambda 表达式
      * @param <T>               排序字段所属的类型
      */
-    public static <T> void buildDefaultSortingField(SortablePageParam sortablePageParam, Func1<T, ?> func) {
-        if (sortablePageParam != null && CollUtil.isEmpty(sortablePageParam.getSortingFields())) {
+    public static <T> void buildDefaultSortingField(SortablePageParam sortablePageParam, Function<T, ?> func) {
+        if (sortablePageParam != null && CollectionUtils.isEmpty(sortablePageParam.getSortingFields())) {
             sortablePageParam.setSortingFields(singletonList(buildSortingField(func)));
+        }
+    }
+
+    /**
+     * 从 Lambda 表达式获取字段名
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> String getFieldName(Function<T, ?> func) {
+        try {
+            // 获取序列化的 lambda
+            Method method = func.getClass().getDeclaredMethod("writeReplace");
+            method.setAccessible(true);
+            SerializedLambda serializedLambda = (SerializedLambda) method.invoke(func);
+            // 获取方法名，格式为 "getXxx" 或 "isXxx"
+            String methodName = serializedLambda.getImplMethodName();
+            // 移除 get 或 is 前缀
+            if (methodName.startsWith("get")) {
+                return Character.toLowerCase(methodName.charAt(3)) + methodName.substring(4);
+            } else if (methodName.startsWith("is")) {
+                return Character.toLowerCase(methodName.charAt(2)) + methodName.substring(3);
+            }
+            return methodName;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get field name from lambda", e);
         }
     }
 

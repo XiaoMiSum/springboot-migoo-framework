@@ -1,7 +1,6 @@
 package xyz.migoo.framework.common.util.object;
 
-import cn.hutool.core.util.ObjectUtil;
-
+import java.io.*;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -12,8 +11,32 @@ import java.util.function.Consumer;
  */
 public class ObjectUtils {
 
-    public static <T> T clone(T object, Consumer<T> consumer) {
-        T result = ObjectUtil.clone(object);
+    /**
+     * 深拷贝对象
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Serializable> T clone(T object) {
+        if (object == null) {
+            return null;
+        }
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(object);
+            oos.close();
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            return (T) ois.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException("Clone failed", e);
+        }
+    }
+
+    /**
+     * 深拷贝对象并修改
+     */
+    public static <T extends Serializable> T clone(T object, Consumer<T> consumer) {
+        T result = clone(object);
         if (result != null) {
             consumer.accept(result);
         }

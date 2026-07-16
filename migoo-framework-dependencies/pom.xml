@@ -50,7 +50,6 @@
         <jdom.version>2.0.6.1</jdom.version>
         <jsoup.version>1.22.1</jsoup.version>
         <bcprov.version>1.84</bcprov.version>
-        <hutool.version>5.8.41</hutool.version>
         <guava.version>33.4.6-jre</guava.version>
         <lombok.version>1.18.38</lombok.version>
         <jackson.version>3.1.0</jackson.version>
@@ -215,32 +214,6 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-core</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-crypto</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-extra</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-socket</artifactId>
-                <version>${hutool.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-system</artifactId>
-                <version>${hutool.version}</version>
             </dependency>
 
             <dependency>

@@ -1,9 +1,6 @@
 package xyz.migoo.framework.common.util.collection;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.IterUtil;
-import cn.hutool.core.util.ArrayUtil;
-
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,7 +27,8 @@ public class ArrayUtils {
         if (object == null) {
             return newElements;
         }
-        Consumer<T>[] result = ArrayUtil.newArray(Consumer.class, 1 + newElements.length);
+        @SuppressWarnings("unchecked")
+        Consumer<T>[] result = (Consumer<T>[]) Array.newInstance(Consumer.class, 1 + newElements.length);
         result[0] = object;
         System.arraycopy(newElements, 0, result, 1, newElements.length);
         return result;
@@ -43,10 +41,20 @@ public class ArrayUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> T[] toArray(Collection<T> from) {
-        if (CollectionUtil.isEmpty(from)) {
+        if (from == null || from.isEmpty()) {
             return (T[]) (new Object[0]);
         }
-        return ArrayUtil.toArray(from, (Class<T>) IterUtil.getElementType(from.iterator()));
+        // 获取元素类型
+        Class<?> componentType = Object.class;
+        if (!from.isEmpty()) {
+            Object first = from.iterator().next();
+            if (first != null) {
+                componentType = first.getClass();
+            }
+        }
+        @SuppressWarnings("unchecked")
+        T[] array = (T[]) Array.newInstance(componentType, from.size());
+        return from.toArray(array);
     }
 
     public static <T> T get(T[] array, int index) {

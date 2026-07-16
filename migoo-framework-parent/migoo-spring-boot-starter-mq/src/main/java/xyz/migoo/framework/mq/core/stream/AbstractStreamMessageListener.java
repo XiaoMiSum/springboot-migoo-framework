@@ -1,6 +1,6 @@
 package xyz.migoo.framework.mq.core.stream;
 
-import cn.hutool.core.util.TypeUtil;
+import xyz.migoo.framework.common.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -209,7 +209,7 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
      */
     @SuppressWarnings("unchecked")
     private Class<T> getMessageClass() {
-        Type type = TypeUtil.getTypeArgument(getClass(), 0);
+        Type type = TypeUtils.getTypeArgument(getClass(), 0);
         if (type == null) {
             throw new IllegalStateException(String.format("类型(%s) 需要设置消息类型", getClass().getName()));
         }

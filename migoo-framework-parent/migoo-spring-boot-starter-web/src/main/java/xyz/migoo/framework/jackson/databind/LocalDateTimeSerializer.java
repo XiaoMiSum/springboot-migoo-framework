@@ -1,6 +1,5 @@
 package xyz.migoo.framework.jackson.databind;
 
-import cn.hutool.core.date.DatePattern;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
@@ -15,6 +14,8 @@ import java.time.format.DateTimeFormatter;
  */
 public class LocalDateTimeSerializer extends StdSerializer<LocalDateTime> {
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public LocalDateTimeSerializer() {
         super(LocalDateTime.class);
     }
@@ -22,7 +23,7 @@ public class LocalDateTimeSerializer extends StdSerializer<LocalDateTime> {
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializationContext provider) throws JacksonException {
         if (value != null) {
-            gen.writeString(value.format(DateTimeFormatter.ofPattern(DatePattern.NORM_DATETIME_PATTERN)));
+            gen.writeString(value.format(FORMATTER));
         }
     }
 }

@@ -1,7 +1,5 @@
 package xyz.migoo.framework.common.util.json;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
@@ -36,7 +34,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, Class<T> clazz) {
-        if (StrUtil.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             return null;
         }
         try {
@@ -47,7 +45,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
-        if (ArrayUtil.isEmpty(bytes)) {
+        if (bytes == null || bytes.length == 0) {
             return null;
         }
         try {
@@ -58,7 +56,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-        if (StrUtil.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             return null;
         }
         try {
@@ -69,7 +67,7 @@ public class JsonUtils {
     }
 
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
-        if (StrUtil.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
         try {
@@ -81,7 +79,7 @@ public class JsonUtils {
 
     public static JsonNode toJSON(String text) {
         try {
-            if (StrUtil.isEmpty(text)) {
+            if (text == null || text.isEmpty()) {
                 return null;
             }
             return objectMapper.readTree(text);
@@ -91,7 +89,7 @@ public class JsonUtils {
     }
 
     public static <T> T parseObject(String text, String path, Class<T> clazz) {
-        if (StrUtil.isEmpty(text)) {
+        if (text == null || text.isEmpty()) {
             return null;
         }
         try {
