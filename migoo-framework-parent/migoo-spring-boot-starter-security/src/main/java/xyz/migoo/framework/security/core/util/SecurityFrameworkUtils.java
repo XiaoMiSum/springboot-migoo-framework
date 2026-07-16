@@ -1,7 +1,7 @@
 package xyz.migoo.framework.security.core.util;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -54,16 +54,13 @@ public class SecurityFrameworkUtils {
      * @return 当前用户
      */
     @Nullable
-    public static AuthUserDetails<? extends AuthUserDetails<?>> getLoginUser() {
+    public static AuthUserDetails<? extends AuthUserDetails<?, ?>, ?> getLoginUser() {
         SecurityContext context = SecurityContextHolder.getContext();
-        if (context == null) {
-            return null;
-        }
         Authentication authentication = context.getAuthentication();
         if (authentication == null) {
             return null;
         }
-        return authentication.getPrincipal() instanceof AuthUserDetails ? (AuthUserDetails<? extends AuthUserDetails<?>>) authentication.getPrincipal() : null;
+        return authentication.getPrincipal() instanceof AuthUserDetails ? (AuthUserDetails<?, ?>) authentication.getPrincipal() : null;
     }
 
     /**
@@ -73,7 +70,7 @@ public class SecurityFrameworkUtils {
      */
     @Nullable
     public static Object getLoginUserId() {
-        AuthUserDetails<? extends AuthUserDetails<?>> authUserDetails = getLoginUser();
+        AuthUserDetails<? extends AuthUserDetails<?, ?>, ?> authUserDetails = getLoginUser();
         return authUserDetails != null ? authUserDetails.getId() : null;
     }
 
@@ -83,7 +80,7 @@ public class SecurityFrameworkUtils {
      * @param authUserDetails 登录用户
      * @param request         请求
      */
-    public static void setLoginUser(AuthUserDetails<? extends AuthUserDetails<?>> authUserDetails, HttpServletRequest request) {
+    public static void setLoginUser(AuthUserDetails<? extends AuthUserDetails<?, ?>, ?> authUserDetails, HttpServletRequest request) {
         // 创建 UsernamePasswordAuthenticationToken 对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 authUserDetails, null, authUserDetails.getAuthorities());

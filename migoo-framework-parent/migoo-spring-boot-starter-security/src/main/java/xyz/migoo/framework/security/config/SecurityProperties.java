@@ -41,6 +41,59 @@ public class SecurityProperties {
     @NotNull(message = "permit-all-urls 允许任意访问的url不能为空")
     private List<String> permitAllUrls = Lists.newArrayList();
 
+    /**
+     * 安全模式
+     * <p>
+     * JWT: 使用自定义 JWT Filter + AuthUserDetailsService (默认)
+     * OAUTH2: 使用 Spring OAuth2 Resource Server
+     */
+    private SecurityMode mode = SecurityMode.JWT;
+
+    /**
+     * OAuth2 Resource Server 配置
+     */
+    @NotNull(message = "oauth2 不能为空")
+    private OAuth2 oauth2 = new OAuth2();
+
+    /**
+     * OAuth2 Resource Server 配置
+     */
+    @Validated
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class OAuth2 {
+
+        /**
+         * 授权服务器 issuer URI
+         * <p>
+         * 用于 JwtDecoder 自动发现 JWK Set
+         */
+        private String issuerUri;
+
+        /**
+         * JWK Set URI
+         * <p>
+         * 直接指定 JWK Set 端点地址 (与 issuerUri 二选一)
+         */
+        private String jwkSetUri;
+
+    }
+
+    /**
+     * 安全模式枚举
+     */
+    public enum SecurityMode {
+        /**
+         * JWT 模式: 使用自定义 JWT Filter + AuthUserDetailsService
+         */
+        JWT,
+        /**
+         * OAuth2 模式: 使用 Spring OAuth2 Resource Server
+         */
+        OAUTH2
+    }
+
     @Validated
     @Data
     @AllArgsConstructor

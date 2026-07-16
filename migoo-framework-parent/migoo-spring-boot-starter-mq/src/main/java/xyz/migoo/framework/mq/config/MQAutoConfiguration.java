@@ -1,6 +1,7 @@
 package xyz.migoo.framework.mq.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -81,7 +82,7 @@ public class MQAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RedisMQTemplate redisMQTemplate(RedisTemplate<String, ?> redisTemplate,
-                                           @org.springframework.beans.factory.annotation.Autowired(required = false) List<RedisMessageInterceptor> interceptors) {
+                                           @Autowired(required = false) List<RedisMessageInterceptor> interceptors) {
         RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
         if (interceptors != null && !interceptors.isEmpty()) {
             interceptors.forEach(template::addInterceptor);

@@ -1,9 +1,10 @@
 package xyz.migoo.framework.security.core.resolver;
 
-import org.springframework.util.StringUtils;
 import jakarta.annotation.Resource;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.annotation.AuthUser;
-import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
+import xyz.migoo.framework.security.core.service.AuthUserDetailsService;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 import java.util.Objects;
@@ -25,8 +26,13 @@ public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentReso
 
     @Resource
     private SecurityProperties properties;
-    @Resource
-    private SecurityAuthFrameworkService<? extends AuthUserDetails<?>> authService;
+    /**
+     * AuthUserDetailsService 可选注入
+     * <p>
+     * JWT 模式下存在，OAuth2 模式下不存在 (由 OAuth2 Resource Server 处理认证)
+     */
+    @Autowired(required = false)
+    private AuthUserDetailsService<? extends AuthUserDetails<?, ?>> authService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -42,11 +48,13 @@ public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentReso
             return user;
         }
         // 兼容无需登录的 url 也可以从 token中获取 user
-        var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getAuthorization().getHeaderName());
-        if (StringUtils.hasText(token)) {
-            var authUserDetails = authService.verifyToken(token);
-            if (Objects.nonNull(authUserDetails)) {
-                return authUserDetails;
+        if (authService != null) {
+            var token = SecurityFrameworkUtils.obtainAuthorization(request, properties.getAuthorization().getHeaderName());
+            if (StringUtils.hasText(token)) {
+                var authUserDetails = authService.verifyToken(token);
+                if (Objects.nonNull(authUserDetails)) {
+                    return authUserDetails;
+                }
             }
         }
         // 如果允许返回null, 则返回 null
@@ -54,6 +62,6 @@ public class AuthUserMethodArgumentResolver implements HandlerMethodArgumentReso
         if (annotation != null && !annotation.required()) {
             return null;
         }
-        throw new MissingServletRequestPartException("currentUser");
+        throw new MissingServletRequestPartException("AuthUser");
     }
 }

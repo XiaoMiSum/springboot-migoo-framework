@@ -1,10 +1,12 @@
 package xyz.migoo.framework.security.config;
 
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,8 +21,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.filter.JWTAuthenticationTokenFilter;
-import xyz.migoo.framework.security.core.service.SecurityAuthFrameworkService;
+import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
+import xyz.migoo.framework.security.core.service.AuthUserDetailsService;
 
 /**
  * 自定义的 Spring Security 配置适配器实现
@@ -38,7 +40,7 @@ public class MiGooWebSecurityConfigurerAdapter {
      * 自定义用户【认证】逻辑
      */
     @Resource
-    private SecurityAuthFrameworkService<? extends AuthUserDetails<?>> userDetailsService;
+    private AuthUserDetailsService<? extends AuthUserDetails<?, ?>> userDetailsService;
     /**
      * Spring Security 加密器
      */
@@ -60,10 +62,10 @@ public class MiGooWebSecurityConfigurerAdapter {
     @Resource
     private LogoutSuccessHandler logoutSuccessHandler;
     /**
-     * Authorization 认证过滤器 Bean
+     * Authorization 认证过滤器 Bean (JWT 模式下使用)
      */
-    @Resource
-    private JWTAuthenticationTokenFilter authenticationTokenFilter;
+    @Autowired(required = false)
+    private JwtAuthenticationFilter authenticationTokenFilter;
 
     /**
      * 由于 Spring Security 创建 AuthenticationManager 对象时，没声明 @Bean 注解，导致无法被注入
@@ -96,7 +98,8 @@ public class MiGooWebSecurityConfigurerAdapter {
      */
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
+        // 通用配置 (两种模式共享)
+        httpSecurity
                 // CSRF 禁用，因为不使用 Session
                 .csrf(AbstractHttpConfigurer::disable)
                 // 基于 token 机制，所以不需要 Session
@@ -109,10 +112,22 @@ public class MiGooWebSecurityConfigurerAdapter {
                 // 设置每个请求的权限 ①：配置的可以任意访问的url
                 .authorizeHttpRequests(requests -> requests.requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll())
                 // 设置每个请求的权限 ②：兜底规则，必须认证
-                .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
-                // 添加 JWT Filter
-                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .authorizeHttpRequests(requests -> requests.anyRequest().authenticated());
+
+        // 模式分支
+        if (properties.getMode() == SecurityProperties.SecurityMode.OAUTH2) {
+            // OAuth2 Resource Server: 使用 Spring 原生 JWT 解析
+            httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
+                    .jwt(Customizer.withDefaults())
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler));
+            // 不添加自定义 JwtAuthenticationFilter
+        } else {
+            // 默认 JWT 模式: 使用自定义 Filter
+            httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+
+        return httpSecurity.build();
     }
 
     @Bean
