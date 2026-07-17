@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-web
 
 Web 组件，提供全局异常处理、统一响应封装、TraceId 注入、i18n 国际化、CORS 过滤等。

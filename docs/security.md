@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-security
 
 安全组件，支持 JWT 和 OAuth2 Resource Server 两种认证模式，内置 TOTP 二次验证。

@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-common
 
 公共组件，提供统一响应体、分页模型、异常体系、校验注解、工具类等。

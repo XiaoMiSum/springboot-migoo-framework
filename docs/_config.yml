@@ -1,0 +1,22 @@
+theme: jekyll-theme-minimal
+
+title: MiGoo Spring Boot Framework
+description: 基于 Spring Boot 4.1.0 的企业级快速开发框架
+
+baseurl: /springboot-migoo-framework
+url: https://migoo.xyz
+
+plugins:
+  - jekyll-seo-tag
+
+exclude:
+  - README.md
+  - LICENSE
+  - pom.xml
+  - .gitignore
+
+defaults:
+  scope:
+    path: ""
+  values:
+    layout: default

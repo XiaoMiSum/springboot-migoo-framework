@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-mybatis
 
 MyBatis-Plus 增强组件，提供扩展 Wrapper、分页支持、加密类型处理器、自动填充等。

@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-redis
 
 Redis 组件，提供类型安全的 `RedisKit` 和标准化 Key 定义。

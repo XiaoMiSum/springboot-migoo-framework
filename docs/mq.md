@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # migoo-spring-boot-starter-mq
 
 MQ 组件，基于 Redis 实现消息队列，支持 Stream（可靠投递）和 Pub/Sub（广播）两种模式。
