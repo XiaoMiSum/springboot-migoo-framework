@@ -11,7 +11,13 @@ import java.util.Objects;
  * Redis Key 定义类
  * <p>
  * 用于定义 Redis 键的模板、类型、值类型、超时等属性。
- * 支持泛型类型安全，通过 {@link TypeReference} 支持复杂的泛型类型（如 List&lt;User&gt;、Map&lt;String, Object&gt; 等）。
+ * 支持泛型类型安全，通过 {@link TypeReference} 支持所有泛型类型：
+ * <ul>
+ *   <li>简单类型：String、Integer、Boolean、Long、Double 等</li>
+ *   <li>单层泛型：List&lt;User&gt;、Map&lt;String, User&gt;、Set&lt;String&gt;</li>
+ *   <li>多层泛型：List&lt;Map&lt;String, User&gt;&gt;、Map&lt;String, List&lt;User&gt;&gt;</li>
+ *   <li>嵌套类型：PageResult&lt;UserDTO&gt;、UserDTO&lt;UserDTO.Address&gt;</li>
+ * </ul>
  *
  * @author xiaomi
  * Created on 2021/11/21 16:12
@@ -83,8 +89,13 @@ public class RedisKeyDefine<T> {
 
     // ==================== 业务方法 ====================
 
-    public T parse(String json) {
-        return JsonUtils.parseObject(json, valueType);
+    public T parse(String value) {
+        try {
+            return JsonUtils.parseObject(value, valueType);
+        } catch (Exception e) {
+            // 兜底：非 JSON 格式，尝试直接转换
+            return JsonUtils.convert(value, valueType);
+        }
     }
 
     /**

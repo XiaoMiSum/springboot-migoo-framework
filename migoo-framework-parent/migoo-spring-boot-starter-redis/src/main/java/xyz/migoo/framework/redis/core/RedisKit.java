@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -36,8 +34,9 @@ public class RedisKit {
      * 返回: 递增后的值
      */
     private static final String INCR_FIXED_SCRIPT = """
+            local existed = redis.call('EXISTS', KEYS[1])
             local v = redis.call('INCR', KEYS[1])
-            if redis.call('TTL', KEYS[1]) == -2 then
+            if existed == 0 then
                 redis.call('EXPIRE', KEYS[1], ARGV[1])
             end
             return v
@@ -56,28 +55,58 @@ public class RedisKit {
             """;
 
     /**
-     * 递增指定增量 + FIXED 过期 Lua 脚本
+     * 整数递增指定增量 + FIXED 过期 Lua 脚本
      * KEYS[1]: key
      * ARGV[1]: 增量值
      * ARGV[2]: 过期秒数
      * 返回: 递增后的值
      */
     private static final String INCRBY_FIXED_SCRIPT = """
-            local v = redis.call('INCRBYFLOAT', KEYS[1], ARGV[1])
-            if redis.call('TTL', KEYS[1]) == -2 then
+            local existed = redis.call('EXISTS', KEYS[1])
+            local v = redis.call('INCRBY', KEYS[1], ARGV[1])
+            if existed == 0 then
                 redis.call('EXPIRE', KEYS[1], ARGV[2])
             end
             return v
             """;
 
     /**
-     * 递增指定增量 + DYNAMIC 过期 Lua 脚本
+     * 整数递增指定增量 + DYNAMIC 过期 Lua 脚本
      * KEYS[1]: key
      * ARGV[1]: 增量值
      * ARGV[2]: 过期秒数
      * 返回: 递增后的值
      */
     private static final String INCRBY_DYNAMIC_SCRIPT = """
+            local v = redis.call('INCRBY', KEYS[1], ARGV[1])
+            redis.call('EXPIRE', KEYS[1], ARGV[2])
+            return v
+            """;
+
+    /**
+     * 浮点递增指定增量 + FIXED 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 增量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCRBY_FLOAT_FIXED_SCRIPT = """
+            local existed = redis.call('EXISTS', KEYS[1])
+            local v = redis.call('INCRBYFLOAT', KEYS[1], ARGV[1])
+            if existed == 0 then
+                redis.call('EXPIRE', KEYS[1], ARGV[2])
+            end
+            return v
+            """;
+
+    /**
+     * 浮点递增指定增量 + DYNAMIC 过期 Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: 增量值
+     * ARGV[2]: 过期秒数
+     * 返回: 递增后的值
+     */
+    private static final String INCRBY_FLOAT_DYNAMIC_SCRIPT = """
             local v = redis.call('INCRBYFLOAT', KEYS[1], ARGV[1])
             redis.call('EXPIRE', KEYS[1], ARGV[2])
             return v
@@ -91,8 +120,9 @@ public class RedisKit {
      * 返回: 递减后的值
      */
     private static final String DECRBY_FIXED_SCRIPT = """
+            local existed = redis.call('EXISTS', KEYS[1])
             local v = redis.call('DECRBY', KEYS[1], ARGV[1])
-            if redis.call('TTL', KEYS[1]) == -2 then
+            if existed == 0 then
                 redis.call('EXPIRE', KEYS[1], ARGV[2])
             end
             return v
@@ -110,7 +140,21 @@ public class RedisKit {
             redis.call('EXPIRE', KEYS[1], ARGV[2])
             return v
             """;
-
+    /**
+     * SET + FIXED 过期（仅 key 不存在时设置 TTL）Lua 脚本
+     * KEYS[1]: key
+     * ARGV[1]: value
+     * ARGV[2]: 过期秒数
+     * 返回: 1-设置成功, 0-key已存在（仅更新value，不修改TTL）
+     */
+    private static final String SET_FIXED_SCRIPT = """
+            local existed = redis.call('EXISTS', KEYS[1])
+            redis.call('SET', KEYS[1], ARGV[1])
+            if existed == 0 then
+                redis.call('EXPIRE', KEYS[1], ARGV[2])
+            end
+            return existed
+            """;
     // ==================== Lua 脚本 ====================
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -119,39 +163,29 @@ public class RedisKit {
     /**
      * 获取缓存值
      * <p>
-     * 支持泛型类型，包括 String、Integer、Boolean 等简单类型，以及 List&lt;T&gt;、Map&lt;K, V&gt; 等复杂类型
+     * 支持所有泛型类型，包括：
+     * <ul>
+     *   <li>简单类型：String、Integer、Boolean、Long、Double 等</li>
+     *   <li>单层泛型：List&lt;User&gt;、Map&lt;String, User&gt;、Set&lt;String&gt;</li>
+     *   <li>多层泛型：List&lt;Map&lt;String, User&gt;&gt;、Map&lt;String, List&lt;User&gt;&gt;</li>
+     *   <li>嵌套类型：PageResult&lt;UserDTO&gt;、UserDTO&lt;UserDTO.Address&gt;</li>
+     * </ul>
      *
      * @param key  RedisKeyDefine 定义
      * @param args 模板参数
      * @param <V>  值类型
      * @return 缓存值，如果不存在返回 null
      */
-    @SuppressWarnings("unchecked")
     public <V> V get(RedisKeyDefine<V> key, Object... args) {
         Object value = redisTemplate.opsForValue().get(key.formatKey(args));
         if (value == null) {
             return null;
         }
 
-        // 获取目标类型
-        Class<?> targetClass = key.getValueType().getType().getClass();
-
-        // 如果值已经是目标类型，直接返回
-        if (targetClass.isInstance(value)) {
-            return (V) value;
-        }
-
-        // 如果是 String 类型，尝试使用 TypeReference 反序列化
         if (value instanceof String strValue) {
-            // 简单类型直接转换（避免 JSON 解析开销）
-            if (targetClass == String.class) {
-                return (V) strValue;
-            }
-            // 其他类型通过 JSON 反序列化
             return key.parse(strValue);
         }
 
-        // 其他类型通过 Jackson 转换
         return JsonUtils.convert(value, key.getValueType());
     }
 
@@ -172,21 +206,16 @@ public class RedisKit {
      */
     public <V> void set(RedisKeyDefine<V> key, V value, Object... args) {
         var formattedKey = key.formatKey(args);
-        // 序列化为 JSON 字符串存储
         String jsonValue = JsonUtils.toJsonString(value);
         if (!key.hasTimeout()) {
-            // 永久有效，不设置过期时间
             redisTemplate.opsForValue().set(formattedKey, jsonValue);
             return;
         }
 
         if (key.isFixedTimeout()) {
-            // 固定过期时间：仅当 key 不存在时才设置过期时间
-            var exists = redisTemplate.hasKey(formattedKey);
-            redisTemplate.opsForValue().set(formattedKey, jsonValue);
-            if (!Boolean.TRUE.equals(exists)) {
-                redisTemplate.expire(formattedKey, key.getTimeout());
-            }
+            long seconds = key.getTimeout().getSeconds();
+            DefaultRedisScript<Long> script = new DefaultRedisScript<>(SET_FIXED_SCRIPT, Long.class);
+            redisTemplate.execute(script, Collections.singletonList(formattedKey), jsonValue, String.valueOf(seconds));
             return;
         }
         // 动态过期时间：每次设置都重新计算过期时间
@@ -263,7 +292,7 @@ public class RedisKit {
      * @return 是否设置成功
      */
     public boolean expire(RedisKeyDefine<?> key, long timeout, Object... args) {
-        return Boolean.TRUE.equals(redisTemplate.expire(key.formatKey(args), timeout, TimeUnit.MILLISECONDS));
+        return Boolean.TRUE.equals(redisTemplate.expire(key.formatKey(args), Duration.ofMillis(timeout)));
     }
 
     // ==================== 原子计数操作 ====================
@@ -293,8 +322,7 @@ public class RedisKit {
         long seconds = key.getTimeout().getSeconds();
         DefaultRedisScript<Long> script = new DefaultRedisScript<>(
                 key.isFixedTimeout() ? INCR_FIXED_SCRIPT : INCR_DYNAMIC_SCRIPT, Long.class);
-        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey), String.valueOf(seconds));
-        return result != null ? result : 0;
+        return redisTemplate.execute(script, Collections.singletonList(formattedKey), String.valueOf(seconds));
     }
 
     /**
@@ -322,10 +350,9 @@ public class RedisKit {
 
         long seconds = key.getTimeout().getSeconds();
         DefaultRedisScript<Double> script = new DefaultRedisScript<>(
-                key.isFixedTimeout() ? INCRBY_FIXED_SCRIPT : INCRBY_DYNAMIC_SCRIPT, Double.class);
-        Double result = redisTemplate.execute(script, Collections.singletonList(formattedKey),
+                key.isFixedTimeout() ? INCRBY_FLOAT_FIXED_SCRIPT : INCRBY_FLOAT_DYNAMIC_SCRIPT, Double.class);
+        return redisTemplate.execute(script, Collections.singletonList(formattedKey),
                 String.valueOf(delta), String.valueOf(seconds));
-        return result != null ? result : 0;
     }
 
     /**
@@ -353,9 +380,9 @@ public class RedisKit {
 
         long seconds = key.getTimeout().getSeconds();
         DefaultRedisScript<Long> script = new DefaultRedisScript<>(
-                key.isFixedTimeout() ? INCR_FIXED_SCRIPT : INCR_DYNAMIC_SCRIPT, Long.class);
-        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey), String.valueOf(seconds));
-        return result != null ? result : 0;
+                key.isFixedTimeout() ? INCRBY_FIXED_SCRIPT : INCRBY_DYNAMIC_SCRIPT, Long.class);
+        return redisTemplate.execute(script, Collections.singletonList(formattedKey),
+                String.valueOf(delta), String.valueOf(seconds));
     }
 
     /**
@@ -384,9 +411,8 @@ public class RedisKit {
         long seconds = key.getTimeout().getSeconds();
         DefaultRedisScript<Long> script = new DefaultRedisScript<>(
                 key.isFixedTimeout() ? DECRBY_FIXED_SCRIPT : DECRBY_DYNAMIC_SCRIPT, Long.class);
-        Long result = redisTemplate.execute(script, Collections.singletonList(formattedKey),
+        return redisTemplate.execute(script, Collections.singletonList(formattedKey),
                 String.valueOf(delta), String.valueOf(seconds));
-        return result != null ? result : 0;
     }
 
     // ==================== 分布式锁操作 ====================
@@ -605,5 +631,302 @@ public class RedisKit {
         String formattedKey = key.formatKey(args);
         Long removed = redisTemplate.opsForZSet().removeRangeByScore(formattedKey, minScore, maxScore);
         return removed != null ? removed : 0;
+    }
+
+    // ==================== Hash 操作 ====================
+
+    /**
+     * 获取 Hash 中指定字段的值
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param field 字段名
+     * @param args  模板参数
+     * @param <V>   值类型
+     * @return 字段值，不存在返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V hget(RedisKeyDefine<?> key, String field, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Object value = redisTemplate.opsForHash().get(formattedKey, field);
+        if (value == null) {
+            return null;
+        }
+        return (V) value;
+    }
+
+    /**
+     * 设置 Hash 中指定字段的值
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param field 字段名
+     * @param value 字段值
+     * @param args  模板参数
+     */
+    public void hset(RedisKeyDefine<?> key, String field, Object value, Object... args) {
+        String formattedKey = key.formatKey(args);
+        redisTemplate.opsForHash().put(formattedKey, field, value);
+    }
+
+    /**
+     * 设置 Hash 中多个字段的值
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param map  字段-值映射
+     * @param args 模板参数
+     */
+    public void hmset(RedisKeyDefine<?> key, Map<String, Object> map, Object... args) {
+        String formattedKey = key.formatKey(args);
+        redisTemplate.opsForHash().putAll(formattedKey, map);
+    }
+
+    /**
+     * 获取 Hash 中多个字段的值
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param fields 字段名列表
+     * @param args   模板参数
+     * @return 字段值列表
+     */
+    public List<Object> hmget(RedisKeyDefine<?> key, Collection<String> fields, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForHash().multiGet(formattedKey, new ArrayList<>(fields));
+    }
+
+    /**
+     * 删除 Hash 中指定字段
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param fields 字段名
+     * @param args   模板参数
+     * @return 删除的字段数量
+     */
+    public long hdel(RedisKeyDefine<?> key, Collection<String> fields, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForHash().delete(formattedKey, fields);
+        return removed != null ? removed : 0;
+    }
+
+    /**
+     * 检查 Hash 中指定字段是否存在
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param field 字段名
+     * @param args  模板参数
+     * @return 是否存在
+     */
+    public boolean hexists(RedisKeyDefine<?> key, String field, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return Boolean.TRUE.equals(redisTemplate.opsForHash().hasKey(formattedKey, field));
+    }
+
+    /**
+     * 获取 Hash 中所有字段
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 所有字段
+     */
+    public Set<Object> hkeys(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForHash().keys(formattedKey);
+    }
+
+    /**
+     * 获取 Hash 中所有值
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 所有值
+     */
+    public List<Object> hvals(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForHash().values(formattedKey);
+    }
+
+    /**
+     * 获取 Hash 中所有字段和值
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 字段-值映射
+     */
+    public Map<Object, Object> hgetAll(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForHash().entries(formattedKey);
+    }
+
+    /**
+     * Hash 字段自增
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param field 字段名
+     * @param delta 增量值
+     * @param args  模板参数
+     * @return 自增后的值
+     */
+    public long hincrBy(RedisKeyDefine<?> key, String field, long delta, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long value = redisTemplate.opsForHash().increment(formattedKey, field, delta);
+        return value != null ? value : 0;
+    }
+
+    // ==================== List 操作 ====================
+
+    /**
+     * 从左侧推入元素
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param values 元素
+     * @param args   模板参数
+     * @return 列表长度
+     */
+    public long lpush(RedisKeyDefine<?> key, Collection<Object> values, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long size = redisTemplate.opsForList().leftPushAll(formattedKey, values);
+        return size != null ? size : 0;
+    }
+
+    /**
+     * 从右侧推入元素
+     *
+     * @param key    RedisKeyDefine 定义
+     * @param values 元素
+     * @param args   模板参数
+     * @return 列表长度
+     */
+    public long rpush(RedisKeyDefine<?> key, Collection<Object> values, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long size = redisTemplate.opsForList().rightPushAll(formattedKey, values);
+        return size != null ? size : 0;
+    }
+
+    /**
+     * 从左侧弹出元素
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @param <V>  值类型
+     * @return 弹出的元素，列表为空返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V lpop(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return (V) redisTemplate.opsForList().leftPop(formattedKey);
+    }
+
+    /**
+     * 从右侧弹出元素
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @param <V>  值类型
+     * @return 弹出的元素，列表为空返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V rpop(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return (V) redisTemplate.opsForList().rightPop(formattedKey);
+    }
+
+    /**
+     * 获取列表指定范围的元素
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param start 开始位置（0 开始）
+     * @param end   结束位置（-1 表示到最后）
+     * @param args  模板参数
+     * @return 元素列表
+     */
+    public List<Object> lrange(RedisKeyDefine<?> key, long start, long end, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return redisTemplate.opsForList().range(formattedKey, start, end);
+    }
+
+    /**
+     * 获取列表长度
+     *
+     * @param key  RedisKeyDefine 定义
+     * @param args 模板参数
+     * @return 列表长度
+     */
+    public long llen(RedisKeyDefine<?> key, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long size = redisTemplate.opsForList().size(formattedKey);
+        return size != null ? size : 0;
+    }
+
+    /**
+     * 获取列表指定位置的元素
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param index 索引（0 开始，负数表示从末尾算起）
+     * @param args  模板参数
+     * @param <V>   值类型
+     * @return 元素值，不存在返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V lindex(RedisKeyDefine<?> key, long index, Object... args) {
+        String formattedKey = key.formatKey(args);
+        return (V) redisTemplate.opsForList().index(formattedKey, index);
+    }
+
+    /**
+     * 设置列表指定位置的元素
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param index 索引
+     * @param value 元素值
+     * @param args  模板参数
+     */
+    public void lset(RedisKeyDefine<?> key, long index, Object value, Object... args) {
+        String formattedKey = key.formatKey(args);
+        redisTemplate.opsForList().set(formattedKey, index, value);
+    }
+
+    /**
+     * 从列表中移除指定数量的元素
+     *
+     * @param key   RedisKeyDefine 定义
+     * @param count 移除数量（正数从左到右，负数从右到左，0 移除所有）
+     * @param value 元素值
+     * @param args  模板参数
+     * @return 实际移除的数量
+     */
+    public long lrem(RedisKeyDefine<?> key, long count, Object value, Object... args) {
+        String formattedKey = key.formatKey(args);
+        Long removed = redisTemplate.opsForList().remove(formattedKey, count, value);
+        return removed != null ? removed : 0;
+    }
+
+    /**
+     * 阻塞弹出左侧元素
+     *
+     * @param key     RedisKeyDefine 定义
+     * @param timeout 超时时间
+     * @param args    模板参数
+     * @param <V>     值类型
+     * @return 弹出的元素，超时返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V blPop(RedisKeyDefine<?> key, Duration timeout, Object... args) {
+        String formattedKey = key.formatKey(args);
+        var result = redisTemplate.opsForList().leftPop(formattedKey, timeout);
+        return result != null ? (V) result : null;
+    }
+
+    /**
+     * 阻塞弹出右侧元素
+     *
+     * @param key     RedisKeyDefine 定义
+     * @param timeout 超时时间
+     * @param args    模板参数
+     * @param <V>     值类型
+     * @return 弹出的元素，超时返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public <V> V brPop(RedisKeyDefine<?> key, Duration timeout, Object... args) {
+        String formattedKey = key.formatKey(args);
+        var result = redisTemplate.opsForList().rightPop(formattedKey, timeout);
+        return result != null ? (V) result : null;
     }
 }
