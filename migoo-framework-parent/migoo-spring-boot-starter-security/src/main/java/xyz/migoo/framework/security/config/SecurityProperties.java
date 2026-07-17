@@ -1,6 +1,6 @@
 package xyz.migoo.framework.security.config;
 
-import com.google.common.collect.Lists;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "migoo.security")
@@ -18,46 +19,103 @@ import java.util.List;
 public class SecurityProperties {
 
     /**
-     * authorization 验证用户登录状态
+     * 安全模式
+     * <p>
+     * JWT: 使用自定义 JWT Filter + AuthUserDetailsFetcher (默认)
+     * OAUTH2: 使用 Spring OAuth2 Resource Server
      */
-    @NotNull(message = "authorization 不能为空")
-    private Authorization authorization = new Authorization();
-
-    /**
-     * 密码加密密钥
-     */
-    @NotEmpty(message = "password-secret 密码加密密钥不能为空")
-    private String passwordSecret;
+    private SecurityMode mode = SecurityMode.JWT;
 
     /**
      * 登出url
      */
-    @NotEmpty(message = "logoutU-url 登出url地址不能为空")
+    @NotEmpty(message = "logout-url 登出url地址不能为空")
     private String logoutUrl;
 
     /**
      * 用户可以任意访问的url
      */
     @NotNull(message = "permit-all-urls 允许任意访问的url不能为空")
-    private List<String> permitAllUrls = Lists.newArrayList();
+    private List<String> permitAllUrls = new ArrayList<>();
 
     /**
-     * 安全模式
-     * <p>
-     * JWT: 使用自定义 JWT Filter + AuthUserDetailsService (默认)
-     * OAUTH2: 使用 Spring OAuth2 Resource Server
+     * JWT 模式配置（仅 mode=jwt 时生效）
      */
-    private SecurityMode mode = SecurityMode.JWT;
+    @NotNull(message = "jwt 不能为空")
+    private Jwt jwt = new Jwt();
 
     /**
-     * OAuth2 Resource Server 配置
+     * OAuth2 模式配置（仅 mode=oauth2 时生效）
      */
     @NotNull(message = "oauth2 不能为空")
     private OAuth2 oauth2 = new OAuth2();
 
     /**
-     * OAuth2 Resource Server 配置
+     * 条件校验
      */
+    @PostConstruct
+    public void validate() {
+        if (mode == SecurityMode.JWT) {
+            if (jwt.getSecretKey() == null || jwt.getSecretKey().isBlank()) {
+                throw new IllegalStateException("JWT 模式下 migoo.security.jwt.secret-key 不能为空");
+            }
+        }
+        if (mode == SecurityMode.OAUTH2) {
+            boolean hasIssuer = oauth2.getIssuerUri() != null && !oauth2.getIssuerUri().isBlank();
+            boolean hasJwk = oauth2.getJwkSetUri() != null && !oauth2.getJwkSetUri().isBlank();
+            if (!hasIssuer && !hasJwk) {
+                throw new IllegalStateException("OAuth2 模式下 migoo.security.oauth2.issuer-uri 或 jwk-set-uri 至少配置一个");
+            }
+        }
+    }
+
+    // ==================== JWT 模式配置 ====================
+
+    @Validated
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Jwt {
+
+        /**
+         * token 秘钥（HMAC-SHA256）
+         */
+        @NotEmpty(message = "jwt.secret-key 不能为空")
+        private String secretKey;
+
+        /**
+         * HTTP 请求时，访问令牌的请求 Header
+         */
+        @NotEmpty(message = "jwt.header-name 不能为空")
+        private String headerName = "Authorization";
+
+        /**
+         * access token 过期时间
+         * <p>
+         * 默认 30 分钟
+         */
+        @NotNull(message = "jwt.access-token-expires 不能为空")
+        private Duration accessTokenExpires = Duration.ofMinutes(30);
+
+        /**
+         * refresh token 过期时间
+         * <p>
+         * 默认 7 天
+         */
+        @NotNull(message = "jwt.refresh-token-expires 不能为空")
+        private Duration refreshTokenExpires = Duration.ofDays(7);
+
+        /**
+         * refresh token 请求 Header
+         * <p>
+         * 默认：X-Refresh-Token
+         */
+        @NotEmpty(message = "jwt.refresh-header-name 不能为空")
+        private String refreshHeaderName = "X-Refresh-Token";
+    }
+
+    // ==================== OAuth2 模式配置 ====================
+
     @Validated
     @Data
     @AllArgsConstructor
@@ -77,62 +135,18 @@ public class SecurityProperties {
          * 直接指定 JWK Set 端点地址 (与 issuerUri 二选一)
          */
         private String jwkSetUri;
-
     }
 
-    /**
-     * 安全模式枚举
-     */
+    // ==================== 枚举 ====================
+
     public enum SecurityMode {
         /**
-         * JWT 模式: 使用自定义 JWT Filter + AuthUserDetailsService
+         * JWT 模式: 使用自定义 JWT Filter + AuthUserDetailsFetcher
          */
         JWT,
         /**
          * OAuth2 模式: 使用 Spring OAuth2 Resource Server
          */
         OAUTH2
-    }
-
-    @Validated
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Authorization {
-
-        /**
-         * HTTP 请求时，访问令牌的请求 Header
-         */
-        @NotEmpty(message = "headerName 请求头名称不能为空")
-        private String headerName = "Authorization";
-
-        /**
-         * access token 过期时间
-         * <p>
-         * 默认 30 分钟
-         */
-        @NotNull(message = "access-authorization-expires 不能为空")
-        private Duration accessTokenExpires = Duration.ofMinutes(30);
-
-        /**
-         * token 秘钥
-         */
-        @NotEmpty(message = "secret-key 不能为空")
-        private String secretKey;
-
-        /**
-         * Authorization 刷新的过期时间
-         * <p>
-         * 默认 7 天
-         */
-        @NotNull(message = "refresh-authorization-expires 不能为空")
-        private Duration refreshTokenExpires = Duration.ofDays(7);
-        /**
-         * Authorization 刷新的请求 Header
-         * <p>
-         * 默认：X-Refresh-Token
-         */
-        @NotEmpty(message = "refreshHeaderName Token刷新的请求Header不能为空")
-        private String refreshHeaderName = "X-Refresh-Token";
     }
 }

@@ -69,9 +69,9 @@ public class SecurityFrameworkUtils {
      * @return 用户编号
      */
     @Nullable
-    public static Object getLoginUserId() {
+    public static String getLoginUserId() {
         AuthUserDetails<? extends AuthUserDetails<?, ?>, ?> authUserDetails = getLoginUser();
-        return authUserDetails != null ? authUserDetails.getId() : null;
+        return authUserDetails != null ? String.valueOf(authUserDetails.getId()) : null;
     }
 
     /**

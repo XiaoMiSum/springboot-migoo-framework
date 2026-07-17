@@ -1,12 +1,14 @@
-package xyz.migoo.framework.security.core.service;
+package xyz.migoo.framework.security.core.authentication;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.codec.binary.Base32;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
-import xyz.migoo.framework.security.core.service.dto.TotpBinding;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 import javax.crypto.KeyGenerator;
@@ -20,11 +22,11 @@ import java.time.Instant;
 import java.util.Objects;
 
 /**
- * TOTP 二次验证服务
+ * TOTP 二次验证器
  *
  * @author xiaomi
  */
-public class TotpService {
+public class TotpAuthenticator {
 
     private static final ErrorCode ERROR_2FA_FAILURE = new ErrorCode(999, "2fa.failure");
 
@@ -50,16 +52,15 @@ public class TotpService {
      * @param code 用户输入的 TOTP 验证码
      */
     public void verify(@Nullable String code) {
-        var authUserDetails = SecurityFrameworkUtils.getLoginUser();
-        Objects.requireNonNull(authUserDetails, "用户未登录，无法进行 TOTP 校验");
-        if (!authUserDetails.isTwoFactorEnabled()) {
-            return;
-        }
-        if (!authUserDetails.isTwoFactorBound()) {
-            return;
-        }
         if (!StringUtils.hasText(code)) {
             throw ServiceExceptionUtil.get(ERROR_2FA_FAILURE);
+        }
+        var authUserDetails = SecurityFrameworkUtils.getLoginUser();
+        if (Objects.isNull(authUserDetails)) {
+            throw ServiceExceptionUtil.get(ERROR_2FA_FAILURE);
+        }
+        if (!authUserDetails.isTwoFactorEnabled()) {
+            return;
         }
         try {
             SecretKey key = restoreKey(authUserDetails.getTotpSecret());
@@ -105,4 +106,24 @@ public class TotpService {
         byte[] decodedKey = BASE32.decode(base32Secret);
         return new SecretKeySpec(decodedKey, TOTP_GENERATOR.getAlgorithm());
     }
+
+    /**
+     * TOTP 绑定信息（密钥 + otpauth URL）
+     */
+    @Data
+    @AllArgsConstructor
+    @EqualsAndHashCode()
+    public static class TotpBinding {
+
+        /**
+         * TOTP 密钥 (Base32 编码)
+         */
+        private String totpSecret;
+
+        /**
+         * otpauth:// URL，用于生成 QR 码
+         */
+        private String otpAuthUri;
+    }
+
 }

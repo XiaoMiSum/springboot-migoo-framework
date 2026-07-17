@@ -1,4 +1,4 @@
-package xyz.migoo.framework.security.core.service;
+package xyz.migoo.framework.security.core.authentication;
 
 import xyz.migoo.framework.security.core.AuthUserDetails;
 

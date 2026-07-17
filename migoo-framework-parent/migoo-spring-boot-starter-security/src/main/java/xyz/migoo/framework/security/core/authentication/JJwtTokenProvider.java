@@ -1,11 +1,10 @@
-package xyz.migoo.framework.security.core.service.impl;
+package xyz.migoo.framework.security.core.authentication;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.service.JwtTokenProvider;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,7 +27,7 @@ public class JJwtTokenProvider implements JwtTokenProvider {
 
     public JJwtTokenProvider(SecurityProperties properties) {
         this.properties = properties;
-        SecretKey key = buildSecretKey(properties.getAuthorization().getSecretKey());
+        SecretKey key = buildSecretKey(properties.getJwt().getSecretKey());
         this.jwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(key));
         this.jwtDecoder = NimbusJwtDecoder.withSecretKey(key)
                 .macAlgorithm(MacAlgorithm.HS256).build();
@@ -36,12 +35,12 @@ public class JJwtTokenProvider implements JwtTokenProvider {
 
     @Override
     public String createAccessToken(AuthUserDetails<?, ?> user) {
-        return createToken(user, "access", properties.getAuthorization().getAccessTokenExpires());
+        return createToken(user, "access", properties.getJwt().getAccessTokenExpires());
     }
 
     @Override
     public String createRefreshToken(AuthUserDetails<?, ?> user) {
-        return createToken(user, "refresh", properties.getAuthorization().getRefreshTokenExpires());
+        return createToken(user, "refresh", properties.getJwt().getRefreshTokenExpires());
     }
 
     @Override

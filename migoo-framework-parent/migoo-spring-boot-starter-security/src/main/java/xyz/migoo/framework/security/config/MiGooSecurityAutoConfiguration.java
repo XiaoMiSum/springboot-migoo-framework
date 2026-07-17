@@ -1,12 +1,11 @@
 package xyz.migoo.framework.security.config;
 
-import jakarta.annotation.Resource;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,44 +13,37 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import xyz.migoo.framework.common.pojo.Result;
+import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.core.AuthUserDetails;
+import xyz.migoo.framework.security.core.authentication.*;
 import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
 import xyz.migoo.framework.security.core.handler.AccessDeniedHandlerImpl;
 import xyz.migoo.framework.security.core.handler.AuthenticationEntryPointImpl;
 import xyz.migoo.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import xyz.migoo.framework.security.core.interceptor.TotpInterceptor;
 import xyz.migoo.framework.security.core.resolver.AuthUserMethodArgumentResolver;
-import xyz.migoo.framework.security.core.service.AuthUserDetailsService;
-import xyz.migoo.framework.security.core.service.JwtTokenProvider;
-import xyz.migoo.framework.security.core.service.TotpService;
-import xyz.migoo.framework.security.core.service.UserDetailsBridge;
-import xyz.migoo.framework.security.core.service.impl.DefaultJwtAuthService;
-import xyz.migoo.framework.security.core.service.impl.JJwtTokenProvider;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
 /**
- * Spring Security 自动配置类，主要用于相关组件的配置
+ * Spring Security 自动配置类
  * <p>
- * 注意，不能和 {@link MiGooWebSecurityConfigurerAdapter} 用一个，原因是会导致初始化报错。
- * 参见 <a href="https://stackoverflow.com/questions/53847050/spring-boot-delegatebuilder-cannot-be-null-on-autowiring-authenticationmanager">...</a> 文档。
+ * 注册安全组件所需的 Bean，与 {@link MiGooWebSecurityFilterChainConfiguration} 分离，
+ * 避免 AuthenticationManager 初始化报错。
  *
  * @author xiaomi
  */
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
-@AutoConfigureAfter(TotpService.class)
 public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
 
-    @Resource
-    private TotpService totpService;
-
     /**
-     * TOTP 二次验证服务
+     * TOTP 二次验证器
      */
     @Bean
-    public TotpService totpService() {
-        return new TotpService();
+    public TotpAuthenticator totpAuthenticator() {
+        return new TotpAuthenticator();
     }
 
     /**
@@ -60,7 +52,7 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * @param registry 拦截器注册
      */
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new TotpInterceptor(totpService))
+        registry.addInterceptor(new TotpInterceptor(totpAuthenticator()))
                 .addPathPatterns("/**");
     }
 
@@ -81,12 +73,24 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 退出处理类 Bean
+     * 退出处理类 Bean（JWT 模式下注册）
      */
     @Bean
+    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
     public LogoutSuccessHandler logoutSuccessHandler(SecurityProperties securityProperties,
-                                                     AuthUserDetailsService<? extends AuthUserDetails<?, ?>> securityFrameworkService) {
-        return new LogoutSuccessHandlerImpl(securityProperties, securityFrameworkService);
+                                                     AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher) {
+        return new LogoutSuccessHandlerImpl(securityProperties, userDetailsFetcher);
+    }
+
+    /**
+     * 退出处理类 Bean（OAuth2 模式下注册）
+     * <p>
+     * OAuth2 模式下无需自定义清理逻辑，直接返回成功
+     */
+    @Bean
+    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "oauth2")
+    public LogoutSuccessHandler oauth2LogoutSuccessHandler() {
+        return (request, response, authentication) -> ServletUtils.writeJSON(response, Result.ok());
     }
 
     /**
@@ -113,40 +117,44 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 默认 JWT 认证服务 Bean
+     * 默认 JWT 认证器 Bean
      * <p>
-     * 仅在 JWT 模式下注册，且当应用未自行实现 AuthUserDetailsService 时生效。
+     * 仅在 JWT 模式下注册，且当应用未自行实现 AuthUserDetailsFetcher 时生效。
      * 组合 JwtTokenProvider + UserDetailsBridge，实现完整的认证/验证/刷新流程。
      */
     @Bean
-    @ConditionalOnMissingBean(AuthUserDetailsService.class)
+    @ConditionalOnMissingBean(AuthUserDetailsFetcher.class)
     @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
-    public DefaultJwtAuthService defaultJwtAuthService(JwtTokenProvider tokenProvider,
-                                                       UserDetailsBridge userBridge,
-                                                       PasswordEncoder passwordEncoder,
-                                                       SecurityProperties properties) {
-        return new DefaultJwtAuthService(tokenProvider, userBridge, passwordEncoder, properties);
+    public DefaultJwtAuthenticator defaultJwtAuthenticator(JwtTokenProvider tokenProvider,
+                                                           UserDetailsBridge userBridge,
+                                                           AuthenticationManager authenticationManager,
+                                                           SecurityProperties properties) {
+        return new DefaultJwtAuthenticator(tokenProvider, userBridge, authenticationManager, properties);
     }
 
     /**
-     * Authorization 认证过滤器 Bean
+     * JWT 认证过滤器 Bean
+     * <p>
+     * 仅在 JWT 模式下注册
      */
     @Bean
+    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
     public JwtAuthenticationFilter jwtAuthenticationFilter(SecurityProperties securityProperties,
-                                                           AuthUserDetailsService<? extends AuthUserDetails<?, ?>> securityFrameworkService,
+                                                           AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher,
                                                            GlobalExceptionHandler globalExceptionHandler,
                                                            I18NMessage i18nMessage) {
-        return new JwtAuthenticationFilter(securityProperties, securityFrameworkService,
+        return new JwtAuthenticationFilter(securityProperties, userDetailsFetcher,
                 globalExceptionHandler, i18nMessage);
     }
 
     /**
-     * 方法参数转换处理器
+     * 方法参数转换处理器（JWT 模式下注册）
      */
     @Bean
-    public AuthUserMethodArgumentResolver currentUserMethodArgumentResolver() {
-        return new AuthUserMethodArgumentResolver();
+    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
+    public AuthUserMethodArgumentResolver currentUserMethodArgumentResolver(SecurityProperties securityProperties,
+                                                                            AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher) {
+        return new AuthUserMethodArgumentResolver(securityProperties, userDetailsFetcher);
     }
-
 
 }

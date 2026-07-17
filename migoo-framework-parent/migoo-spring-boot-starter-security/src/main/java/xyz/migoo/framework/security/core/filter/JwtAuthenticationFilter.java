@@ -1,6 +1,5 @@
 package xyz.migoo.framework.security.core.filter;
 
-import org.springframework.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,13 +9,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.servlet.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.service.AuthUserDetailsService;
+import xyz.migoo.framework.security.core.authentication.AuthUserDetailsFetcher;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final SecurityProperties securityProperties;
 
-    private final AuthUserDetailsService<? extends AuthUserDetails<?, ?>> authService;
+    private final AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher;
 
     private final GlobalExceptionHandler globalExceptionHandler;
 
@@ -56,15 +56,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
-            String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getAuthorization().getHeaderName());
+            String token = SecurityFrameworkUtils.obtainAuthorization(request, securityProperties.getJwt().getHeaderName());
             if (!StringUtils.hasText(token)) {
                 throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
-            var authUserDetails = authService.verifyToken(token);
+            var authUserDetails = userDetailsFetcher.verifyToken(token);
             if (authUserDetails != null) {
                 SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
             }
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)
                     : globalExceptionHandler.allExceptionHandler(request, ex);
             ServletUtils.writeJSON(response, result);

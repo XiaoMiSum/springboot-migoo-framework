@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.migoo.framework.security.core.annotation.RequiresTotp;
-import xyz.migoo.framework.security.core.service.TotpService;
+import xyz.migoo.framework.security.core.authentication.TotpAuthenticator;
 
 import java.util.Objects;
 
@@ -22,13 +22,13 @@ import java.util.Objects;
 @AllArgsConstructor
 public class TotpInterceptor implements HandlerInterceptor {
 
-    private final TotpService totpService;
+    private final TotpAuthenticator totpAuthenticator;
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         if (handler instanceof HandlerMethod handlerMethod) {
             if (Objects.nonNull(handlerMethod.getMethod().getAnnotation(RequiresTotp.class))) {
-                this.totpService.verify(request.getParameter("_code"));
+                this.totpAuthenticator.verify(request.getParameter("_code"));
             }
         }
         return true;

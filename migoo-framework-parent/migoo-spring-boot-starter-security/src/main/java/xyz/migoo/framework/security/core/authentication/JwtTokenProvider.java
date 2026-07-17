@@ -1,4 +1,4 @@
-package xyz.migoo.framework.security.core.service;
+package xyz.migoo.framework.security.core.authentication;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 import xyz.migoo.framework.security.core.AuthUserDetails;
@@ -7,7 +7,7 @@ import xyz.migoo.framework.security.core.AuthUserDetails;
  * JWT token 机械操作接口
  * <p>
  * 职责: 创建、解析、验证 token，与业务逻辑无关
- * 默认实现: {@link xyz.migoo.framework.security.core.service.impl.JJwtTokenProvider}
+ * 默认实现: {@link xyz.migoo.framework.security.core.authentication.JJwtTokenProvider}
  *
  * @author xiaomi
  */
@@ -48,7 +48,7 @@ public interface JwtTokenProvider {
     /**
      * 从 Jwt 提取 userId (统一存储为 String)
      * <p>
-     * 应用层在 {@link UserDetailsBridge#loadFromJwt} 中将 String 转回自己的 ID 类型
+     * 应用层在 {@link UserDetailsBridge#loadByUserId} 中将 String 转回自己的 ID 类型
      *
      * @param jwt Jwt 对象
      * @return userId 字符串

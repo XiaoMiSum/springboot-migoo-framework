@@ -1,15 +1,19 @@
-package xyz.migoo.framework.security.core.service;
+package xyz.migoo.framework.security.core.authentication;
 
+import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.service.dto.LoginResult;
+
+import java.time.LocalDateTime;
 
 /**
- * Security 框架 Auth Service 接口，定义 security 组件需要的功能
+ * 用户详情获取接口
+ * <p>
+ * 定义 security 组件需要的用户加载与认证能力
  *
  * @author xiaomi
  */
-public interface AuthUserDetailsService<T extends AuthUserDetails<T, ?>> extends UserDetailsService {
+public interface AuthUserDetailsFetcher<T extends AuthUserDetails<T, ?>> extends UserDetailsService {
 
     /**
      * 用户认证
@@ -22,7 +26,6 @@ public interface AuthUserDetailsService<T extends AuthUserDetails<T, ?>> extends
 
     /**
      * 校验 accessToken 的有效性，并获取用户信息
-     * 通过后，刷新 token 的过期时间
      *
      * @param accessToken accessToken
      * @return 用户信息
@@ -43,5 +46,22 @@ public interface AuthUserDetailsService<T extends AuthUserDetails<T, ?>> extends
      * @param accessToken token
      */
     void clean(String accessToken);
+
+    /**
+     * 登录/刷新 token 返回结果
+     */
+    @Data
+    class LoginResult<T extends AuthUserDetails<T, ?>> {
+
+        private String accessToken;
+
+        private LocalDateTime accessExpiry;
+
+        private String refreshToken;
+
+        private LocalDateTime refreshExpiry;
+
+        private T userInfo;
+    }
 
 }
