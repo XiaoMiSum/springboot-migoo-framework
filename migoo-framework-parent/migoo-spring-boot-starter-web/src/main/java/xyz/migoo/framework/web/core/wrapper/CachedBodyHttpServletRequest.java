@@ -9,6 +9,7 @@ import org.springframework.util.StreamUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -21,30 +22,36 @@ import java.nio.charset.StandardCharsets;
 @Getter
 public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
-    /**
-     * -- GETTER --
-     * 获取缓存的请求体字节数组
-     *
-     * @return 缓存的请求体字节数组
-     */
     private final byte[] cachedBody;
 
-    public CachedBodyHttpServletRequest(HttpServletRequest request) throws IOException {
+    public CachedBodyHttpServletRequest(HttpServletRequest request, int maxBodySize) throws IOException {
         super(request);
-        // 读取并缓存请求体内容
-        this.cachedBody = StreamUtils.copyToByteArray(request.getInputStream());
+        this.cachedBody = readBoundedBody(request.getInputStream(), maxBodySize);
     }
 
     @Override
     public ServletInputStream getInputStream() {
-        // 返回缓存的输入流
         return new CachedBodyServletInputStream(new ByteArrayInputStream(cachedBody));
     }
 
     @Override
     public BufferedReader getReader() {
-        // 返回缓存的 Reader
         return new BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8));
+    }
+
+    private static byte[] readBoundedBody(java.io.InputStream inputStream, int maxSize) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(Math.min(maxSize, 8192));
+        byte[] buffer = new byte[8192];
+        int totalRead = 0;
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            totalRead += bytesRead;
+            if (totalRead > maxSize) {
+                throw new IOException("Request body exceeds maximum cache size: " + maxSize + " bytes");
+            }
+            baos.write(buffer, 0, bytesRead);
+        }
+        return baos.toByteArray();
     }
 
     /**
@@ -80,7 +87,6 @@ public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
         @Override
         public void setReadListener(ReadListener readListener) {
-            // 不支持异步读取
             throw new UnsupportedOperationException("异步读取不受支持");
         }
     }

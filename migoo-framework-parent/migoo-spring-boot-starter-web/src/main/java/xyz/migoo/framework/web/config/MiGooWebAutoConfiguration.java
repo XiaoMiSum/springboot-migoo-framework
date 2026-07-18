@@ -1,99 +1,25 @@
 package xyz.migoo.framework.web.config;
 
-import jakarta.servlet.Filter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.LocaleResolver;
-import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
-import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
-import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
-import xyz.migoo.framework.web.core.filter.TraceIdFilter;
-import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
-import xyz.migoo.framework.web.core.handler.GlobalResponseBodyHandler;
-import xyz.migoo.framework.web.i18n.I18NLocaleResolver;
-import xyz.migoo.framework.web.i18n.I18NMessage;
+import org.springframework.context.annotation.Import;
 
-import static java.lang.Thread.ofVirtual;
-import static java.util.concurrent.Executors.newThreadPerTaskExecutor;
-
+/**
+ * MiGoo Web 模块自动配置入口
+ *
+ * <p>通过 {@link Import} 显式导入各子配置类，不再使用 {@code @ComponentScan}。</p>
+ */
 @Configuration
-@ComponentScan("xyz.migoo.framework")
+@EnableConfigurationProperties(MigooWebProperties.class)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@Import({
+        FrameworkCorsConfiguration.class,
+        FilterConfiguration.class,
+        ExceptionHandlingConfiguration.class,
+        ResponseBodyConfiguration.class,
+        I18nConfiguration.class,
+        VirtualThreadConfiguration.class
+})
 public class MiGooWebAutoConfiguration {
-
-    /**
-     * 应用名
-     */
-    @Value("${spring.application.name}")
-    private String applicationName;
-
-    private static <T extends Filter> FilterRegistrationBean<T> createFilterBean(T filter, Integer order) {
-        FilterRegistrationBean<T> bean = new FilterRegistrationBean<>(filter);
-        bean.setOrder(order);
-        return bean;
-    }
-
-
-    @Bean
-    public LocaleResolver I18NLocaleResolver() {
-        return new I18NLocaleResolver();
-    }
-
-    @Bean
-    public GlobalExceptionHandler globalExceptionHandler(ApiErrorLogFrameworkService apiErrorLog, I18NMessage i18n) {
-        return new GlobalExceptionHandler(applicationName, apiErrorLog, i18n);
-    }
-
-    // ========== Filter 相关 ==========
-
-    @Bean
-    public GlobalResponseBodyHandler globalResponseBodyHandler(I18NMessage i18n) {
-        return new GlobalResponseBodyHandler(i18n);
-    }
-
-    /**
-     * 创建 CorsFilter Bean，解决跨域问题
-     */
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterBean() {
-        // 创建 CorsConfiguration 对象
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*"); // 设置访问源地址
-        config.addAllowedHeader("*"); // 设置访问源请求头
-        config.addAllowedMethod("*"); // 设置访问源请求方法
-        // 创建 UrlBasedCorsConfigurationSource 对象
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // 对接口配置跨域设置
-        return createFilterBean(new CorsFilter(source), WebFilterOrderEnum.CORS_FILTER);
-    }
-
-    /**
-     * 创建 RequestBodyCacheFilter Bean，可重复读取请求内容
-     */
-    @Bean
-    public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
-        return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderEnum.REQUEST_BODY_CACHE_FILTER);
-    }
-
-    /**
-     * 创建 TraceIdFilter Bean，MDC traceId 关联日志
-     */
-    @Bean
-    public FilterRegistrationBean<TraceIdFilter> traceIdFilter() {
-        return createFilterBean(new TraceIdFilter(), WebFilterOrderEnum.TRACE_FILTER);
-    }
-
-    @Bean
-    public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
-        // 创建 OfVirtual，指定虚拟线程名称的前缀，以及线程编号起始值
-        return handler -> handler.setExecutor(newThreadPerTaskExecutor(ofVirtual().name("virtual-thread-", 1).factory()));
-    }
-
 }

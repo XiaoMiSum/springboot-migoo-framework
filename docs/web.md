@@ -107,29 +107,87 @@ String message = i18n.getMessage("user.exists", "13800138000");
 
 ### 5. 请求体缓存（自动生效）
 
-`CacheRequestBodyFilter` 自动将请求体包装为 `CachedBodyHttpServletRequest`，支持重复读取（仅 JSON，最大 10MB）。
+`CacheRequestBodyFilter` 自动将请求体包装为 `CachedBodyHttpServletRequest`，支持重复读取（仅 JSON，默认最大 10MB）。
+
+可通过配置调整缓存行为：
+
+```yaml
+migoo:
+  web:
+    cache-body:
+      enabled: true       # 是否开启，默认 true
+      max-size: 10485760  # 最大缓存大小（字节），默认 10MB
+```
+
+### 6. CORS 跨域配置
+
+默认允许所有来源。可通过配置自定义：
+
+```yaml
+migoo:
+  web:
+    cors:
+      enabled: true                      # 是否开启，默认 true
+      allowed-origins:                   # 允许的来源，默认 ["*"]
+        - https://example.com
+        - https://admin.example.com
+      allowed-methods: ["GET", "POST"]   # 允许的 HTTP 方法，默认 ["*"]
+      allowed-headers: ["*"]             # 允许的请求头，默认 ["*"]
+      allow-credentials: true            # 是否允许携带凭证，默认 true
+      max-age: 1800                      # 预检请求缓存时间（秒），默认 1800
+```
 
 ---
 
 ## 自动注册的组件
 
-| 组件 | 说明 |
-|------|------|
-| `GlobalExceptionHandler` | 全局异常处理 |
-| `GlobalResponseBodyHandler` | 响应体 i18n 处理 |
-| `CorsFilter` | CORS 过滤（允许所有来源） |
-| `CacheRequestBodyFilter` | 请求体缓存 |
-| `TraceIdFilter` | TraceId 生成与注入 |
-| `I18NLocaleResolver` | 语言解析（Accept-Language） |
-| 虚拟线程执行器 | Tomcat 使用虚拟线程（Java 21+） |
+| 组件 | 说明 | 条件 |
+|------|------|------|
+| `GlobalExceptionHandler` | 全局异常处理 | Servlet Web 环境 |
+| `ResponseBodyStorageAdvice` | Result 存入 RequestAttribute | Servlet Web 环境 |
+| `ResponseBodyI18nAdvice` | 响应体 i18n 消息解析 | Servlet Web 环境 |
+| `CorsFilter` | CORS 过滤 | `migoo.web.cors.enabled=true` |
+| `CacheRequestBodyFilter` | 请求体缓存 | `migoo.web.cache-body.enabled=true` |
+| `TraceIdFilter` | TraceId 生成与注入 | Servlet Web 环境 |
+| `I18NLocaleResolver` | 语言解析（Accept-Language） | Servlet Web 环境 |
+| 虚拟线程执行器 | Tomcat 使用虚拟线程（Java 21+） | Tomcat 在 classpath |
 
 ## 配置项
 
 ```yaml
+# Web 模块完整配置
+migoo:
+  web:
+    cors:                                 # CORS 跨域
+      enabled: true
+      allowed-origins: ["*"]
+      allowed-methods: ["*"]
+      allowed-headers: ["*"]
+      allow-credentials: true
+      max-age: 1800
+    cache-body:                           # 请求体缓存
+      enabled: true
+      max-size: 10485760                  # 10MB
+
+# Spring MVC 配置（配合 404 异常处理）
 spring:
   mvc:
     throw-exception-if-no-handler-found: true
     static-path-pattern: /static/**
 ```
 
-> 框架无专属配置项，Tomcat 虚拟线程通过 Spring Boot 3.x 的 `server.threads.virtual=true` 控制（默认开启）。
+## 架构说明
+
+模块采用单一入口 + `@Import` 组装架构：
+
+```
+MiGooWebAutoConfiguration (入口)
+├── CorsConfiguration          → CorsFilter
+├── FilterConfiguration        → TraceIdFilter + CacheRequestBodyFilter
+├── ExceptionHandlingConfiguration → GlobalExceptionHandler
+├── ResponseBodyConfiguration  → ResponseBodyStorageAdvice + ResponseBodyI18nAdvice
+├── I18nConfiguration          → I18NLocaleResolver + I18NMessage
+└── VirtualThreadConfiguration → TomcatProtocolHandlerCustomizer
+```
+
+所有配置类通过 `@ConditionalOnWebApplication(type = SERVLET)` 保护，非 Web 环境不会激活。

@@ -18,10 +18,11 @@ import java.io.IOException;
  */
 public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
-    /**
-     * 最大缓存 body 大小：10MB
-     */
-    private static final int MAX_CACHE_BODY_SIZE = 10 * 1024 * 1024;
+    private final int maxCacheBodySize;
+
+    public CacheRequestBodyFilter(int maxCacheBodySize) {
+        this.maxCacheBodySize = maxCacheBodySize;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -30,7 +31,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
         String contentLength = request.getHeader("Content-Length");
         if (contentLength != null) {
             try {
-                if (Long.parseLong(contentLength) > MAX_CACHE_BODY_SIZE) {
+                if (Long.parseLong(contentLength) > maxCacheBodySize) {
                     filterChain.doFilter(request, response);
                     return;
                 }
@@ -38,7 +39,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
             }
         }
         try {
-            var wrappedRequest = new CachedBodyHttpServletRequest(request);
+            var wrappedRequest = new CachedBodyHttpServletRequest(request, maxCacheBodySize);
             filterChain.doFilter(wrappedRequest, response);
         } catch (IOException e) {
             // 如果读取失败 则直接使用原始请求
@@ -51,5 +52,4 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
         // 只处理 json 请求内容
         return !ServletUtils.isJsonRequest(request);
     }
-
 }
