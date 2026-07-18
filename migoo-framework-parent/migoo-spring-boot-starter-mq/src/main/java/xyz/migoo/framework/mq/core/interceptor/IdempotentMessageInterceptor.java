@@ -12,10 +12,10 @@ import java.util.Objects;
 /**
  * 消息幂等性拦截器
  * <p>
- * 基于 Redis SETNX 实现分布式环境下的消息去重，确保同一消息只被处理一次
+ * 基于 Redis Lua 脚本实现分布式环境下的消息去重，确保同一消息只被处理一次
  * <p>
  * 工作原理：
- * 1. 消费前：尝试 SETNX messageId，成功则继续消费，失败则跳过（已被其他消费者处理）
+ * 1. 消费前：通过 Lua 脚本原子执行 SETNX + GET，成功则继续消费，失败则跳过
  * 2. 消费后：设置过期时间，防止 Redis 内存无限增长
  */
 @Slf4j
@@ -37,6 +37,29 @@ public class IdempotentMessageInterceptor implements RedisMessageInterceptor {
      */
     private static final String STATUS_CONSUMED = "consumed";
 
+    /**
+     * Lua 脚本：原子 SETNX + GET
+     * <p>
+     * KEYS[1] = 幂等键
+     * ARGV[1] = 状态值
+     * ARGV[2] = 过期时间（秒）
+     * <p>
+     * 返回值：
+     * - "ok" = SETNX 成功（首次消费）
+     * - "skip" = 键已存在（重复消费），返回当前状态
+     */
+    private static final String IDEMPOTENT_LUA_SCRIPT = """
+            local key = KEYS[1]
+            local value = ARGV[1]
+            local ttl = tonumber(ARGV[2])
+            local current = redis.call('GET', key)
+            if current then
+                return current
+            end
+            redis.call('SETEX', key, ttl, value)
+            return 'ok'
+            """;
+
     private final StringRedisTemplate stringRedisTemplate;
 
     /**
@@ -47,7 +70,7 @@ public class IdempotentMessageInterceptor implements RedisMessageInterceptor {
     /**
      * 消息消费前拦截
      * <p>
-     * 使用 SETNX 原子操作检查消息是否已被处理
+     * 使用 Lua 脚本原子操作检查消息是否已被处理，消除 TOCTOU 竞态
      *
      * @param message 消息
      * @throws MessageAlreadyConsumedException 如果消息已被消费
@@ -61,17 +84,19 @@ public class IdempotentMessageInterceptor implements RedisMessageInterceptor {
         }
 
         String idempotentKey = buildIdempotentKey(message);
+        long ttlSeconds = expireTime.getSeconds();
 
-        // 使用 SETNX 尝试设置标记，原子操作保证并发安全
-        Boolean setSuccess = stringRedisTemplate.opsForValue()
-                .setIfAbsent(idempotentKey, STATUS_PROCESSING, expireTime);
+        // Lua 脚本原子操作：SETNX + GET，消除 TOCTOU 竞态
+        String result = stringRedisTemplate.execute(
+                new org.springframework.data.redis.core.script.DefaultRedisScript<>(IDEMPOTENT_LUA_SCRIPT, String.class),
+                java.util.List.of(idempotentKey),
+                STATUS_PROCESSING,
+                String.valueOf(ttlSeconds));
 
-        if (Boolean.FALSE.equals(setSuccess)) {
-            // 获取当前状态判断是正在处理还是已完成
-            String currentStatus = stringRedisTemplate.opsForValue().get(idempotentKey);
+        if (!"ok".equals(result)) {
             log.info("[consumeMessageBefore][消息已被处理，跳过消费] messageId={}, status={}, channel={}",
-                    messageId, currentStatus, message.getChannel());
-            throw new MessageAlreadyConsumedException(messageId, currentStatus);
+                    messageId, result, message.getChannel());
+            throw new MessageAlreadyConsumedException(messageId, result);
         }
 
         log.debug("[consumeMessageBefore][消息幂等检查通过] messageId={}, channel={}",

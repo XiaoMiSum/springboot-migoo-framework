@@ -2,17 +2,16 @@ package xyz.migoo.framework.mq.core.pubsub;
 
 import xyz.migoo.framework.common.util.TypeUtils;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
+import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptorUtils;
 import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,10 +37,10 @@ public abstract class AbstractChannelMessageListener<T extends AbstractChannelMe
     @Setter
     private RedisMQTemplate redisMQTemplate;
 
-    @SneakyThrows
     protected AbstractChannelMessageListener() {
         this.messageType = getMessageClass();
-        this.channel = messageType.getConstructor().newInstance().getChannel();
+        // 直接使用类名作为 Channel，无需反射创建临时对象
+        this.channel = messageType.getSimpleName();
     }
 
     /**
@@ -94,26 +93,16 @@ public abstract class AbstractChannelMessageListener<T extends AbstractChannelMe
 
     private void consumeMessageBefore(AbstractMessage message) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 正序
-        interceptors.forEach(interceptor -> interceptor.consumeMessageBefore(message));
+        RedisMessageInterceptorUtils.consumeMessageBefore(redisMQTemplate.getInterceptors(), message);
     }
 
     private void consumeMessageAfter(AbstractMessage message) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 倒序
-        for (int i = interceptors.size() - 1; i >= 0; i--) {
-            interceptors.get(i).consumeMessageAfter(message);
-        }
+        RedisMessageInterceptorUtils.consumeMessageAfter(redisMQTemplate.getInterceptors(), message);
     }
 
     private void consumeMessageError(AbstractMessage message, Throwable throwable) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 倒序
-        for (int i = interceptors.size() - 1; i >= 0; i--) {
-            interceptors.get(i).consumeMessageError(message, throwable);
-        }
+        RedisMessageInterceptorUtils.consumeMessageError(redisMQTemplate.getInterceptors(), message, throwable);
     }
 }

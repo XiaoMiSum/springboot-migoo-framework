@@ -3,21 +3,19 @@ package xyz.migoo.framework.mq.core.stream;
 import xyz.migoo.framework.common.util.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.mq.config.MQProperties;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
-import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
+import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptorUtils;
 import xyz.migoo.framework.mq.core.message.AbstractMessage;
 
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,47 +39,55 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
     private final Class<T> messageType;
 
     /**
-     * Redis Channel
+     * Redis Stream Key
      */
     @Getter
     private final String streamKey;
 
     /**
-     * Redis 消费者分组，默认使用 migoo.mq.group 名字
+     * 消费者分组名称
      */
-    @Value("${migoo.mq.group:def_group}")
     @Getter
-    private String group;
+    private final String group;
 
     /**
      * 最大重试次数
      */
-    @Value("${migoo.mq.max-retry:3}")
     @Getter
-    private int maxRetry = 3;
+    private final int maxRetry;
 
     /**
      * 是否启用死信队列
      */
-    @Value("${migoo.mq.dead-letter-enabled:true}")
     @Getter
-    private boolean deadLetterEnabled = true;
+    private final boolean deadLetterEnabled;
+
+    /**
+     * 消费成功后是否删除消息
+     */
+    @Getter
+    private final boolean deleteAfterAck;
 
     /**
      * RedisMQTemplate
      */
     @Setter
     private RedisMQTemplate redisMQTemplate;
+
     /**
-     *
+     * RedisTemplate
      */
     @Setter
     private RedisTemplate<String, ?> redisTemplate;
 
-    @SneakyThrows
-    protected AbstractStreamMessageListener() {
+    protected AbstractStreamMessageListener(MQProperties properties) {
         this.messageType = getMessageClass();
-        this.streamKey = messageType.getConstructor().newInstance().getChannel();
+        // 直接使用类名作为 Stream Key，无需反射创建临时对象
+        this.streamKey = messageType.getSimpleName();
+        this.group = properties.getGroup();
+        this.maxRetry = properties.getMaxRetry();
+        this.deadLetterEnabled = properties.getDeadLetterEnabled();
+        this.deleteAfterAck = properties.getDeleteAfterAck();
     }
 
     @Override
@@ -101,12 +107,16 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
             redisTemplate.opsForStream().acknowledge(group, message);
             log.debug("[onMessage][消费Stream消息成功] stream={}, messageId={}, recordId={}",
                     streamKey, messageObj.getMessageId(), message.getId());
-            // 消费成功后删除消息（可选，保留一段时间用于追踪）
-            redisTemplate.opsForStream().delete(message);
+            // 根据配置决定是否删除消息
+            if (deleteAfterAck) {
+                redisTemplate.opsForStream().delete(message);
+            }
         } catch (IdempotentMessageInterceptor.MessageAlreadyConsumedException e) {
             // 消息已被消费，直接 ACK 并跳过
             redisTemplate.opsForStream().acknowledge(group, message);
-            redisTemplate.opsForStream().delete(message);
+            if (deleteAfterAck) {
+                redisTemplate.opsForStream().delete(message);
+            }
             log.info("[onMessage][消息已被其他消费者处理，跳过] stream={}, messageId={}, status={}",
                     streamKey, messageObj.getMessageId(), e.getStatus());
         } catch (Exception e) {
@@ -218,27 +228,16 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
 
     private void consumeMessageBefore(AbstractMessage message) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 正序
-        interceptors.forEach(interceptor -> interceptor.consumeMessageBefore(message));
+        RedisMessageInterceptorUtils.consumeMessageBefore(redisMQTemplate.getInterceptors(), message);
     }
 
     private void consumeMessageAfter(AbstractMessage message) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 倒序
-        for (int i = interceptors.size() - 1; i >= 0; i--) {
-            interceptors.get(i).consumeMessageAfter(message);
-        }
+        RedisMessageInterceptorUtils.consumeMessageAfter(redisMQTemplate.getInterceptors(), message);
     }
 
     private void consumeMessageError(AbstractMessage message, Throwable throwable) {
         Objects.requireNonNull(redisMQTemplate, "RedisMQTemplate 未注入，请检查 MQAutoConfiguration 配置");
-        List<RedisMessageInterceptor> interceptors = redisMQTemplate.getInterceptors();
-        // 倒序
-        for (int i = interceptors.size() - 1; i >= 0; i--) {
-            interceptors.get(i).consumeMessageError(message, throwable);
-        }
+        RedisMessageInterceptorUtils.consumeMessageError(redisMQTemplate.getInterceptors(), message, throwable);
     }
-
 }

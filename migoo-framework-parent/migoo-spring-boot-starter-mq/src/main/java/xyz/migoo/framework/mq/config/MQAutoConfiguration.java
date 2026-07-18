@@ -65,6 +65,7 @@ public class MQAutoConfiguration {
      * @return 幂等拦截器
      */
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "migoo.mq.idempotent", name = "enabled", havingValue = "true", matchIfMissing = true)
     public IdempotentMessageInterceptor idempotentMessageInterceptor(StringRedisTemplate stringRedisTemplate,
                                                                      MQProperties properties) {
@@ -124,7 +125,8 @@ public class MQAutoConfiguration {
     public StreamMessageListenerContainer<String, ObjectRecord<String, String>> redisStreamMessageListenerContainer(
             RedisTemplate<String, Object> redisTemplate,
             List<AbstractStreamMessageListener<?>> listeners,
-            RedisMQTemplate redisMQTemplate) {
+            RedisMQTemplate redisMQTemplate,
+            MQProperties properties) {
         // 第一步，创建 StreamMessageListenerContainer 容器
         // 创建 options 配置
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> containerOptions =

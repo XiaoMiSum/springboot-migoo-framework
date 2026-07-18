@@ -28,13 +28,15 @@ public class MQProperties {
     private Boolean deadLetterEnabled = true;
 
     /**
-     * 幂等性配置
+     * 消费成功后是否删除 Stream 消息（保留用于审计追踪）
      */
-    private Idempotent idempotent = new Idempotent();
+    private Boolean deleteAfterAck = false;
 
     /**
      * 幂等性配置
      */
+    private Idempotent idempotent = new Idempotent();
+
     @Data
     public static class Idempotent {
 
