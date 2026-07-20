@@ -35,7 +35,7 @@
     </developers>
 
     <properties>
-        <migoo.version>1.3.16</migoo.version>
+        <migoo.framework.version>1.3.16</migoo.framework.version>
         <!-- 统一依赖管理 -->
         <spring.boot.version>4.1.0</spring.boot.version>
         <spring.ai.version>2.0.0</spring.ai.version>
@@ -123,19 +123,19 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-common</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-web</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-security</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <!-- DB 相关 -->
@@ -172,7 +172,7 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-mybatis</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <!-- Redis 相关 -->
@@ -184,14 +184,14 @@
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-redis</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <!-- 消息队列相关 -->
             <dependency>
                 <groupId>xyz.migoo.springboot</groupId>
                 <artifactId>migoo-spring-boot-starter-mq</artifactId>
-                <version>${migoo.version}</version>
+                <version>${migoo.framework.version}</version>
             </dependency>
 
             <dependency>
