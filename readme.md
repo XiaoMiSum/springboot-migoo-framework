@@ -20,12 +20,13 @@
 ### 1. 引入 BOM
 
 ```xml
+
 <dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-framework-dependencies</artifactId>
-            <version>1.3.16</version>
+            <version>1.3.17</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -36,6 +37,7 @@
 ### 2. 按需引入组件
 
 ```xml
+
 <dependencies>
     <!-- 公共组件 -->
     <dependency>
@@ -90,20 +92,22 @@ public Result<UserVO> getUser(@AuthUser AuthUserDetails user) {
 }
 
 // Redis 缓存操作
-redisKit.set(UserRedisKey.TOKEN.getKeyDefine(), token, userId);
+redisKit.
+
+set(UserRedisKey.TOKEN.getKeyDefine(),token,userId);
 String cached = redisKit.get(UserRedisKey.TOKEN.getKeyDefine(), userId);
 ```
 
 ## 组件文档
 
-| 组件 | 说明 | 文档 |
-|------|------|------|
-| `migoo-spring-boot-starter-common` | 公共工具类、异常处理、分页、校验 | [查看](docs/common.md) |
-| `migoo-spring-boot-starter-web` | Web MVC 配置、全局异常、统一响应 | [查看](docs/web.md) |
-| `migoo-spring-boot-starter-security` | 认证授权、JWT、OAuth2、TOTP 2FA | [查看](docs/security.md) |
-| `migoo-spring-boot-starter-mybatis` | MyBatis-Plus 增强、分页、数据源 | [查看](docs/mybatis.md) |
-| `migoo-spring-boot-starter-redis` | Redis 配置、工具类 | [查看](docs/redis.md) |
-| `migoo-spring-boot-starter-mq` | Redis 消息队列（Stream/Pub-Sub） | [查看](docs/mq.md) |
+| 组件                                 | 说明                             | 文档                     |
+|--------------------------------------|----------------------------------|--------------------------|
+| `migoo-spring-boot-starter-common`   | 公共工具类、异常处理、分页、校验 | [查看](docs/common.md)   |
+| `migoo-spring-boot-starter-web`      | Web MVC 配置、全局异常、统一响应 | [查看](docs/web.md)      |
+| `migoo-spring-boot-starter-security` | 认证授权、JWT、OAuth2、TOTP 2FA  | [查看](docs/security.md) |
+| `migoo-spring-boot-starter-mybatis`  | MyBatis-Plus 增强、分页、数据源  | [查看](docs/mybatis.md)  |
+| `migoo-spring-boot-starter-redis`    | Redis 配置、工具类               | [查看](docs/redis.md)    |
+| `migoo-spring-boot-starter-mq`       | Redis 消息队列（Stream/Pub-Sub） | [查看](docs/mq.md)       |
 
 ## 项目结构
 
