@@ -4,7 +4,7 @@ title: MiGoo Spring Boot Framework
 description: 基于 Spring Boot 4.1.0 的企业级快速开发框架
 
 baseurl: /springboot-migoo-framework
-url: https://migoo.xyz
+url: https://xiaomisum.github.io
 
 plugins:
   - jekyll-seo-tag
