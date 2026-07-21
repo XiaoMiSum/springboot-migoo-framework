@@ -138,6 +138,12 @@
                 <version>${migoo.framework.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-websocket</artifactId>
+                <version>${migoo.framework.version}</version>
+            </dependency>
+
             <!-- DB 相关 -->
             <dependency>
                 <groupId>com.baomidou</groupId>

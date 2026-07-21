@@ -13,6 +13,7 @@ layout: default
 | [Common](common.md)     | 公共工具类、异常处理、分页、校验 |
 | [Web](web.md)           | Web MVC 配置、全局异常、统一响应 |
 | [Security](security.md) | 认证授权、JWT、OAuth2、TOTP 2FA  |
+| [WebSocket](websocket.md) | WebSocket 连接管理、Token 认证 |
 | [MyBatis](mybatis.md)   | MyBatis-Plus 增强、分页、数据源  |
 | [Redis](redis.md)       | Redis 配置、工具类               |
 | [MQ](mq.md)             | Redis 消息队列（Stream/Pub-Sub） |
@@ -67,6 +68,12 @@ layout: default
 <dependency>
 <groupId>xyz.migoo.springboot</groupId>
 <artifactId>migoo-spring-boot-starter-redis</artifactId>
+</dependency>
+
+        <!-- WebSocket 组件 -->
+<dependency>
+<groupId>xyz.migoo.springboot</groupId>
+<artifactId>migoo-spring-boot-starter-websocket</artifactId>
 </dependency>
 
         <!-- MQ 组件 -->
