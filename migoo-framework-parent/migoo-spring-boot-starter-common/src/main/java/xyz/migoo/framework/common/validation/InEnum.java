@@ -2,7 +2,7 @@ package xyz.migoo.framework.common.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import xyz.migoo.framework.common.core.IntArrayValuable;
+import xyz.migoo.framework.common.core.ArrayValuable;
 
 import java.lang.annotation.*;
 
@@ -22,9 +22,9 @@ import java.lang.annotation.*;
 public @interface InEnum {
 
     /**
-     * @return 实现 EnumValuable 接口的
+     * @return 实现 ArrayValuable 接口的枚举类
      */
-    Class<? extends IntArrayValuable> value();
+    Class<? extends ArrayValuable> value();
 
     String message() default "{validation.values.range.invalid}";
 

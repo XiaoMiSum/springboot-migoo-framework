@@ -6,8 +6,11 @@ import xyz.migoo.framework.common.util.validation.ValidationUtils;
 
 public class MobileValidator implements ConstraintValidator<Mobile, String> {
 
+    private String region;
+
     @Override
     public void initialize(Mobile annotation) {
+        this.region = annotation.region();
     }
 
     @Override
@@ -15,7 +18,7 @@ public class MobileValidator implements ConstraintValidator<Mobile, String> {
         if (value == null || value.isEmpty()) {
             return true;
         }
-        return ValidationUtils.isMobile(value);
+        return ValidationUtils.isMobile(value, region);
     }
 
 }

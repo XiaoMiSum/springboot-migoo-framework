@@ -13,6 +13,12 @@ import java.lang.annotation.*;
 )
 public @interface Password {
 
+    int min() default 8;
+
+    int max() default 32;
+
+    String specialChars() default "_@#$!";
+
     String message() default "{validation.password.strength.invalid}";
 
     Class<?>[] groups() default {};

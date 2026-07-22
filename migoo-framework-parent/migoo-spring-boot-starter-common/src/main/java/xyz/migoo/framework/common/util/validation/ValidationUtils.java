@@ -21,10 +21,19 @@ public class ValidationUtils {
 
     private final static Pattern PATTERN_MOBILE = Pattern.compile("^(1)\\d{10}$");
 
-    private final static Pattern PATTERN_EMAIL = Pattern.compile("^\\s*\\w+(?:\\.{0,1}[\\w-]+)*@[a-zA-Z0-9]+(?:[-.][a-zA-Z0-9]+)*\\.[a-zA-Z]+\\s*$");
+    private final static Pattern PATTERN_MOBILE_INTL = Pattern.compile("^\\+\\d{7,15}$");
+
+    private final static Pattern PATTERN_EMAIL = Pattern.compile("^\\w+(?:[.+_-][\\w-]+)*@[a-zA-Z0-9]+(?:[-.][a-zA-Z0-9]+)*\\.[a-zA-Z]{2,}$");
 
     public static boolean isMobile(String mobile) {
         return StringUtils.hasText(mobile) && mobile.length() == N_11 && PATTERN_MOBILE.matcher(mobile).matches();
+    }
+
+    public static boolean isMobile(String mobile, String region) {
+        if ("CN".equalsIgnoreCase(region)) {
+            return isMobile(mobile);
+        }
+        return StringUtils.hasText(mobile) && PATTERN_MOBILE_INTL.matcher(mobile).matches();
     }
 
     public static boolean isEmail(String email) {

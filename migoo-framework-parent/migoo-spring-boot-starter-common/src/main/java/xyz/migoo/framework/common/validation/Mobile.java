@@ -20,6 +20,8 @@ import java.lang.annotation.*;
 )
 public @interface Mobile {
 
+    String region() default "CN";
+
     String message() default "{validation.mobile.phone.number.format.invalid}";
 
     Class<?>[] groups() default {};
