@@ -1,11 +1,11 @@
 package xyz.migoo.framework.mq.core.pubsub;
 
-import xyz.migoo.framework.common.util.TypeUtils;
+import xyz.migoo.framework.common.util.type.TypeUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptorUtils;

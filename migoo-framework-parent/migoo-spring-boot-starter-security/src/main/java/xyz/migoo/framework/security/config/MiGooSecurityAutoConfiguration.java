@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.common.util.ServletUtils;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.authentication.*;
 import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;

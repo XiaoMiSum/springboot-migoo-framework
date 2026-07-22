@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.io;
+package xyz.migoo.framework.common.util;
 
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
@@ -82,7 +82,7 @@ public class FileUtils {
         }
         // 情况二：基于 content 计算
         try {
-            String contentType = xyz.migoo.framework.common.util.FileTypeUtils.getType(new ByteArrayInputStream(content));
+            String contentType = xyz.migoo.framework.common.util.io.FileTypeUtils.getType(new ByteArrayInputStream(content));
             return sha256Hex + '.' + contentType;
         } catch (Exception e) {
             return sha256Hex;

@@ -6,8 +6,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
-import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
-import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
+import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 

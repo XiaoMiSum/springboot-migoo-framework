@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.message.AbstractMessage;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessage;

@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.cache;
+package xyz.migoo.framework.common.util;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.google.common.cache.CacheBuilder;

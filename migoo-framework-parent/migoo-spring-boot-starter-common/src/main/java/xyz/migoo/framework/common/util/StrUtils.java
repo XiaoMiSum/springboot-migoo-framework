@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.string;
+package xyz.migoo.framework.common.util;
 
 import com.google.common.collect.Maps;
 import org.springframework.util.CollectionUtils;

@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.exception.util;
+package xyz.migoo.framework.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import xyz.migoo.framework.common.exception.ErrorCode;

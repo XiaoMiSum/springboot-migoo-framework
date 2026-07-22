@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.thread;
+package xyz.migoo.framework.common.util;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

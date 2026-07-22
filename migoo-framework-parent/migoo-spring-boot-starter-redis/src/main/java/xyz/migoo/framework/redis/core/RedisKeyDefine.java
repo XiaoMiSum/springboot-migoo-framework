@@ -2,7 +2,7 @@ package xyz.migoo.framework.redis.core;
 
 import lombok.Getter;
 import tools.jackson.core.type.TypeReference;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 
 import java.time.Duration;
 import java.util.Objects;

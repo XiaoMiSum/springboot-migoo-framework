@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
-import xyz.migoo.framework.common.util.string.StrUtils;
+import xyz.migoo.framework.common.util.StrUtils;
 
 import java.util.Collection;
 import java.util.List;

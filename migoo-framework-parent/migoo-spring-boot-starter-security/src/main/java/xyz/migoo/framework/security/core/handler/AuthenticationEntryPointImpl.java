@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.common.util.ServletUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;

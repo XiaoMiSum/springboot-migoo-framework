@@ -9,7 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.common.util.ServletUtils;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 

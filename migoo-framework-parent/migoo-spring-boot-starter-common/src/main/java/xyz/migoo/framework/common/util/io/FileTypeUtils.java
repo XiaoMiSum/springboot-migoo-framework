@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util;
+package xyz.migoo.framework.common.util.io;
 
 import java.io.File;
 import java.io.FileInputStream;

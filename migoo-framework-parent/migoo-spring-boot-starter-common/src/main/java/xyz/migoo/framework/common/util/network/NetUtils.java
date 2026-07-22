@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util;
+package xyz.migoo.framework.common.util.network;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

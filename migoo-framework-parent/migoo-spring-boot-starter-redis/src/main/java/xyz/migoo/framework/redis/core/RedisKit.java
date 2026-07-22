@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 
 import java.time.Duration;
 import java.util.*;

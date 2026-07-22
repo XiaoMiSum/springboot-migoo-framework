@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.util.Assert;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.ServiceException;
-import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
+import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
 
 import java.io.Serializable;
 

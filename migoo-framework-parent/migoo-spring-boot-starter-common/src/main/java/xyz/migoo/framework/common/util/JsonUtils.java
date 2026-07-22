@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.json;
+package xyz.migoo.framework.common.util;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;

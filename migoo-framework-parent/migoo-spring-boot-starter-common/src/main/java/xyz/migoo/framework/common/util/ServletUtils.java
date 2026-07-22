@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.servlet;
+package xyz.migoo.framework.common.util;
 
 import com.google.common.base.Strings;
 import jakarta.servlet.ServletRequest;
@@ -8,8 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import xyz.migoo.framework.common.util.json.JsonUtils;
-import xyz.migoo.framework.common.util.NetUtils;
+import xyz.migoo.framework.common.util.network.NetUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,10 +31,10 @@ public class ServletUtils {
      * @param response 响应
      * @param object   对象，会序列化成 JSON 字符串
      */
-    @SuppressWarnings("deprecation") // 必须使用 APPLICATION_JSON_UTF8_VALUE，否则会乱码
+    // 必须使用 APPLICATION_JSON_UTF8_VALUE，否则会乱码
     public static void writeJSON(HttpServletResponse response, Object object) {
         String content = JsonUtils.toJsonString(object);
-        write(response, content, "application/json;charset=utf-8");
+        write(response, content);
     }
 
     /**
@@ -44,7 +43,6 @@ public class ServletUtils {
      * @param response 响应
      * @param filename 文件名
      * @param content  附件内容
-     * @throws IOException
      */
     public static void writeAttachment(HttpServletResponse response, String filename, byte[] content) throws IOException {
         // 设置 header 和 contentType
@@ -108,22 +106,13 @@ public class ServletUtils {
     }
 
 
-    private static void write(HttpServletResponse response, String text, String contentType) {
-        response.setContentType(contentType);
-        Writer writer = null;
-        try {
-            writer = response.getWriter();
+    private static void write(HttpServletResponse response, String text) {
+        response.setContentType("application/json;charset=utf-8");
+        try (Writer writer = response.getWriter()) {
             writer.write(text);
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException ignored) {
-                }
-            }
         }
     }
 

@@ -1,6 +1,6 @@
 package xyz.migoo.framework.mq.core.stream;
 
-import xyz.migoo.framework.common.util.TypeUtils;
+import xyz.migoo.framework.common.util.type.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,7 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.mq.config.MQProperties;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;

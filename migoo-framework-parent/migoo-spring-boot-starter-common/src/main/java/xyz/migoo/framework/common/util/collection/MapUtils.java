@@ -2,7 +2,7 @@ package xyz.migoo.framework.common.util.collection;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import xyz.migoo.framework.common.core.KeyValue;
+import xyz.migoo.framework.common.pojo.KeyValue;
 
 import java.util.ArrayList;
 import java.util.Collection;

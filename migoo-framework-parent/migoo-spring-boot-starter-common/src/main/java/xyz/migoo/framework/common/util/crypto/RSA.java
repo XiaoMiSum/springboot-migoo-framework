@@ -2,7 +2,7 @@ package xyz.migoo.framework.common.util.crypto;
 
 import com.google.common.base.Strings;
 import xyz.migoo.framework.common.exception.ErrorCode;
-import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
 
 import javax.crypto.Cipher;
 import java.io.FileInputStream;

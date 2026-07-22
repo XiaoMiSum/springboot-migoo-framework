@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
-import xyz.migoo.framework.common.util.servlet.ServletUtils;
+import xyz.migoo.framework.common.util.ServletUtils;
 import xyz.migoo.framework.web.core.wrapper.CachedBodyHttpServletRequest;
 
 import java.io.IOException;

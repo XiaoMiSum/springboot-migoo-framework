@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.http;
+package xyz.migoo.framework.common.util;
 
 import java.net.URI;
 import java.net.URLDecoder;

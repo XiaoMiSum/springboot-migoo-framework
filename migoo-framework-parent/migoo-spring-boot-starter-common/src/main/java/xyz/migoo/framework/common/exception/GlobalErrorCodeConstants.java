@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.exception.enums;
+package xyz.migoo.framework.common.exception;
 
 import xyz.migoo.framework.common.exception.ErrorCode;
 

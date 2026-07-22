@@ -2,7 +2,7 @@ package xyz.migoo.framework.mybatis.core.handler;
 
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import tools.jackson.core.type.TypeReference;
-import xyz.migoo.framework.common.util.json.JsonUtils;
+import xyz.migoo.framework.common.util.JsonUtils;
 
 import java.util.Set;
 

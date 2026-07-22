@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.number;
+package xyz.migoo.framework.common.util.money;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

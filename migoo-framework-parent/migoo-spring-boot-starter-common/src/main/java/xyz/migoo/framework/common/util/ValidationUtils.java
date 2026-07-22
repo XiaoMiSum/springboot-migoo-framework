@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util.validation;
+package xyz.migoo.framework.common.util;
 
 import jakarta.validation.*;
 import org.springframework.util.Assert;

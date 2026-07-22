@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util;
+package xyz.migoo.framework.common.util.type;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

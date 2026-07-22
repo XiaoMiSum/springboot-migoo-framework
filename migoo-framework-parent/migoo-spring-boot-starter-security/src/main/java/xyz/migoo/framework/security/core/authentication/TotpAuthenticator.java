@@ -8,7 +8,7 @@ import org.apache.commons.codec.binary.Base32;
 import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.exception.ErrorCode;
-import xyz.migoo.framework.common.exception.util.ServiceExceptionUtil;
+import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 
 import javax.crypto.KeyGenerator;

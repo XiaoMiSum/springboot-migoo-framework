@@ -1,7 +1,7 @@
 package xyz.migoo.framework.common.exception;
 
-import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
-import xyz.migoo.framework.common.exception.enums.ServiceErrorCodeRange;
+import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
+import xyz.migoo.framework.common.exception.ServiceErrorCodeRange;
 
 /**
  * 错误码对象

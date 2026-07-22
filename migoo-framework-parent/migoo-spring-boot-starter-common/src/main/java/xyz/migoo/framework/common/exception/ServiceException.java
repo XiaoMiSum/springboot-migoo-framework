@@ -3,7 +3,7 @@ package xyz.migoo.framework.common.exception;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import xyz.migoo.framework.common.exception.enums.ServiceErrorCodeRange;
+import xyz.migoo.framework.common.exception.ServiceErrorCodeRange;
 
 /**
  * 业务逻辑异常 Exception

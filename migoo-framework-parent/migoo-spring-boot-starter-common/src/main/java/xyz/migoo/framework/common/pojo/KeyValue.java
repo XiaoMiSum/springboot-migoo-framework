@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.core;
+package xyz.migoo.framework.common.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util;
+package xyz.migoo.framework.common.util.object;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

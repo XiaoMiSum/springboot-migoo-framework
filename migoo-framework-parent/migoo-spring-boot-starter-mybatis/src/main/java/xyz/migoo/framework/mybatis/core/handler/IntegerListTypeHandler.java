@@ -4,7 +4,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 import org.apache.ibatis.type.TypeHandler;
-import xyz.migoo.framework.common.util.string.StrUtils;
+import xyz.migoo.framework.common.util.StrUtils;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

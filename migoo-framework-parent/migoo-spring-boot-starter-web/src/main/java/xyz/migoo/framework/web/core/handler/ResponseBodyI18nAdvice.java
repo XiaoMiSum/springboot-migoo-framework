@@ -6,7 +6,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants;
+import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 

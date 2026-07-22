@@ -2,7 +2,7 @@ package xyz.migoo.framework.common.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import xyz.migoo.framework.common.util.validation.ValidationUtils;
+import xyz.migoo.framework.common.util.ValidationUtils;
 
 public class MobileValidator implements ConstraintValidator<Mobile, String> {
 
