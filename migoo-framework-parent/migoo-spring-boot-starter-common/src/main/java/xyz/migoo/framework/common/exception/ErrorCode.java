@@ -1,8 +1,5 @@
 package xyz.migoo.framework.common.exception;
 
-import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
-import xyz.migoo.framework.common.exception.ServiceErrorCodeRange;
-
 /**
  * 错误码对象
  * <p>

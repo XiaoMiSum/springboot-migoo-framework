@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import xyz.migoo.framework.common.util.network.NetUtils;
+import xyz.migoo.framework.common.util.network.NetworkUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -183,11 +183,11 @@ public class ServletUtils {
         String ip;
         for (String header : headerNames) {
             ip = request.getHeader(header);
-            if (!NetUtils.isUnknown(ip)) {
-                return NetUtils.getMultistageReverseProxyIp(ip, null);
+            if (!NetworkUtils.isUnknown(ip)) {
+                return NetworkUtils.getMultistageReverseProxyIp(ip, null);
             }
         }
         ip = request.getRemoteAddr();
-        return NetUtils.getMultistageReverseProxyIp(ip, null);
+        return NetworkUtils.getMultistageReverseProxyIp(ip, null);
     }
 }

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *
  * @author xiaomi
  */
-public class StrUtils {
+public class StringUtils {
 
     /**
      * 截断字符串，超过最大长度时补充 ...

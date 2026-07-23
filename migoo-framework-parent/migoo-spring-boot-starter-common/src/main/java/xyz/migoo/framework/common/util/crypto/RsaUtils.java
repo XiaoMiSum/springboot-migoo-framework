@@ -22,7 +22,7 @@ import java.util.Base64;
  *
  * @author xiaomi
  */
-public class RSA {
+public class RsaUtils {
 
     public static final ErrorCode SIGN_INVALID = new ErrorCode(580, "签名生成失败，请检查密钥配置是否正确");
     public static final ErrorCode DATA_DECRYPT_INVALID = new ErrorCode(580, "数据解密失败");

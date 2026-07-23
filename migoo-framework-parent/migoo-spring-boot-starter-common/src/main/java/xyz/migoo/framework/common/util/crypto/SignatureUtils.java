@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * @author xiaomi
  * Created at 2024/5/16 19:03
  */
-public class Signature {
+public class SignatureUtils {
 
     public static String[] getIgnoreFields(Class<?> clazz) {
         List<String> fieldNameList = new ArrayList<>();

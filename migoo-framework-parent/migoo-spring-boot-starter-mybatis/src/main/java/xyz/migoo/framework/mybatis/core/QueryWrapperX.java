@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
-import xyz.migoo.framework.common.util.StrUtils;
+import xyz.migoo.framework.common.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +34,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     private String columnToString(SFunction<T, ?> column) {
-        return StrUtils.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return StringUtils.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
     }
 
     public QueryWrapperX<T> limit(int n) {
