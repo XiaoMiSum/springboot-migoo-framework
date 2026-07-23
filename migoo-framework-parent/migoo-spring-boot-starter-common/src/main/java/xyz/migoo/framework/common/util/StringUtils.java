@@ -1,8 +1,8 @@
 package xyz.migoo.framework.common.util;
 
 import com.google.common.collect.Maps;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import org.jspecify.annotations.Nullable;
+import xyz.migoo.framework.common.util.collection.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +16,24 @@ import java.util.stream.Collectors;
  * @author xiaomi
  */
 public class StringUtils {
+
+    public static boolean hasText(@Nullable CharSequence str) {
+        if (str == null) {
+            return false;
+        }
+
+        int strLen = str.length();
+        if (strLen == 0) {
+            return false;
+        }
+
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 截断字符串，超过最大长度时补充 ...

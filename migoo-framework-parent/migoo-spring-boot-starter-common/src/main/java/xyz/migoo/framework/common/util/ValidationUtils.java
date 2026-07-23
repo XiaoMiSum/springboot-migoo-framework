@@ -1,9 +1,8 @@
 package xyz.migoo.framework.common.util;
 
+import com.google.common.base.Preconditions;
 import jakarta.validation.*;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import xyz.migoo.framework.common.util.collection.CollectionUtils;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -47,7 +46,7 @@ public class ValidationUtils {
     public static void validate(Object object, Class<?>... groups) {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             Validator validator = factory.getValidator();
-            Assert.notNull(validator, "Validator must not be null");
+            Preconditions.checkNotNull(validator, "Validator must not be null");
             validate(validator, object, groups);
         }
     }

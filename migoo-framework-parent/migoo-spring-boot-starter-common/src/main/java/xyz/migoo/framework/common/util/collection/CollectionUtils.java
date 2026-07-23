@@ -244,8 +244,24 @@ public class CollectionUtils {
         return asList(createList, updateList, deleteList);
     }
 
+    public static boolean isEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
     public static boolean containsAny(Collection<?> source, Collection<?> candidates) {
-        return org.springframework.util.CollectionUtils.containsAny(source, candidates);
+        if (source == null || source.isEmpty() || candidates == null || candidates.isEmpty()) {
+            return false;
+        }
+        for (Object candidate : candidates) {
+            if (source.contains(candidate)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static <T> T getFirst(List<T> from) {

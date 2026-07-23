@@ -9,13 +9,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.ServletUtils;
+import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.security.core.util.SecurityFrameworkUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.io.IOException;
 
-import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
+import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.FORBIDDEN;
 
 /**
  * 访问一个需要认证的 URL 资源，已经认证（登录）但是没有权限的情况下，返回 {@link GlobalErrorCodeConstants#FORBIDDEN} 错误码。

@@ -24,7 +24,7 @@ import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.object.ExceptionUtils;
 import xyz.migoo.framework.common.util.JsonUtils;
-import xyz.migoo.framework.common.util.ServletUtils;
+import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.*;
+import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.*;
 
 /**
  * 全局异常处理器，将 Exception 翻译成 CommonResult + 对应的异常编号

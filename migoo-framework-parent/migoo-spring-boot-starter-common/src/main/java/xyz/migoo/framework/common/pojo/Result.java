@@ -1,7 +1,7 @@
 package xyz.migoo.framework.common.pojo;
 
+import com.google.common.base.Preconditions;
 import lombok.Data;
-import org.springframework.util.Assert;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
@@ -47,7 +47,7 @@ public class Result<T> implements Serializable {
     }
 
     public static <T> Result<T> error(Integer code, String message) {
-        Assert.isTrue(!GlobalErrorCodeConstants.SUCCESS.code().equals(code), "code 必须是错误的！");
+        Preconditions.checkArgument(!GlobalErrorCodeConstants.SUCCESS.code().equals(code), "code 必须是错误的！");
         Result<T> result = new Result<>();
         result.code = code;
         result.msg = message;

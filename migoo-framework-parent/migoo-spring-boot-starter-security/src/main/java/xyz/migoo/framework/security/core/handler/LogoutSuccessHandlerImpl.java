@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.ServletUtils;
+import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.authentication.AuthUserDetailsFetcher;

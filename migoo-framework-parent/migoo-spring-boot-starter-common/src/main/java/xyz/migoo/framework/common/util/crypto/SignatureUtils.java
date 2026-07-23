@@ -1,7 +1,7 @@
 package xyz.migoo.framework.common.util.crypto;
 
 import com.google.common.collect.Lists;
-import org.springframework.util.StringUtils;
+import xyz.migoo.framework.common.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.security.MessageDigest;

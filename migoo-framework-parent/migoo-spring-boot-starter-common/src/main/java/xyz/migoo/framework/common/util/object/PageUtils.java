@@ -1,12 +1,11 @@
 package xyz.migoo.framework.common.util.object;
 
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
+import com.google.common.base.Preconditions;
 import xyz.migoo.framework.common.pojo.PageParam;
 import xyz.migoo.framework.common.pojo.SortField;
 import xyz.migoo.framework.common.pojo.SortablePageParam;
+import xyz.migoo.framework.common.util.collection.CollectionUtils;
 
-import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -45,7 +44,7 @@ public class PageUtils {
      * @return 排序字段
      */
     public static <T> SortField buildSortingField(Function<T, ?> func, String order) {
-        Assert.isTrue(Arrays.asList(ORDER_TYPES).contains(order),
+        Preconditions.checkArgument(Arrays.asList(ORDER_TYPES).contains(order),
                 String.format("字段的排序类型只能是 %s/%s", ORDER_TYPES));
 
         String fieldName = getFieldName(func);
@@ -69,7 +68,6 @@ public class PageUtils {
     /**
      * 从 Lambda 表达式获取字段名
      */
-    @SuppressWarnings("unchecked")
     private static <T> String getFieldName(Function<T, ?> func) {
         try {
             // 获取序列化的 lambda

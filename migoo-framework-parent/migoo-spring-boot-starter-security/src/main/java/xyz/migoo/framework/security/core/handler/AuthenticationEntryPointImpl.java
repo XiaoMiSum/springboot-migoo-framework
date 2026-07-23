@@ -9,10 +9,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.ServletUtils;
+import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
-import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
+import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * 访问一个需要认证的 URL 资源，但是此时自己尚未认证（登录）的情况下，返回 {@link GlobalErrorCodeConstants#UNAUTHORIZED} 错误码，从而使前端重定向到登录页

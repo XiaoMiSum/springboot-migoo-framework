@@ -1,7 +1,6 @@
 package xyz.migoo.framework.common.util;
 
 import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

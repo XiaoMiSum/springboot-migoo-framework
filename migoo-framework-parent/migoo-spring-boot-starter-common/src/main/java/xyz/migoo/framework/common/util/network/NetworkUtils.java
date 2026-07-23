@@ -1,10 +1,6 @@
 package xyz.migoo.framework.common.util.network;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Enumeration;
 
 /**
@@ -13,13 +9,13 @@ import java.util.Enumeration;
  * @author migoo
  * @since 1.3.16
  */
-public final class NetUtils {
+public final class NetworkUtils {
 
     private static final String UNKNOWN = "unknown";
     private static final String LOCALHOST = "127.0.0.1";
     private static final String SEPARATOR = ",";
 
-    private NetUtils() {
+    private NetworkUtils() {
     }
 
     /**

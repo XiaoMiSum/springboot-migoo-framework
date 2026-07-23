@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.google.common.collect.Lists;
 import org.apache.ibatis.reflection.property.PropertyNamer;
-import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
-import xyz.migoo.framework.common.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +32,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     private String columnToString(SFunction<T, ?> column) {
-        return StringUtils.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
+        return xyz.migoo.framework.common.util.StringUtils.toUnderlineCase(PropertyNamer.methodToProperty(LambdaUtils.extract(column).getImplMethodName()));
     }
 
     public QueryWrapperX<T> limit(int n) {
@@ -47,7 +45,7 @@ public class QueryWrapperX<T> extends QueryWrapper<T> {
     }
 
     public QueryWrapperX<T> likeIfPresent(String column, String val) {
-        if (StringUtils.hasText(val)) {
+        if (org.springframework.util.StringUtils.hasText(val)) {
             return (QueryWrapperX<T>) super.like(column, val);
         }
         return this;

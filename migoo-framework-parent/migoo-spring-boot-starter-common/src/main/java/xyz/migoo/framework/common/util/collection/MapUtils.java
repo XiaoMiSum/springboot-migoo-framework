@@ -28,7 +28,7 @@ public class MapUtils {
         List<V> result = new ArrayList<>();
         keys.forEach(k -> {
             Collection<V> values = multimap.get(k);
-            if (values == null || values.isEmpty()) {
+            if (values.isEmpty()) {
                 return;
             }
             result.addAll(values);

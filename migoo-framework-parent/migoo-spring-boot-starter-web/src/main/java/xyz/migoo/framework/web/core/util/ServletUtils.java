@@ -1,4 +1,4 @@
-package xyz.migoo.framework.common.util;
+package xyz.migoo.framework.web.core.util;
 
 import com.google.common.base.Strings;
 import jakarta.servlet.ServletRequest;
@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.common.util.network.NetworkUtils;
 
 import java.io.BufferedReader;

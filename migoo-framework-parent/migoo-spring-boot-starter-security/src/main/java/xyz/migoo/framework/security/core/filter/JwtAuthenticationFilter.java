@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.ServletUtils;
+import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.authentication.AuthUserDetailsFetcher;
@@ -23,9 +23,9 @@ import xyz.migoo.framework.web.core.util.WebFrameworkUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
 import java.io.IOException;
+import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.FORBIDDEN;
 
-import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.FORBIDDEN;
-import static xyz.migoo.framework.common.exception.enums.GlobalErrorCodeConstants.UNAUTHORIZED;
+import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.UNAUTHORIZED;
 
 /**
  * JWT 认证过滤器，验证 token 的有效性
