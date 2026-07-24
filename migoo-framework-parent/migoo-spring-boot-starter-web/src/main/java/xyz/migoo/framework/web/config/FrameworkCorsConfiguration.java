@@ -25,7 +25,7 @@ public class FrameworkCorsConfiguration {
         MigooWebProperties.Cors corsConfig = properties.getCors();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(corsConfig.isAllowCredentials());
-        config.setAllowedOrigins(corsConfig.getAllowedOrigins());
+        config.setAllowedOriginPatterns(corsConfig.getAllowedOrigins());
         config.setAllowedHeaders(corsConfig.getAllowedHeaders());
         config.setAllowedMethods(corsConfig.getAllowedMethods());
         config.setMaxAge(corsConfig.getMaxAge());
