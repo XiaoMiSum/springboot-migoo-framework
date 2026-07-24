@@ -13,8 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
 import xyz.migoo.framework.mybatis.core.handler.UTCLocalDateTimeHandler;
+import xyz.migoo.framework.mybatis.core.handler.UUIDTypeHandler;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author xiaomi
@@ -36,9 +38,11 @@ public class MybatisAutoConfiguration {
     @Bean
     public ConfigurationCustomizer mybatisConfigurationCustomizer() {
         return configuration -> {
-            // 为所有 LocalDateTime 注册同一个 Handler
             TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+            // 为所有 LocalDateTime 注册同一个 Handler
             registry.register(LocalDateTime.class, UTCLocalDateTimeHandler.class);
+            // 为 UUID 注册 TypeHandler
+            registry.register(UUID.class, UUIDTypeHandler.class);
         };
 
     }

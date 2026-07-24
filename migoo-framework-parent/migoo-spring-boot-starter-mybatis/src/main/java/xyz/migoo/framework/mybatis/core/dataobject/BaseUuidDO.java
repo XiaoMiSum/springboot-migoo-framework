@@ -11,8 +11,8 @@ import java.util.UUID;
  * <p>
  * 使用说明：
  * - 适用于需要全局唯一 ID 的场景
- * - PostgreSQL 数据库会自动生成 UUID
- * - 其他数据库使用 ASSIGN_UUID 策略
+ * - 数据库字段类型建议为 CHAR(36) 或 BINARY(16)
+ * - UUID TypeHandler 已在 MybatisAutoConfiguration 中全局注册
  *
  * @author xiaomi
  */
@@ -22,7 +22,7 @@ import java.util.UUID;
 public abstract class BaseUuidDO<SELF extends BaseUuidDO<SELF>> extends BaseDO {
 
     /**
-     * 重写 id 字段，指定使用 UUID 策略
+     * 主键
      */
     @TableId()
     private UUID id;
