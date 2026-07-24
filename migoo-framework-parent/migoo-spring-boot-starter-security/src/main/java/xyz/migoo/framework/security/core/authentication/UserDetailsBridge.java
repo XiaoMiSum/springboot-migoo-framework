@@ -1,5 +1,10 @@
 package xyz.migoo.framework.security.core.authentication;
 
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
+import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 
 /**
@@ -7,10 +12,13 @@ import xyz.migoo.framework.security.core.AuthUserDetails;
  * <p>
  * 应用必须实现此接口，提供从数据库加载用户的逻辑。
  * 框架通过此接口将 token 操作与用户存储解耦。
+ * <p>
+ * 继承 {@link UserDetailsService}，可直接作为 AuthenticationManager 的 UserDetailsService，
+ * 避免与 {@link AuthUserDetailsFetcher} 产生循环依赖。
  *
  * @author xiaomi
  */
-public interface UserDetailsBridge {
+public interface UserDetailsBridge extends UserDetailsService {
 
     /**
      * 根据用户名加载用户 (用于 loadUserByUsername / authenticate)
@@ -32,6 +40,20 @@ public interface UserDetailsBridge {
      * @return 用户信息
      */
     AuthUserDetails<?, ?> loadByUserId(String userId);
+
+    /**
+     * Spring Security UserDetailsService 回调
+     * <p>
+     * 默认委托给 {@link #loadByUsername(String)}
+     */
+    @Override
+    default UserDetails loadUserByUsername(@NonNull String username) {
+        var user = loadByUsername(username);
+        if (user == null) {
+            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.INVALID_AUTHORIZED);
+        }
+        return user;
+    }
 
     /**
      * 清理 token (用于 clean / 登出)

@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.ObjectPostProcessor;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -102,6 +104,26 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 创建 AuthenticationManager Bean
+     * <p>
+     * 仅在 JWT 模式下创建，OAuth2 模式由 Spring Security 内部管理。
+     * <p>
+     * 与 {@link MiGooWebSecurityFilterChainConfiguration} 分离，避免循环依赖:
+     * FilterChain 创建 AuthenticationManager → DefaultJwtAuthenticator 依赖 AuthenticationManager
+     * → LogoutSuccessHandler 依赖 DefaultJwtAuthenticator → FilterChain 消费 LogoutSuccessHandler
+     */
+    @Bean
+    @ConditionalOnMissingBean(AuthenticationManager.class)
+    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
+    public AuthenticationManager authenticationManagerBean(ObjectPostProcessor<Object> objectPostProcessor,
+                                                            UserDetailsBridge userDetailsBridge,
+                                                            PasswordEncoder passwordEncoder) throws Exception {
+        AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(objectPostProcessor);
+        builder.userDetailsService(userDetailsBridge).passwordEncoder(passwordEncoder);
+        return builder.build();
     }
 
     /**

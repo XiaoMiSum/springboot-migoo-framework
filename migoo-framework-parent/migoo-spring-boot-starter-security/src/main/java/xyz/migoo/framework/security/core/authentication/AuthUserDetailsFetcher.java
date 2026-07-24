@@ -1,7 +1,6 @@
 package xyz.migoo.framework.security.core.authentication;
 
 import lombok.Data;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 
 import java.time.LocalDateTime;
@@ -9,11 +8,13 @@ import java.time.LocalDateTime;
 /**
  * 用户详情获取接口
  * <p>
- * 定义 security 组件需要的用户加载与认证能力
+ * 定义 security 组件需要的认证能力（登录、token 校验、刷新、登出）。
+ * 与 {@link org.springframework.security.core.userdetails.UserDetailsService} 解耦，
+ * 用户加载由 {@link UserDetailsBridge} 负责。
  *
  * @author xiaomi
  */
-public interface AuthUserDetailsFetcher<T extends AuthUserDetails<T, ?>> extends UserDetailsService {
+public interface AuthUserDetailsFetcher<T extends AuthUserDetails<T, ?>> {
 
     /**
      * 用户认证

@@ -1,6 +1,5 @@
 package xyz.migoo.framework.security.core.authentication;
 
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
  * @author xiaomi
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-@RequiredArgsConstructor
 public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
 
     private final JwtTokenProvider tokenProvider;
@@ -30,15 +28,16 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
     private final AuthenticationManager authenticationManager;
     private final SecurityProperties properties;
 
-    @Override
-    @NonNull
-    public AuthUserDetails loadUserByUsername(@NonNull String username) {
-        AuthUserDetails user = userBridge.loadByUsername(username);
-        if (user == null) {
-            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.INVALID_AUTHORIZED);
-        }
-        return user;
+    public DefaultJwtAuthenticator(JwtTokenProvider tokenProvider,
+                                   UserDetailsBridge userBridge,
+                                   AuthenticationManager authenticationManager,
+                                   SecurityProperties properties) {
+        this.tokenProvider = tokenProvider;
+        this.userBridge = userBridge;
+        this.authenticationManager = authenticationManager;
+        this.properties = properties;
     }
+
 
     @Override
     public AuthUserDetailsFetcher.LoginResult authenticate(String username, String password) {

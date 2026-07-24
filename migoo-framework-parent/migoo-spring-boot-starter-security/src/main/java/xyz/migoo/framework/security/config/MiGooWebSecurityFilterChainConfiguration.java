@@ -1,14 +1,10 @@
 package xyz.migoo.framework.security.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.ObjectPostProcessor;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,15 +15,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import xyz.migoo.framework.security.core.AuthUserDetails;
-import xyz.migoo.framework.security.core.authentication.AuthUserDetailsFetcher;
 import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
 
 /**
  * Spring Security 过滤链配置
  * <p>
- * 定义 SecurityFilterChain，包括认证管理器、请求授权、异常处理、登出等。
- * 与 {@link MiGooSecurityAutoConfiguration} 分离，避免 AuthenticationManager 初始化报错。
+ * 定义 SecurityFilterChain，包括请求授权、异常处理、登出等。
+ * AuthenticationManager 已移至 {@link MiGooSecurityAutoConfiguration}，避免循环依赖。
  *
  * @author xiaomi
  */
@@ -35,51 +29,19 @@ import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
 @EnableMethodSecurity(securedEnabled = true)
 public class MiGooWebSecurityFilterChainConfiguration {
 
-    @Autowired
-    private SecurityProperties properties;
-
-    /**
-     * AuthUserDetailsFetcher 可选注入
-     * <p>
-     * JWT 模式下存在，OAuth2 模式下不存在
-     */
-    @Autowired(required = false)
-    private AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationEntryPoint authenticationEntryPoint;
-
-    @Autowired
-    private AccessDeniedHandler accessDeniedHandler;
-
-    @Autowired
-    private LogoutSuccessHandler logoutSuccessHandler;
-
-    @Autowired(required = false)
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    /**
-     * 创建 AuthenticationManager Bean
-     * <p>
-     * 仅在 JWT 模式下创建，OAuth2 模式由 Spring Security 内部管理。
-     */
-    @Bean
-    @ConditionalOnMissingBean(AuthenticationManager.class)
-    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
-    public AuthenticationManager authenticationManagerBean(ObjectPostProcessor<Object> objectPostProcessor) throws Exception {
-        AuthenticationManagerBuilder builder = new AuthenticationManagerBuilder(objectPostProcessor);
-        builder.userDetailsService(userDetailsFetcher).passwordEncoder(passwordEncoder);
-        return builder.build();
-    }
-
     /**
      * SecurityFilterChain 核心配置
+     * <p>
+     * 所有依赖通过方法参数注入，避免字段注入引起的循环依赖。
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                   SecurityProperties properties,
+                                                   PasswordEncoder passwordEncoder,
+                                                   AuthenticationEntryPoint authenticationEntryPoint,
+                                                   AccessDeniedHandler accessDeniedHandler,
+                                                   LogoutSuccessHandler logoutSuccessHandler,
+                                                   @Nullable JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         httpSecurity
                 // CSRF 禁用，因为不使用 Session
                 .csrf(AbstractHttpConfigurer::disable)
