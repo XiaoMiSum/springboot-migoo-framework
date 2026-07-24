@@ -206,3 +206,64 @@ mybatis-plus:
 # 加密密钥配置（可选）
 -Dmybatis-plus.encryptor.password=your-encrypt-key
 ```
+
+## 多数据源配置
+
+框架默认提供单数据源，如需多数据源请引入 `dynamic-datasource-spring-boot4-starter`。
+
+### 1. 引入依赖
+
+```xml
+<dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
+</dependency>
+```
+
+版本由 BOM 统一管理，无需单独指定。
+
+### 2. 配置数据源
+
+```yaml
+spring:
+  datasource:
+    dynamic:
+      primary: master
+      strict: false
+      datasource:
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/master_db
+          username: root
+          password: root
+        slave:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://localhost:3306/slave_db
+          username: root
+          password: root
+```
+
+### 3. 使用注解切换数据源
+
+```java
+@Service
+public class UserService {
+
+    @DS("master")  // 切换到主库
+    public void saveMaster(UserDO user) {
+        userMapper.insert(user);
+    }
+
+    @DS("slave")  // 切换到从库
+    public UserDO getFromSlave(Long id) {
+        return userMapper.selectById(id);
+    }
+}
+```
+
+### 4. 注意事项
+
+- `@DS` 注解标注在类上可实现类级别数据源切换
+- 未标注 `@DS` 的方法使用 `primary` 配置的主数据源
+- 多数据源下请确保每个数据源都有对应的 `Mapper` 扫描路径
+- 动态数据源事务管理器与 Spring 默认不同，需使用 `@Transactional(rollbackFor = Exception.class)`
