@@ -1,9 +1,9 @@
 package xyz.migoo.framework.security.core.authentication;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
@@ -46,8 +46,8 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
                     new UsernamePasswordAuthenticationToken(username, password));
             AuthUserDetails user = (AuthUserDetails) authentication.getPrincipal();
             return buildLoginResult(user);
-        } catch (Exception e) {
-            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.INVALID_AUTHORIZED);
+        } catch (AuthenticationException e) {
+            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.UNAUTHORIZED);
         }
     }
 
