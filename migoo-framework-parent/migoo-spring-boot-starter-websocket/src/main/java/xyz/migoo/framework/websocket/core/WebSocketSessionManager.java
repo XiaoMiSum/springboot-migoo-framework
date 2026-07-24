@@ -101,4 +101,81 @@ public interface WebSocketSessionManager {
      */
     Set<String> getOnlineUserIds();
 
+    // ========== 房间管理 ==========
+
+    /**
+     * 用户加入房间
+     *
+     * @param roomId 房间 ID
+     * @param userId 用户 ID
+     */
+    void joinRoom(String roomId, String userId);
+
+    /**
+     * 用户离开房间
+     *
+     * @param roomId 房间 ID
+     * @param userId 用户 ID
+     */
+    void leaveRoom(String roomId, String userId);
+
+    /**
+     * 获取房间内所有用户 ID
+     *
+     * @param roomId 房间 ID
+     * @return 用户 ID 集合
+     */
+    Set<String> getRoomMembers(String roomId);
+
+    /**
+     * 获取用户加入的所有房间
+     *
+     * @param userId 用户 ID
+     * @return 房间 ID 集合
+     */
+    Set<String> getUserRooms(String userId);
+
+    /**
+     * 判断用户是否在房间内
+     *
+     * @param roomId 房间 ID
+     * @param userId 用户 ID
+     * @return 是否在房间内
+     */
+    boolean isRoomMember(String roomId, String userId);
+
+    /**
+     * 获取房间数量
+     *
+     * @return 房间数量
+     */
+    int getRoomCount();
+
+    /**
+     * 获取房间内在线用户数量
+     *
+     * @param roomId 房间 ID
+     * @return 在线用户数量
+     */
+    int getRoomMemberCount(String roomId);
+
+    // ========== 房间消息 ==========
+
+    /**
+     * 发送消息给房间内所有用户
+     *
+     * @param roomId  房间 ID
+     * @param message 消息内容
+     */
+    void sendToRoom(String roomId, String message);
+
+    /**
+     * 发送消息给房间内所有用户（排除指定用户）
+     *
+     * @param roomId        房间 ID
+     * @param excludeUserId 排除的用户 ID
+     * @param message       消息内容
+     */
+    void sendToRoomExcept(String roomId, String excludeUserId, String message);
+
 }

@@ -18,6 +18,8 @@ import xyz.migoo.framework.websocket.core.MiGooWebSocketHandler;
 import xyz.migoo.framework.websocket.core.WebSocketAuthInterceptor;
 import xyz.migoo.framework.websocket.core.WebSocketSessionManager;
 
+import java.util.List;
+
 /**
  * WebSocket 自动配置类
  *
@@ -75,9 +77,13 @@ public class MiGooWebSocketAutoConfiguration {
                                                     WebSocketAuthInterceptor authInterceptor,
                                                     MiGooWebSocketHandler webSocketHandler) {
         return registry -> {
-            registry.addHandler(webSocketHandler, properties.getEndpoint())
-                    .addInterceptors(authInterceptor)
-                    .setAllowedOrigins(properties.getAllowedOrigins().split(","));
+            // 获取所有端点路径
+            List<String> endpoints = properties.getAllEndpoints();
+            for (String endpoint : endpoints) {
+                registry.addHandler(webSocketHandler, endpoint)
+                        .addInterceptors(authInterceptor)
+                        .setAllowedOrigins(properties.getAllowedOrigins().split(","));
+            }
         };
     }
 

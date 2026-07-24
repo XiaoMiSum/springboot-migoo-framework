@@ -9,6 +9,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * WebSocket 消息处理器
@@ -144,6 +145,87 @@ public class MiGooWebSocketHandler extends TextWebSocketHandler {
      */
     protected void broadcast(String message) {
         sessionManager.broadcast(message);
+    }
+
+    // ========== 房间操作方法 ==========
+
+    /**
+     * 加入房间
+     *
+     * @param session WebSocket 会话
+     * @param roomId  房间 ID
+     */
+    protected void joinRoom(WebSocketSession session, String roomId) {
+        String userId = getUserId(session);
+        if (userId != null) {
+            sessionManager.joinRoom(roomId, userId);
+        }
+    }
+
+    /**
+     * 离开房间
+     *
+     * @param session WebSocket 会话
+     * @param roomId  房间 ID
+     */
+    protected void leaveRoom(WebSocketSession session, String roomId) {
+        String userId = getUserId(session);
+        if (userId != null) {
+            sessionManager.leaveRoom(roomId, userId);
+        }
+    }
+
+    /**
+     * 发送消息给房间内所有用户
+     *
+     * @param roomId  房间 ID
+     * @param message 消息内容
+     */
+    protected void sendToRoom(String roomId, String message) {
+        sessionManager.sendToRoom(roomId, message);
+    }
+
+    /**
+     * 发送消息给房间内所有用户（排除指定用户）
+     *
+     * @param roomId        房间 ID
+     * @param excludeUserId 排除的用户 ID
+     * @param message       消息内容
+     */
+    protected void sendToRoomExcept(String roomId, String excludeUserId, String message) {
+        sessionManager.sendToRoomExcept(roomId, excludeUserId, message);
+    }
+
+    /**
+     * 获取房间内所有用户 ID
+     *
+     * @param roomId 房间 ID
+     * @return 用户 ID 集合
+     */
+    protected Set<String> getRoomMembers(String roomId) {
+        return sessionManager.getRoomMembers(roomId);
+    }
+
+    /**
+     * 获取用户加入的所有房间
+     *
+     * @param session WebSocket 会话
+     * @return 房间 ID 集合
+     */
+    protected Set<String> getUserRooms(WebSocketSession session) {
+        String userId = getUserId(session);
+        return userId != null ? sessionManager.getUserRooms(userId) : Set.of();
+    }
+
+    /**
+     * 判断用户是否在房间内
+     *
+     * @param roomId 房间 ID
+     * @param userId 用户 ID
+     * @return 是否在房间内
+     */
+    protected boolean isRoomMember(String roomId, String userId) {
+        return sessionManager.isRoomMember(roomId, userId);
     }
 
 }
