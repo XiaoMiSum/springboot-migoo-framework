@@ -1,6 +1,8 @@
 package xyz.migoo.framework.security.config;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.security.autoconfigure.web.servlet.ServletWebSecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,10 +22,13 @@ import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
  * <p>
  * 定义 SecurityFilterChain，包括请求授权、异常处理、登出等。
  * AuthenticationManager 已移至 {@link MiGooSecurityAutoConfiguration}，避免循环依赖。
+ * <p>
+ * 使用 @AutoConfiguration 确保在 Spring Boot 默认 SecurityFilterChain 之前注册，
+ * 使其 @ConditionalOnMissingBean 生效并跳过默认配置。
  *
  * @author xiaomi
  */
-@Configuration
+@AutoConfiguration(before = ServletWebSecurityAutoConfiguration.class)
 @EnableMethodSecurity(securedEnabled = true)
 public class MiGooWebSecurityFilterChainConfiguration {
 
