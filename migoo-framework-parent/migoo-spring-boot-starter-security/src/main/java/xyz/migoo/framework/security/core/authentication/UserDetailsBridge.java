@@ -47,6 +47,7 @@ public interface UserDetailsBridge extends UserDetailsService {
      * 默认委托给 {@link #loadByUsername(String)}
      */
     @Override
+    @NonNull
     default UserDetails loadUserByUsername(@NonNull String username) {
         var user = loadByUsername(username);
         if (user == null) {
