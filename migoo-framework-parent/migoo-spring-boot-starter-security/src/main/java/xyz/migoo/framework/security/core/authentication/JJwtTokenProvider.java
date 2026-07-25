@@ -71,7 +71,8 @@ public class JJwtTokenProvider implements JwtTokenProvider {
                 .claim("type", type)
                 .issuedAt(now)
                 .expiresAt(now.plus(expiresIn));
-        JwtEncoderParameters params = JwtEncoderParameters.from(claimsBuilder.build());
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        JwtEncoderParameters params = JwtEncoderParameters.from(header, claimsBuilder.build());
         return jwtEncoder.encode(params).getTokenValue();
     }
 
