@@ -62,7 +62,7 @@ public interface AuthUserDetailsFetcher<T extends AuthUserDetails<T, ?>> {
 
         private LocalDateTime refreshExpiry;
 
-        private T userInfo;
+        private T user;
     }
 
 }
