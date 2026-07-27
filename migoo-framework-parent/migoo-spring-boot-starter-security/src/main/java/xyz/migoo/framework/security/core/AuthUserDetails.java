@@ -74,7 +74,6 @@ public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub, ID>, ID> 
     }
 
     @Override
-    @JsonIgnore
     @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities != null ? authorities : Collections.emptyList();
@@ -120,24 +119,6 @@ public abstract class AuthUserDetails<Sub extends AuthUserDetails<Sub, ID>, ID> 
     public Sub setPassword(String password) {
         this.password = password;
         return (Sub) this;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    @JsonIgnore
-    public boolean isCredentialsNonExpired() {
-        return true;
     }
 
     @Override
