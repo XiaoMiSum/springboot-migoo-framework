@@ -88,7 +88,7 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
         result.setRefreshToken(refreshToken);
         result.setAccessExpiry(LocalDateTime.now().plus(properties.getJwt().getAccessTokenExpires()));
         result.setRefreshExpiry(LocalDateTime.now().plus(properties.getJwt().getRefreshTokenExpires()));
-        result.setUserInfo(user);
+        result.setUser(user);
         return result;
     }
 }
