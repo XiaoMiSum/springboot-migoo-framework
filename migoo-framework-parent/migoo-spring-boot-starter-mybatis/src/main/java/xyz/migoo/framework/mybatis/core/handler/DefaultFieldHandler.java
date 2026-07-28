@@ -28,9 +28,11 @@ public class DefaultFieldHandler implements MetaObjectHandler {
             this.setFieldValByName("updatedAt", now, metaObject);
             this.setFieldValByName("isDeleted", false, metaObject);
         }
-        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseUuidDO<?>) {
-            // 设置 uuid
-            this.setFieldValByName("id", UuidCreator.getTimeOrderedEpoch(), metaObject);
+        if (Objects.nonNull(metaObject) && metaObject.getOriginalObject() instanceof BaseUuidDO<?> uuid) {
+            if (Objects.isNull(uuid.getId())) {
+                // 如果应用层没有设置id，则使用 uuid v7设置 id
+                this.setFieldValByName("id", UuidCreator.getTimeOrderedEpoch(), metaObject);
+            }
         }
 
     }
