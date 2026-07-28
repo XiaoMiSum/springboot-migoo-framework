@@ -4,7 +4,7 @@ layout: default
 
 # migoo-spring-boot-starter-websocket
 
-WebSocket 组件，提供 WebSocket 连接管理、Token 认证、会话管理等功能。支持单机和分布式两种模式。
+WebSocket 组件，提供 WebSocket 连接管理、Token 认证、会话管理等功能。支持文本和二进制消息，支持单机和分布式两种模式。
 
 ## 快速开始
 
@@ -164,11 +164,21 @@ MiGooWebSocketAutoConfiguration
 private WebSocketSessionManager sessionManager;
 
 // ========== 用户消息 ==========
-// 发送消息给指定用户
+// 发送文本消息给指定用户
 sessionManager.sendToUser(userId, "Hello!");
 
-// 广播消息给所有在线用户
+// 广播文本消息给所有在线用户
 sessionManager.broadcast("系统通知");
+
+// ========== 二进制消息 ==========
+// 发送二进制消息给指定用户
+sessionManager.sendBinaryToUser(userId, binaryData);
+
+// 发送二进制消息给指定会话
+sessionManager.sendBinaryToSession(sessionId, binaryData);
+
+// 广播二进制消息给所有在线用户
+sessionManager.broadcastBinary(binaryData);
 
 // ========== 房间管理 ==========
 // 用户加入房间
@@ -187,11 +197,17 @@ Set<String> rooms = sessionManager.getUserRooms(userId);
 boolean isInRoom = sessionManager.isRoomMember(roomId, userId);
 
 // ========== 房间消息 ==========
-// 发送消息给房间内所有用户
+// 发送文本消息给房间内所有用户
 sessionManager.sendToRoom(roomId, "房间消息");
 
-// 发送消息给房间内所有用户（排除指定用户）
+// 发送文本消息给房间内所有用户（排除指定用户）
 sessionManager.sendToRoomExcept(roomId, excludeUserId, "广播消息");
+
+// 发送二进制消息给房间内所有用户
+sessionManager.sendBinaryToRoom(roomId, binaryData);
+
+// 发送二进制消息给房间内所有用户（排除指定用户）
+sessionManager.sendBinaryToRoomExcept(roomId, excludeUserId, binaryData);
 
 // ========== 查询方法 ==========
 // 获取在线用户数
@@ -227,7 +243,7 @@ String userId = (String) session.getAttributes().get("USER_ID");
 
 ### MiGooWebSocketHandler
 
-消息处理器基类，提供便捷方法：
+消息处理器基类，提供便捷方法（支持文本和二进制消息）：
 
 ```java
 public class MyHandler extends MiGooWebSocketHandler {
@@ -243,14 +259,24 @@ public class MyHandler extends MiGooWebSocketHandler {
         String userId = getUserId(session);
         
         // ========== 用户消息 ==========
-        // 发送消息给当前用户
+        // 发送文本消息给当前用户
         sendMessage(session, "Echo: " + message.getPayload());
         
-        // 发送消息给其他用户
+        // 发送文本消息给其他用户
         sendMessageToUser(otherUserId, "新消息");
         
-        // 广播
+        // 广播文本消息
         broadcast("系统通知");
+        
+        // ========== 二进制消息 ==========
+        // 发送二进制消息给当前用户
+        sendBinaryMessage(session, binaryData);
+        
+        // 发送二进制消息给其他用户
+        sendBinaryMessageToUser(otherUserId, binaryData);
+        
+        // 广播二进制消息
+        broadcastBinary(binaryData);
         
         // ========== 房间操作 ==========
         // 加入房间
@@ -259,11 +285,17 @@ public class MyHandler extends MiGooWebSocketHandler {
         // 离开房间
         leaveRoom(session, "room-1");
         
-        // 发送消息给房间
+        // 发送文本消息给房间
         sendToRoom("room-1", "房间消息");
         
-        // 发送消息给房间（排除自己）
+        // 发送文本消息给房间（排除自己）
         sendToRoomExcept("room-1", userId, "广播消息");
+        
+        // 发送二进制消息给房间
+        sendBinaryToRoom("room-1", binaryData);
+        
+        // 发送二进制消息给房间（排除自己）
+        sendBinaryToRoomExcept("room-1", userId, binaryData);
         
         // 获取房间成员
         Set<String> members = getRoomMembers("room-1");
@@ -274,6 +306,17 @@ public class MyHandler extends MiGooWebSocketHandler {
         // 判断用户是否在房间内
         boolean isInRoom = isRoomMember("room-1", userId);
     }
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        byte[] payload = message.getPayload().array();
+        log.info("收到二进制消息，大小: {} 字节", payload.length);
+        
+        // 处理二进制数据...
+        
+        // 回复二进制消息
+        sendBinaryMessage(session, responseBinaryData);
+    }
 }
 ```
 
@@ -281,7 +324,7 @@ public class MyHandler extends MiGooWebSocketHandler {
 
 ### 1. 实现业务 Handler
 
-继承 `MiGooWebSocketHandler` 并重写 `handleTextMessage` 方法：
+继承 `MiGooWebSocketHandler` 并重写 `handleTextMessage` 或 `handleBinaryMessage` 方法：
 
 ```java
 @Component
@@ -301,6 +344,17 @@ public class ChatHandler extends MiGooWebSocketHandler {
         
         // 处理业务逻辑...
         sendMessage(session, "处理完成");
+    }
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        String userId = getUserId(session);
+        byte[] payload = message.getPayload().array();
+        
+        log.info("用户 {} 发送二进制消息，大小: {} 字节", userId, payload.length);
+        
+        // 处理二进制数据（如文件上传、音视频流等）...
+        sendBinaryMessage(session, responseBinaryData);
     }
 
     @Override
@@ -390,7 +444,15 @@ class WebSocketClient {
         };
         
         this.socket.onmessage = (event) => {
-            console.log('收到消息:', event.data);
+            if (event.data instanceof Blob) {
+                // 收到二进制消息
+                event.data.arrayBuffer().then(buffer => {
+                    console.log('收到二进制消息:', new Uint8Array(buffer));
+                });
+            } else {
+                // 收到文本消息
+                console.log('收到文本消息:', event.data);
+            }
         };
         
         this.socket.onclose = (event) => {
@@ -408,6 +470,13 @@ class WebSocketClient {
         }
     }
 
+    sendBinary(data) {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            // data 可以是 ArrayBuffer, Blob, 或 Uint8Array
+            this.socket.send(data);
+        }
+    }
+
     disconnect() {
         if (this.socket) {
             this.socket.close();
@@ -418,6 +487,13 @@ class WebSocketClient {
 // 使用
 const client = new WebSocketClient('ws://localhost:8080/ws', 'your-jwt-token');
 client.connect();
+
+// 发送文本消息
+client.send('Hello!');
+
+// 发送二进制消息
+const binaryData = new Uint8Array([1, 2, 3, 4, 5]);
+client.sendBinary(binaryData);
 ```
 
 ## 自动注册的组件
@@ -436,11 +512,58 @@ client.connect();
 
 ### 1. 用户消息
 
-- `sendToUser(userId, message)` - 发送消息给指定用户
-- `sendToSession(sessionId, message)` - 发送消息给指定会话
-- `broadcast(message)` - 广播消息给所有在线用户
+- `sendToUser(userId, message)` - 发送文本消息给指定用户
+- `sendToSession(sessionId, message)` - 发送文本消息给指定会话
+- `broadcast(message)` - 广播文本消息给所有在线用户
 
-### 2. 房间管理
+### 2. 二进制消息
+
+支持发送二进制数据（`byte[]`），适用于文件传输、音视频流、Protocol Buffers 等场景：
+
+```java
+@Resource
+private WebSocketSessionManager sessionManager;
+
+// 发送二进制消息给指定用户
+sessionManager.sendBinaryToUser(userId, binaryData);
+
+// 发送二进制消息给指定会话
+sessionManager.sendBinaryToSession(sessionId, binaryData);
+
+// 广播二进制消息给所有在线用户
+sessionManager.broadcastBinary(binaryData);
+
+// 发送二进制消息给房间内所有用户
+sessionManager.sendBinaryToRoom(roomId, binaryData);
+
+// 发送二进制消息给房间内所有用户（排除指定用户）
+sessionManager.sendBinaryToRoomExcept(roomId, excludeUserId, binaryData);
+```
+
+在 Handler 中处理二进制消息：
+
+```java
+@Component
+public class BinaryHandler extends MiGooWebSocketHandler {
+
+    public BinaryHandler(WebSocketSessionManager sessionManager) {
+        super(sessionManager);
+    }
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        byte[] payload = message.getPayload().array();
+        log.info("收到二进制消息，大小: {} 字节", payload.length);
+
+        // 处理二进制数据...
+        
+        // 回复二进制消息
+        sendBinaryMessage(session, responseBinaryData);
+    }
+}
+```
+
+### 3. 房间管理
 
 - `joinRoom(roomId, userId)` - 用户加入房间
 - `leaveRoom(roomId, userId)` - 用户离开房间
@@ -450,17 +573,18 @@ client.connect();
 - `getRoomCount()` - 获取房间数量
 - `getRoomMemberCount(roomId)` - 获取房间内在线用户数量
 
-### 3. 房间消息
+### 4. 房间消息
 
-- `sendToRoom(roomId, message)` - 发送消息给房间内所有用户
-- `sendToRoomExcept(roomId, excludeUserId, message)` - 发送消息给房间内所有用户（排除指定用户）
+- `sendToRoom(roomId, message)` - 发送文本消息给房间内所有用户
+- `sendToRoomExcept(roomId, excludeUserId, message)` - 发送文本消息给房间内所有用户（排除指定用户）
 
-### 4. 多端点支持
+### 5. 多端点支持
 
 - 配置 `endpoints` 列表注册多个 WebSocket URL
 - 不同端点可用于不同业务场景（聊天、通知、直播等）
 
-### 5. 分布式支持
+### 6. 分布式支持
 
 - 基于 Redis Pub/Sub 实现跨节点消息推送
 - 支持分布式房间广播
+- 文本和二进制消息均支持跨节点传输（二进制消息使用 Base64 编码）
