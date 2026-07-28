@@ -6,8 +6,10 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
 
@@ -70,13 +72,37 @@ public class DistributedWebSocketSessionManager extends AbstractWebSocketSession
         publishRoomMessage(roomId, message, excludeUserId);
     }
 
+    // ========== 二进制消息回调 ==========
+
+    @Override
+    protected void onSendBinaryToUser(String userId, byte[] message) {
+        publishBinaryMessage(userId, message);
+    }
+
+    @Override
+    protected void onBroadcastBinary(byte[] message) {
+        publishBinaryMessage(null, message);
+    }
+
+    @Override
+    protected void onSendBinaryToRoom(String roomId, byte[] message) {
+        publishBinaryRoomMessage(roomId, message, null);
+    }
+
+    @Override
+    protected void onSendBinaryToRoomExcept(String roomId, String excludeUserId, byte[] message) {
+        publishBinaryRoomMessage(roomId, message, excludeUserId);
+    }
+
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
             String payload = new String(message.getBody(), StandardCharsets.UTF_8);
 
             // 解析消息格式
-            if (payload.startsWith("ROOM:")) {
+            if (payload.startsWith("BINARY:")) {
+                handleBinaryMessage(payload);
+            } else if (payload.startsWith("ROOM:")) {
                 handleRoomMessage(payload);
             } else if (payload.startsWith("ROOM_EXCEPT:")) {
                 handleRoomExceptMessage(payload);
@@ -200,6 +226,113 @@ public class DistributedWebSocketSessionManager extends AbstractWebSocketSession
             redisTemplate.convertAndSend(CHANNEL, payload);
         } catch (Exception e) {
             log.error("[publishRoomMessage][发布 Redis 房间消息异常]", e);
+        }
+    }
+
+    // ========== 二进制消息处理 ==========
+
+    /**
+     * 处理二进制消息（来自 Redis）
+     *
+     * @param payload 消息内容，格式：
+     *                BINARY:userId:base64data
+     *                BINARY::base64data（广播）
+     *                BINARY:ROOM:roomId:base64data
+     *                BINARY:ROOM_EXCEPT:roomId:excludeUserId:base64data
+     */
+    private void handleBinaryMessage(String payload) {
+        String content = payload.substring("BINARY:".length());
+
+        if (content.startsWith("ROOM_EXCEPT:")) {
+            // 格式：BINARY:ROOM_EXCEPT:roomId:excludeUserId:base64data
+            String[] parts = content.split(":", 4);
+            if (parts.length < 4) {
+                log.warn("[handleBinaryMessage][ROOM_EXCEPT 消息格式错误: {}]", payload);
+                return;
+            }
+            String roomId = parts[1];
+            String excludeUserId = parts[2];
+            byte[] binaryData = Base64.getDecoder().decode(parts[3]);
+
+            Set<String> userIds = roomUsers.get(roomId);
+            if (userIds != null) {
+                for (String userId : userIds) {
+                    if (!userId.equals(excludeUserId)) {
+                        getUserSessions(userId).forEach(session -> doSendBinaryMessage(session, binaryData));
+                    }
+                }
+            }
+        } else if (content.startsWith("ROOM:")) {
+            // 格式：BINARY:ROOM:roomId:base64data
+            String[] parts = content.split(":", 3);
+            if (parts.length < 3) {
+                log.warn("[handleBinaryMessage][ROOM 消息格式错误: {}]", payload);
+                return;
+            }
+            String roomId = parts[1];
+            byte[] binaryData = Base64.getDecoder().decode(parts[2]);
+
+            Set<String> userIds = roomUsers.get(roomId);
+            if (userIds != null) {
+                for (String userId : userIds) {
+                    getUserSessions(userId).forEach(session -> doSendBinaryMessage(session, binaryData));
+                }
+            }
+        } else {
+            // 格式：BINARY:userId:base64data 或 BINARY::base64data（广播）
+            int index = content.indexOf(':');
+            if (index == -1) {
+                log.warn("[handleBinaryMessage][消息格式错误: {}]", payload);
+                return;
+            }
+            String targetUserId = content.substring(0, index);
+            byte[] binaryData = Base64.getDecoder().decode(content.substring(index + 1));
+
+            if (!targetUserId.isEmpty()) {
+                getUserSessions(targetUserId).forEach(session -> doSendBinaryMessage(session, binaryData));
+            } else {
+                sessions.values().stream()
+                        .filter(WebSocketSession::isOpen)
+                        .forEach(session -> doSendBinaryMessage(session, binaryData));
+            }
+        }
+    }
+
+    /**
+     * 发布二进制消息到 Redis
+     *
+     * @param targetUserId 目标用户 ID（null 表示广播）
+     * @param message      二进制消息
+     */
+    private void publishBinaryMessage(String targetUserId, byte[] message) {
+        try {
+            String base64Data = Base64.getEncoder().encodeToString(message);
+            String payload = "BINARY:" + (targetUserId != null ? targetUserId : "") + ":" + base64Data;
+            redisTemplate.convertAndSend(CHANNEL, payload);
+        } catch (Exception e) {
+            log.error("[publishBinaryMessage][发布 Redis 二进制消息异常]", e);
+        }
+    }
+
+    /**
+     * 发布二进制房间消息到 Redis
+     *
+     * @param roomId        房间 ID
+     * @param message       二进制消息
+     * @param excludeUserId 排除的用户 ID（null 表示不排除）
+     */
+    private void publishBinaryRoomMessage(String roomId, byte[] message, String excludeUserId) {
+        try {
+            String base64Data = Base64.getEncoder().encodeToString(message);
+            String payload;
+            if (excludeUserId != null) {
+                payload = "BINARY:ROOM_EXCEPT:" + roomId + ":" + excludeUserId + ":" + base64Data;
+            } else {
+                payload = "BINARY:ROOM:" + roomId + ":" + base64Data;
+            }
+            redisTemplate.convertAndSend(CHANNEL, payload);
+        } catch (Exception e) {
+            log.error("[publishBinaryRoomMessage][发布 Redis 房间二进制消息异常]", e);
         }
     }
 

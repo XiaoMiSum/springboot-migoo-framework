@@ -178,4 +178,46 @@ public interface WebSocketSessionManager {
      */
     void sendToRoomExcept(String roomId, String excludeUserId, String message);
 
+    // ========== 二进制消息 ==========
+
+    /**
+     * 发送二进制消息给指定用户
+     *
+     * @param userId  用户 ID
+     * @param message 二进制消息
+     */
+    void sendBinaryToUser(String userId, byte[] message);
+
+    /**
+     * 发送二进制消息给指定会话
+     *
+     * @param sessionId 会话 ID
+     * @param message   二进制消息
+     */
+    void sendBinaryToSession(String sessionId, byte[] message);
+
+    /**
+     * 广播二进制消息给所有在线用户
+     *
+     * @param message 二进制消息
+     */
+    void broadcastBinary(byte[] message);
+
+    /**
+     * 发送二进制消息给房间内所有用户
+     *
+     * @param roomId  房间 ID
+     * @param message 二进制消息
+     */
+    void sendBinaryToRoom(String roomId, byte[] message);
+
+    /**
+     * 发送二进制消息给房间内所有用户（排除指定用户）
+     *
+     * @param roomId        房间 ID
+     * @param excludeUserId 排除的用户 ID
+     * @param message       二进制消息
+     */
+    void sendBinaryToRoomExcept(String roomId, String excludeUserId, byte[] message);
+
 }

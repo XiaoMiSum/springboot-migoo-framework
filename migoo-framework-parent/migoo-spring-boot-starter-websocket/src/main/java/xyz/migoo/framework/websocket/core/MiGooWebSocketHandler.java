@@ -2,10 +2,11 @@ package xyz.migoo.framework.websocket.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.Set;
  * @author xiaomi
  */
 @Slf4j
-public class MiGooWebSocketHandler extends TextWebSocketHandler {
+public class MiGooWebSocketHandler extends AbstractWebSocketHandler {
 
     private final WebSocketSessionManager sessionManager;
 
@@ -62,6 +63,22 @@ public class MiGooWebSocketHandler extends TextWebSocketHandler {
 
         // 默认实现：回声消息（子类可以重写此方法来处理消息）
         sendMessage(session, "Echo: " + payload);
+    }
+
+    /**
+     * 接收二进制消息
+     *
+     * @param session WebSocket 会话
+     * @param message 二进制消息
+     */
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        String userId = sessionManager.getUserId(session.getId());
+        byte[] payload = message.getPayload().array();
+        log.info("[handleBinaryMessage][用户({}) 收到二进制消息，大小: {} 字节]", userId, payload.length);
+
+        // 默认实现：回声消息（子类可以重写此方法来处理消息）
+        sendBinaryMessage(session, payload);
     }
 
     /**
@@ -145,6 +162,66 @@ public class MiGooWebSocketHandler extends TextWebSocketHandler {
      */
     protected void broadcast(String message) {
         sessionManager.broadcast(message);
+    }
+
+    // ========== 二进制消息方法 ==========
+
+    /**
+     * 发送二进制消息
+     *
+     * @param session WebSocket 会话
+     * @param message 二进制消息
+     */
+    protected void sendBinaryMessage(WebSocketSession session, byte[] message) {
+        try {
+            if (session.isOpen()) {
+                synchronized (session) {
+                    session.sendMessage(new BinaryMessage(message));
+                }
+            }
+        } catch (IOException e) {
+            log.error("[sendBinaryMessage][会话ID({}) 发送二进制消息失败]", session.getId(), e);
+        }
+    }
+
+    /**
+     * 发送二进制消息给用户
+     *
+     * @param userId  用户 ID
+     * @param message 二进制消息
+     */
+    protected void sendBinaryMessageToUser(String userId, byte[] message) {
+        sessionManager.sendBinaryToUser(userId, message);
+    }
+
+    /**
+     * 广播二进制消息给所有在线用户
+     *
+     * @param message 二进制消息
+     */
+    protected void broadcastBinary(byte[] message) {
+        sessionManager.broadcastBinary(message);
+    }
+
+    /**
+     * 发送二进制消息给房间内所有用户
+     *
+     * @param roomId  房间 ID
+     * @param message 二进制消息
+     */
+    protected void sendBinaryToRoom(String roomId, byte[] message) {
+        sessionManager.sendBinaryToRoom(roomId, message);
+    }
+
+    /**
+     * 发送二进制消息给房间内所有用户（排除指定用户）
+     *
+     * @param roomId        房间 ID
+     * @param excludeUserId 排除的用户 ID
+     * @param message       二进制消息
+     */
+    protected void sendBinaryToRoomExcept(String roomId, String excludeUserId, byte[] message) {
+        sessionManager.sendBinaryToRoomExcept(roomId, excludeUserId, message);
     }
 
     // ========== 房间操作方法 ==========

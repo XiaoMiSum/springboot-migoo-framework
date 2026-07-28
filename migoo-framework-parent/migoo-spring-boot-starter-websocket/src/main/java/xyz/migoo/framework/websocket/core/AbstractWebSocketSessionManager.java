@@ -1,6 +1,7 @@
 package xyz.migoo.framework.websocket.core;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -242,6 +243,62 @@ public abstract class AbstractWebSocketSessionManager implements WebSocketSessio
         onSendToRoomExcept(roomId, excludeUserId, message);
     }
 
+    // ========== 二进制消息实现 ==========
+
+    @Override
+    public void sendBinaryToSession(String sessionId, byte[] message) {
+        WebSocketSession session = sessions.get(sessionId);
+        if (session != null && session.isOpen()) {
+            doSendBinaryMessage(session, message);
+        }
+    }
+
+    @Override
+    public void sendBinaryToUser(String userId, byte[] message) {
+        Collection<WebSocketSession> userSessionList = getUserSessions(userId);
+        if (!userSessionList.isEmpty()) {
+            for (WebSocketSession session : userSessionList) {
+                doSendBinaryMessage(session, message);
+            }
+            return;
+        }
+        onSendBinaryToUser(userId, message);
+    }
+
+    @Override
+    public void broadcastBinary(byte[] message) {
+        sessions.values().stream()
+                .filter(WebSocketSession::isOpen)
+                .forEach(session -> doSendBinaryMessage(session, message));
+        onBroadcastBinary(message);
+    }
+
+    @Override
+    public void sendBinaryToRoom(String roomId, byte[] message) {
+        Set<String> userIds = roomUsers.get(roomId);
+        if (userIds == null || userIds.isEmpty()) {
+            return;
+        }
+        for (String userId : userIds) {
+            sendBinaryToUser(userId, message);
+        }
+        onSendBinaryToRoom(roomId, message);
+    }
+
+    @Override
+    public void sendBinaryToRoomExcept(String roomId, String excludeUserId, byte[] message) {
+        Set<String> userIds = roomUsers.get(roomId);
+        if (userIds == null || userIds.isEmpty()) {
+            return;
+        }
+        for (String userId : userIds) {
+            if (!userId.equals(excludeUserId)) {
+                sendBinaryToUser(userId, message);
+            }
+        }
+        onSendBinaryToRoomExcept(roomId, excludeUserId, message);
+    }
+
     // ========== 房间相关回调 ==========
 
     /**
@@ -324,6 +381,48 @@ public abstract class AbstractWebSocketSessionManager implements WebSocketSessio
         // 默认空实现，子类可重写
     }
 
+    // ========== 二进制消息回调（用于分布式场景） ==========
+
+    /**
+     * 本地没有用户会话时的回调（用于分布式场景）
+     *
+     * @param userId  用户 ID
+     * @param message 二进制消息
+     */
+    protected void onSendBinaryToUser(String userId, byte[] message) {
+        // 默认空实现，子类可重写
+    }
+
+    /**
+     * 本地广播后的回调（用于分布式场景）
+     *
+     * @param message 二进制消息
+     */
+    protected void onBroadcastBinary(byte[] message) {
+        // 默认空实现，子类可重写
+    }
+
+    /**
+     * 本地房间消息发送后的回调（用于分布式场景）
+     *
+     * @param roomId  房间 ID
+     * @param message 二进制消息
+     */
+    protected void onSendBinaryToRoom(String roomId, byte[] message) {
+        // 默认空实现，子类可重写
+    }
+
+    /**
+     * 本地房间消息发送（排除指定用户）后的回调（用于分布式场景）
+     *
+     * @param roomId        房间 ID
+     * @param excludeUserId 排除的用户 ID
+     * @param message       二进制消息
+     */
+    protected void onSendBinaryToRoomExcept(String roomId, String excludeUserId, byte[] message) {
+        // 默认空实现，子类可重写
+    }
+
     /**
      * 发送消息
      *
@@ -339,6 +438,24 @@ public abstract class AbstractWebSocketSessionManager implements WebSocketSessio
             }
         } catch (IOException e) {
             log.error("[doSendMessage][会话ID({}) 发送消息失败]", session.getId(), e);
+        }
+    }
+
+    /**
+     * 发送二进制消息
+     *
+     * @param session WebSocket 会话
+     * @param message 二进制消息
+     */
+    protected void doSendBinaryMessage(WebSocketSession session, byte[] message) {
+        try {
+            if (session.isOpen()) {
+                synchronized (session) {
+                    session.sendMessage(new BinaryMessage(message));
+                }
+            }
+        } catch (IOException e) {
+            log.error("[doSendBinaryMessage][会话ID({}) 发送二进制消息失败]", session.getId(), e);
         }
     }
 
