@@ -8,15 +8,15 @@ layout: default
 
 ## 组件文档
 
-| 组件                    | 说明                             |
-|-------------------------|----------------------------------|
-| [Common](common.md)     | 公共工具类、异常处理、分页、校验 |
-| [Web](web.md)           | Web MVC 配置、全局异常、统一响应 |
-| [Security](security.md) | 认证授权、JWT、OAuth2、TOTP 2FA  |
-| [WebSocket](websocket.md) | WebSocket 连接管理、Token 认证 |
-| [MyBatis](mybatis.md)   | MyBatis-Plus 增强、分页、数据源  |
-| [Redis](redis.md)       | Redis 配置、工具类               |
-| [MQ](mq.md)             | Redis 消息队列（Stream/Pub-Sub） |
+| 组件                      | 说明                             |
+|---------------------------|----------------------------------|
+| [Common](common.md)       | 公共工具类、异常处理、分页、校验 |
+| [Web](web.md)             | Web MVC 配置、全局异常、统一响应 |
+| [Security](security.md)   | 认证授权、JWT、OAuth2、TOTP 2FA  |
+| [WebSocket](websocket.md) | WebSocket 连接管理、Token 认证   |
+| [MyBatis](mybatis.md)     | MyBatis-Plus 增强、分页、数据源  |
+| [Redis](redis.md)         | Redis 配置、工具类               |
+| [MQ](mq.md)               | Redis 消息队列（Stream/Pub-Sub） |
 
 ## 快速开始
 
@@ -29,7 +29,7 @@ layout: default
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-framework-dependencies</artifactId>
-            <version>1.3.17</version>
+            <version>1.3.18</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>

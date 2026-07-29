@@ -26,7 +26,7 @@
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-framework-dependencies</artifactId>
-            <version>1.3.17</version>
+            <version>1.3.18</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
