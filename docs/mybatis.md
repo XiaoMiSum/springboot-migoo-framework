@@ -179,6 +179,32 @@ default PageResult<UserDO> selectPage(UserPageReqParam reqParam) {
 
 ---
 
+## 时区设计
+
+框架采用 **DB 统一存 UTC，API 返回 UTC，前端按用户时区显示** 的策略。
+
+```
+应用层（UTC+8 16:35）
+  ↓ 自动填充 LocalDateTime.now()
+  ↓ UTCLocalDateTimeHandler 转换
+DB（UTC 08:35）
+  ↓ UTCLocalDateTimeHandler 读取
+API（UTC 08:35 → "yyyy-MM-dd'T'HH:mm:ss'Z'"）
+  ↓ 前端解析 Z 后缀
+浏览器（按用户时区显示 16:35）
+```
+
+关键组件：
+
+- **`UTCLocalDateTimeHandler`** — 全局 `LocalDateTime` 类型处理器
+  - 写入：将系统时区时间转为 UTC Instant 存储
+  - 读取：保持 UTC 时间返回，不转回系统时区（由前端自行转换）
+- **`DefaultFieldHandler`** — 自动填充 `createdAt` / `updatedAt`
+  - 取系统时区的当前时间（`LocalDateTime.now()`），`UTCLocalDateTimeHandler` 负责转 UTC
+- **`BaseDO`** — `@JsonFormat(timezone = "UTC")` 确保 API 响应输出带 `Z` 后缀的 ISO 8601 格式
+
+> 注意事项：应用 JVM 时区（`-Duser.timezone=Asia/Shanghai` 或 `TZ` 环境变量）必须与业务期望时区一致，否则 `LocalDateTime.now()` 会取错时间。
+
 ## 自动注册的组件
 
 | 组件 | 说明 |
