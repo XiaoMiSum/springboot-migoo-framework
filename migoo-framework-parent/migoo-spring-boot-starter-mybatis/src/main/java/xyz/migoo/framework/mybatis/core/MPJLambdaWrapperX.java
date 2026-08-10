@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.MFunction;
+import org.springframework.util.StringUtils;
 import xyz.migoo.framework.common.util.collection.ArrayUtils;
 
 import java.util.Collection;
@@ -38,7 +39,9 @@ public class MPJLambdaWrapperX<T> extends MPJLambdaWrapper<T> {
     }
 
     public <X> MPJLambdaWrapperX<T> likeIfPresent(SFunction<X, ?> column, String val) {
-        super.likeIfExists(column, val);
+        if (StringUtils.hasText(val)) {
+            super.like(column, val);
+        }
         return this;
     }
 
