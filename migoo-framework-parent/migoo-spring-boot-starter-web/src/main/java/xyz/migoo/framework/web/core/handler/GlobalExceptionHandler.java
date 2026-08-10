@@ -1,6 +1,7 @@
 package xyz.migoo.framework.web.core.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
@@ -22,8 +23,8 @@ import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ServiceException;
 import xyz.migoo.framework.common.pojo.Result;
-import xyz.migoo.framework.common.util.object.ExceptionUtils;
 import xyz.migoo.framework.common.util.JsonUtils;
+import xyz.migoo.framework.common.util.object.ExceptionUtils;
 import xyz.migoo.framework.web.core.util.ServletUtils;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler {
      * @param t       异常
      * @return 通用返回
      */
-    public Result<?> allExceptionHandler(HttpServletRequest request, Throwable t) {
+    public Result<?> allExceptionHandler(HttpServletRequest request, HttpServletResponse response, Throwable t) {
         return switch (t) {
             case HttpMediaTypeNotSupportedException e -> httpMediaTypeNotSupportedException(request, e);
             case MissingServletRequestParameterException e -> missingServletRequestParameterHandler(request, e);
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
             case ValidationException e -> validationException(request, e);
             case NoHandlerFoundException e -> noHandlerFoundExceptionHandler(request, e);
             case HttpRequestMethodNotSupportedException e -> httpRequestMethodNotSupportedExceptionHandler(request, e);
-            case IOException e -> socketRuntimeExceptionHandler(request, e);
+            case IOException e -> socketRuntimeExceptionHandler(request, response, e);
             case ServiceException e -> serviceExceptionHandler(request, e);
             default -> defaultExceptionHandler(request, t);
         };
@@ -186,9 +187,17 @@ public class GlobalExceptionHandler {
      * 处理请求超时异常 SocketRuntimeException
      * <p>
      * 例如说，请求连接超时、响应数据读取超时。
+     * <p>
+     * 注意：SSE（text/event-stream）等异步流式响应已提交后，无法再写 JSON 结果——
+     * 此时返回 {@code null} 让 SpringMVC 结束处理，避免 {@code HttpMessageNotWritableException}
+     * （无 converter 能把 Result 写成 text/event-stream）掩盖真实异常。
      */
     @ExceptionHandler(value = IOException.class)
-    public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, IOException ex) {
+    public Result<?> socketRuntimeExceptionHandler(HttpServletRequest request, HttpServletResponse response, IOException ex) {
+        // SSE 等流式响应已提交（响应头已下发）→ 不能再写 JSON，直接结束请求
+        if (response.isCommitted()) {
+            return null;
+        }
         var message = i18n.getMessage(SOCKET_TIME_OUT.msg());
         return Result.error(SOCKET_TIME_OUT.code(), message);
     }
