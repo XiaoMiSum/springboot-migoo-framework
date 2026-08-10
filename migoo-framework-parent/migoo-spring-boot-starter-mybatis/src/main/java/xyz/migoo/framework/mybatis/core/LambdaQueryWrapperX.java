@@ -360,7 +360,7 @@ public class LambdaQueryWrapperX<T> extends LambdaQueryWrapper<T> {
 
     @Override
     public LambdaQueryWrapperX<T> and(boolean condition, Consumer<LambdaQueryWrapper<T>> consumer) {
-        super.and(consumer);
+        super.and(condition, consumer);
         return this;
     }
 
