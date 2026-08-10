@@ -1,10 +1,11 @@
 package xyz.migoo.framework.security.config;
 
+import jakarta.servlet.DispatcherType;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.security.autoconfigure.web.servlet.ServletWebSecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,6 +39,7 @@ public class MiGooWebSecurityFilterChainConfiguration {
      * 所有依赖通过方法参数注入，避免字段注入引起的循环依赖。
      */
     @Bean
+    @ConditionalOnMissingBean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
                                                    SecurityProperties properties,
                                                    AuthenticationEntryPoint authenticationEntryPoint,
@@ -61,6 +63,8 @@ public class MiGooWebSecurityFilterChainConfiguration {
                         .logoutSuccessHandler(logoutSuccessHandler))
                 // 请求授权
                 .authorizeHttpRequests(requests -> requests
+                        // ASYNC/ERROR dispatch 放行：SseEmitter 等异步场景的二次分发无 SecurityContext，需跳过授权
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                         .requestMatchers(properties.getPermitAllUrls().toArray(new String[0])).permitAll()
                         .anyRequest().authenticated());
 
