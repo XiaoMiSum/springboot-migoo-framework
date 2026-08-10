@@ -21,12 +21,21 @@ public class HttpUtils {
     public static String replaceUrlQuery(String url, String key, String value) {
         try {
             URI uri = URI.create(url);
-            String query = uri.getQuery();
-            Map<String, String> params = parseQuery(query);
+            Map<String, String> params = parseQuery(uri.getQuery());
             params.put(key, value);
             String newQuery = buildQuery(params);
-            return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(),
-                    newQuery, uri.getFragment()).toString();
+            // 手动拼接，避免 new URI(多参构造) 对已编码的 query 二次编码（如 % -> %25）
+            int qIdx = url.indexOf('?');
+            int fIdx = url.indexOf('#');
+            int cut = url.length();
+            if (qIdx >= 0) {
+                cut = Math.min(cut, qIdx);
+            }
+            if (fIdx >= 0) {
+                cut = Math.min(cut, fIdx);
+            }
+            String fragment = uri.getRawFragment() == null ? "" : "#" + uri.getRawFragment();
+            return url.substring(0, cut) + "?" + newQuery + fragment;
         } catch (Exception e) {
             throw new RuntimeException("Failed to replace URL query", e);
         }
