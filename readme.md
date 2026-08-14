@@ -4,6 +4,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21+-orange)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-brightgreen)](https://spring.io/projects/spring-boot)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.xiaomisum/migoo)](https://central.sonatype.com/artifact/xyz.migoo.springboot/migoo-framework-dependencies)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## 特性
