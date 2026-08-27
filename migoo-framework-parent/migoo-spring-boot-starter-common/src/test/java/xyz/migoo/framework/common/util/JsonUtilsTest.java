@@ -16,10 +16,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class JsonUtilsTest {
 
-    /** 测试用 record */
-    public record TestDTO(String name, Integer age) {
-    }
-
     @Test
     void toJsonString_nullReturnsEmptyObject() {
         assertThat(JsonUtils.toJsonString(null)).isEqualTo("{}");
@@ -59,8 +55,8 @@ class JsonUtilsTest {
 
     @Test
     void parseObject_typeReference() {
-        assertThat(JsonUtils.parseObject(null, new TypeReference<List<String>>() {})).isNull();
-        List<String> list = JsonUtils.parseObject("[\"a\",\"b\"]", new TypeReference<List<String>>() {});
+        List<String> list = JsonUtils.parseObject("[\"a\",\"b\"]", new TypeReference<List<String>>() {
+        });
         assertThat(list).containsExactly("a", "b");
     }
 
@@ -102,9 +98,17 @@ class JsonUtilsTest {
 
     @Test
     void convert_typeReference() {
-        assertThat(JsonUtils.convert(null, new TypeReference<List<TestDTO>>() {})).isNull();
+        assertThat(JsonUtils.convert(null, new TypeReference<List<TestDTO>>() {
+        })).isNull();
         List<TestDTO> source = List.of(new TestDTO("migoo", 18));
-        List<TestDTO> result = JsonUtils.convert(source, new TypeReference<List<TestDTO>>() {});
+        List<TestDTO> result = JsonUtils.convert(source, new TypeReference<List<TestDTO>>() {
+        });
         assertThat(result).containsExactly(new TestDTO("migoo", 18));
+    }
+
+    /**
+     * 测试用 record
+     */
+    public record TestDTO(String name, Integer age) {
     }
 }

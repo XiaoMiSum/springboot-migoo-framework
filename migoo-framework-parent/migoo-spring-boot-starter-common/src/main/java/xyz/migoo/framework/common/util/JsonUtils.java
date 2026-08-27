@@ -6,7 +6,9 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +68,13 @@ public class JsonUtils {
         }
     }
 
+    public static <T> T parseObject(InputStream in, TypeReference<T> typeReference) {
+        if (in == null) {
+            return null;
+        }
+        return objectMapper.readValue(in, typeReference);
+    }
+
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
@@ -112,6 +121,25 @@ public class JsonUtils {
             return null;
         }
         return objectMapper.convertValue(object, typeReference);
+    }
+
+    public static <T> T toObject(JsonNode node, Class<T> clazz) {
+        if (node == null) {
+            return null;
+        }
+        try {
+            return objectMapper.treeToValue(node, clazz);
+        } catch (JacksonException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+    public static JsonNode valueToTree(Object value) {
+        return objectMapper.valueToTree(value);
     }
 
 }
