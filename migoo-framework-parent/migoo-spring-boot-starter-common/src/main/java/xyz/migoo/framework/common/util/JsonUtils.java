@@ -24,48 +24,32 @@ public class JsonUtils {
             .build();
 
 
-    public static String toJsonString(Object object) {
-        try {
-            if (object == null) {
-                return "{}";
-            }
-            return objectMapper.writeValueAsString(object);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
+    public static String toJsonString(Object object) throws JacksonException {
+        if (object == null) {
+            return "{}";
         }
+        return objectMapper.writeValueAsString(object);
     }
 
-    public static <T> T parseObject(String text, Class<T> clazz) {
+    public static <T> T parseObject(String text, Class<T> clazz) throws JacksonException {
         if (text == null || text.isEmpty()) {
             return null;
         }
-        try {
-            return objectMapper.readValue(text, clazz);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(text, clazz);
     }
 
-    public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
+    public static <T> T parseObject(byte[] bytes, Class<T> clazz) throws JacksonException {
         if (bytes == null || bytes.length == 0) {
             return null;
         }
-        try {
-            return objectMapper.readValue(bytes, clazz);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(bytes, clazz);
     }
 
-    public static <T> T parseObject(String text, TypeReference<T> typeReference) {
+    public static <T> T parseObject(String text, TypeReference<T> typeReference) throws JacksonException {
         if (text == null || text.isEmpty()) {
             return null;
         }
-        try {
-            return objectMapper.readValue(text, typeReference);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(text, typeReference);
     }
 
     public static <T> T parseObject(InputStream in, TypeReference<T> typeReference) {
@@ -75,38 +59,26 @@ public class JsonUtils {
         return objectMapper.readValue(in, typeReference);
     }
 
-    public static <T> List<T> parseArray(String text, Class<T> clazz) {
+    public static <T> List<T> parseArray(String text, Class<T> clazz) throws JacksonException {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
-        try {
-            return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.readValue(text, objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 
-    public static JsonNode toJSON(String text) {
-        try {
-            if (text == null || text.isEmpty()) {
-                return null;
-            }
-            return objectMapper.readTree(text);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T parseObject(String text, String path, Class<T> clazz) {
+    public static JsonNode toJSON(String text) throws JacksonException {
         if (text == null || text.isEmpty()) {
             return null;
         }
-        try {
-            JsonNode pathNode = objectMapper.readTree(text).path(path);
-            return objectMapper.readValue(pathNode.toString(), clazz);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
+        return objectMapper.readTree(text);
+    }
+
+    public static <T> T parseObject(String text, String path, Class<T> clazz) throws JacksonException {
+        if (text == null || text.isEmpty()) {
+            return null;
         }
+        JsonNode pathNode = objectMapper.readTree(text).path(path);
+        return objectMapper.readValue(pathNode.toString(), clazz);
     }
 
     public static <T> T convert(Object object, Class<T> clazz) {
@@ -123,15 +95,11 @@ public class JsonUtils {
         return objectMapper.convertValue(object, typeReference);
     }
 
-    public static <T> T toObject(JsonNode node, Class<T> clazz) {
+    public static <T> T toObject(JsonNode node, Class<T> clazz) throws JacksonException {
         if (node == null) {
             return null;
         }
-        try {
-            return objectMapper.treeToValue(node, clazz);
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+        return objectMapper.treeToValue(node, clazz);
     }
 
     public static ObjectNode createObjectNode() {
