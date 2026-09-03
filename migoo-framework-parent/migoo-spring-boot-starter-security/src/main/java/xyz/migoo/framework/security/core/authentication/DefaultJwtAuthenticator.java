@@ -67,7 +67,7 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
         Jwt jwt = tokenProvider.parseToken(refreshToken);
         String type = jwt.getClaimAsString("type");
         if (!"refresh".equals(type)) {
-            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.INVALID_AUTHORIZED);
+            throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.INVALID_REFRESH_TOKEN_);
         }
         String userId = tokenProvider.getUserIdFromToken(jwt);
         AuthUserDetails user = userBridge.loadByUserId(userId);
