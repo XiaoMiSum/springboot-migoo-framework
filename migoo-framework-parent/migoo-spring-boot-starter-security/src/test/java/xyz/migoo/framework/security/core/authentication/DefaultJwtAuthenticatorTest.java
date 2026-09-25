@@ -2,12 +2,16 @@ package xyz.migoo.framework.security.core.authentication;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import xyz.migoo.framework.common.exception.ServiceException;
+import xyz.migoo.framework.common.observability.AccountLockedEvent;
+import xyz.migoo.framework.common.observability.AuthenticationFailedEvent;
+import xyz.migoo.framework.common.observability.TokenRevokedEvent;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.TestAuthUser;
 import xyz.migoo.framework.security.core.lockout.LoginLockManager;
@@ -16,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -35,6 +40,7 @@ class DefaultJwtAuthenticatorTest {
     private AuthenticationManager authenticationManager;
     private SecurityProperties properties;
     private LoginLockManager lockManager;
+    private ApplicationEventPublisher eventPublisher;
     private DefaultJwtAuthenticator authenticator;
 
     @BeforeEach
@@ -44,8 +50,9 @@ class DefaultJwtAuthenticatorTest {
         authenticationManager = mock(AuthenticationManager.class);
         properties = new SecurityProperties();
         lockManager = mock(LoginLockManager.class);
+        eventPublisher = mock(ApplicationEventPublisher.class);
         authenticator = new DefaultJwtAuthenticator(tokenProvider, bridge, authenticationManager,
-                properties, lockManager);
+                properties, lockManager, eventPublisher);
     }
 
     // ==================== verifyToken: 分层异常处理 ====================
@@ -271,5 +278,73 @@ class DefaultJwtAuthenticatorTest {
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 401);
         verifyNoInteractions(lockManager);
+    }
+
+    // ==================== authenticate / 撤销: 可观测性信号事件 ====================
+
+    @Test
+    void authenticateFailurePublishesAuthenticationFailedEvent() {
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+        when(lockManager.onFailure("admin")).thenReturn(false);
+
+        assertThatThrownBy(() -> authenticator.authenticate("admin", "pwd"))
+                .isInstanceOf(ServiceException.class)
+                .hasFieldOrPropertyWithValue("code", 401);
+
+        verify(eventPublisher).publishEvent(new AuthenticationFailedEvent("BadCredentialsException"));
+        verify(eventPublisher, never()).publishEvent(any(AccountLockedEvent.class));
+    }
+
+    @Test
+    void authenticateLockedAccountPublishesAlreadyLockedEvent() {
+        when(lockManager.isLocked("admin")).thenReturn(true);
+
+        assertThatThrownBy(() -> authenticator.authenticate("admin", "pwd"))
+                .isInstanceOf(ServiceException.class);
+
+        verify(eventPublisher).publishEvent(new AccountLockedEvent("already_locked"));
+        verify(eventPublisher, never()).publishEvent(any(AuthenticationFailedEvent.class));
+        verifyNoInteractions(authenticationManager);
+    }
+
+    @Test
+    void authenticateFailureHittingLockPublishesBothEvents() {
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+        when(lockManager.onFailure("admin")).thenReturn(true);
+
+        assertThatThrownBy(() -> authenticator.authenticate("admin", "pwd"))
+                .isInstanceOf(ServiceException.class)
+                .hasFieldOrPropertyWithValue("code", 423);
+
+        verify(eventPublisher).publishEvent(new AuthenticationFailedEvent("BadCredentialsException"));
+        verify(eventPublisher).publishEvent(new AccountLockedEvent("failure_threshold"));
+    }
+
+    @Test
+    void cleanPublishesTokenRevokedWithTokenScope() {
+        authenticator.clean("some-token");
+
+        verify(bridge).clean("some-token");
+        verify(eventPublisher).publishEvent(new TokenRevokedEvent("token"));
+    }
+
+    @Test
+    void revokeUserTokensPublishesTokenRevokedWithUserScope() {
+        authenticator.revokeUserTokens("1024");
+
+        verify(bridge).revokeByUserId("1024");
+        verify(eventPublisher).publishEvent(new TokenRevokedEvent("user"));
+    }
+
+    @Test
+    void publishFailureDoesNotBreakAuthentication() {
+        // 监听器异常经发布器抛回 → 认证流程照常按 401 收场（观测不得影响业务）
+        doThrow(new IllegalStateException("listener failed")).when(eventPublisher).publishEvent(any());
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+        when(lockManager.onFailure("admin")).thenReturn(false);
+
+        assertThatThrownBy(() -> authenticator.authenticate("admin", "pwd"))
+                .isInstanceOf(ServiceException.class)
+                .hasFieldOrPropertyWithValue("code", 401);
     }
 }

@@ -1,6 +1,7 @@
 package xyz.migoo.framework.security.core.authentication;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,6 +10,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
+import xyz.migoo.framework.common.observability.AccountLockedEvent;
+import xyz.migoo.framework.common.observability.AuthenticationFailedEvent;
+import xyz.migoo.framework.common.observability.TokenRevokedEvent;
 import xyz.migoo.framework.security.config.SecurityProperties;
 import xyz.migoo.framework.security.core.AuthUserDetails;
 import xyz.migoo.framework.security.core.lockout.LoginLockManager;
@@ -55,16 +59,31 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
     private final SecurityProperties properties;
     private final LoginLockManager lockManager;
 
+    /**
+     * 事件发布器（可观测性信号，可空：直连构造时允许不发布）
+     */
+    private final ApplicationEventPublisher eventPublisher;
+
     public DefaultJwtAuthenticator(JwtTokenProvider tokenProvider,
                                    UserDetailsBridge userBridge,
                                    AuthenticationManager authenticationManager,
                                    SecurityProperties properties,
                                    LoginLockManager lockManager) {
+        this(tokenProvider, userBridge, authenticationManager, properties, lockManager, null);
+    }
+
+    public DefaultJwtAuthenticator(JwtTokenProvider tokenProvider,
+                                   UserDetailsBridge userBridge,
+                                   AuthenticationManager authenticationManager,
+                                   SecurityProperties properties,
+                                   LoginLockManager lockManager,
+                                   ApplicationEventPublisher eventPublisher) {
         this.tokenProvider = tokenProvider;
         this.userBridge = userBridge;
         this.authenticationManager = authenticationManager;
         this.properties = properties;
         this.lockManager = lockManager;
+        this.eventPublisher = eventPublisher;
     }
 
     // ==================== 登录 ====================
@@ -74,6 +93,7 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
         boolean lockEnabled = properties.getLoginLock().isEnabled();
         // 认证前: 检查账号是否已被登录失败策略锁定（423）
         if (lockEnabled && lockManager.isLocked(username)) {
+            publishEvent(new AccountLockedEvent("already_locked"));
             throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.ACCOUNT_LOCKED);
         }
         try {
@@ -85,8 +105,10 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
             }
             return buildLoginResult((AuthUserDetails) authentication.getPrincipal());
         } catch (AuthenticationException e) {
+            publishEvent(new AuthenticationFailedEvent(e.getClass().getSimpleName()));
             // 认证失败: 记录失败次数并评估锁定策略，命中则抛出 423
             if (lockEnabled && lockManager.onFailure(username)) {
+                publishEvent(new AccountLockedEvent("failure_threshold"));
                 throw ServiceExceptionUtil.get(GlobalErrorCodeConstants.ACCOUNT_LOCKED);
             }
             throw ServiceExceptionUtil.get(UNAUTHORIZED);
@@ -125,14 +147,32 @@ public class DefaultJwtAuthenticator implements AuthUserDetailsFetcher {
     @Override
     public void clean(String token) {
         userBridge.clean(token);
+        publishEvent(new TokenRevokedEvent("token"));
     }
 
     @Override
     public void revokeUserTokens(String userId) {
         userBridge.revokeByUserId(userId);
+        publishEvent(new TokenRevokedEvent("user"));
     }
 
     // ==================== 内部实现 ====================
+
+    /**
+     * 发布可观测性信号事件（观测不得影响业务：发布异常只记日志）
+     *
+     * @param event common 中的信号事件 record
+     */
+    private void publishEvent(Object event) {
+        if (eventPublisher == null) {
+            return;
+        }
+        try {
+            eventPublisher.publishEvent(event);
+        } catch (Exception ex) {
+            log.warn("[publishEvent][发布可观测性事件失败] event({})", event, ex);
+        }
+    }
 
     /**
      * 统一 token 认证管线（verifyToken 与 refreshToken 共用，相似校验收敛于此）

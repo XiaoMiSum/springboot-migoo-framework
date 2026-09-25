@@ -6,8 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import xyz.migoo.framework.common.enums.WebFilterOrderEnum;
+import xyz.migoo.framework.common.observability.TraceIdResolver;
 import xyz.migoo.framework.web.core.filter.CacheRequestBodyFilter;
 import xyz.migoo.framework.web.core.filter.TraceIdFilter;
 
@@ -23,10 +25,14 @@ import static org.mockito.Mockito.when;
 class FilterConfigurationTest {
 
     @Test
+    @SuppressWarnings("unchecked")
     void traceIdFilterRegistersWithTraceOrder() {
-        FilterRegistrationBean<TraceIdFilter> bean = new FilterConfiguration().traceIdFilter();
+        // 未引入可观测性组件时 ObjectProvider 取不到 TraceIdFilter，回退本地生成
+        ObjectProvider<TraceIdResolver> resolvers = mock(ObjectProvider.class);
+        FilterRegistrationBean<TraceIdFilter> bean = new FilterConfiguration().traceIdFilter(resolvers, true);
         assertThat(bean.getFilter()).isInstanceOf(TraceIdFilter.class);
         assertThat(bean.getOrder()).isEqualTo(WebFilterOrderEnum.TRACE_FILTER);
+        verify(resolvers).getIfAvailable();
     }
 
     @Test

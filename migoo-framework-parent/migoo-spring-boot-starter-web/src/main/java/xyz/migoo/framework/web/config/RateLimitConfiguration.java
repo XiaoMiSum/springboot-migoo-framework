@@ -2,6 +2,7 @@ package xyz.migoo.framework.web.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import xyz.migoo.framework.web.core.ratelimit.DefaultRateLimiter;
@@ -48,7 +49,7 @@ public class RateLimitConfiguration {
     @Bean
     @ConditionalOnMissingBean(RateLimitAspect.class)
     @ConditionalOnProperty(name = "migoo.web.rate-limit.enabled", havingValue = "true", matchIfMissing = true)
-    public RateLimitAspect rateLimitAspect(RateLimiter rateLimiter) {
-        return new RateLimitAspect(rateLimiter);
+    public RateLimitAspect rateLimitAspect(RateLimiter rateLimiter, ApplicationEventPublisher eventPublisher) {
+        return new RateLimitAspect(rateLimiter, eventPublisher);
     }
 }

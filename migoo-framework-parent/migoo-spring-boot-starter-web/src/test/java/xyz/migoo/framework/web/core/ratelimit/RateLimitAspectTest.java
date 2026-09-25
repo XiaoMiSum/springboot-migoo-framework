@@ -4,7 +4,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import xyz.migoo.framework.common.exception.ServiceException;
+import xyz.migoo.framework.common.observability.RateLimitExceededEvent;
 import xyz.migoo.framework.web.core.annotation.RateLimit;
 import xyz.migoo.framework.web.core.annotation.RateLimitType;
 import xyz.migoo.framework.web.core.store.InMemoryStateStore;
@@ -14,7 +16,10 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -69,6 +74,37 @@ class RateLimitAspectTest {
         assertThatThrownBy(() -> aspect.around(joinPoint("missingKey"), rateLimit))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("key SpEL");
+    }
+
+    @Test
+    void publishesRateLimitExceededEventWhenRejected() throws Throwable {
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        RateLimitAspect aspectWithPublisher =
+                new RateLimitAspect(new DefaultRateLimiter(new InMemoryStateStore()), publisher);
+        RateLimit rateLimit = annotation("ipLimited");
+
+        aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit);
+        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit))
+                .isInstanceOf(ServiceException.class)
+                .hasFieldOrPropertyWithValue("code", 429);
+
+        // 无请求上下文 → path=unknown；keyType 取自限流维度；limit=1
+        verify(publisher).publishEvent(new RateLimitExceededEvent("unknown", "ip", 1));
+    }
+
+    @Test
+    void publishFailureDoesNotChangeRejection() throws Throwable {
+        // 发布器异常（监听器抛回）→ 照常抛 429（观测不得影响业务）
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        doThrow(new IllegalStateException("listener failed")).when(publisher).publishEvent(any());
+        RateLimitAspect aspectWithPublisher =
+                new RateLimitAspect(new DefaultRateLimiter(new InMemoryStateStore()), publisher);
+        RateLimit rateLimit = annotation("ipLimited");
+
+        aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit);
+        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit))
+                .isInstanceOf(ServiceException.class)
+                .hasFieldOrPropertyWithValue("code", 429);
     }
 
     // ==================== 测试夹具 ====================

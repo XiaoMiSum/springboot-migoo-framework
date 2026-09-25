@@ -5,6 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.Expression;
@@ -13,6 +14,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import xyz.migoo.framework.common.exception.GlobalErrorCodeConstants;
 import xyz.migoo.framework.common.exception.ServiceExceptionUtil;
+import xyz.migoo.framework.common.observability.RateLimitExceededEvent;
 import xyz.migoo.framework.web.core.annotation.RateLimit;
 import xyz.migoo.framework.web.core.annotation.RateLimitType;
 import xyz.migoo.framework.web.core.util.ServletUtils;
@@ -51,12 +53,22 @@ public class RateLimitAspect {
     private final RateLimiter rateLimiter;
 
     /**
+     * 事件发布器（可观测性信号，可空：直连构造时允许不发布）
+     */
+    private final ApplicationEventPublisher eventPublisher;
+
+    /**
      * SpEL 表达式缓存（key: 方法 + 表达式）
      */
     private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>();
 
     public RateLimitAspect(RateLimiter rateLimiter) {
+        this(rateLimiter, null);
+    }
+
+    public RateLimitAspect(RateLimiter rateLimiter, ApplicationEventPublisher eventPublisher) {
         this.rateLimiter = rateLimiter;
+        this.eventPublisher = eventPublisher;
     }
 
     @Around(value = "@annotation(rateLimit) || @within(rateLimit)", argNames = "joinPoint,rateLimit")
@@ -67,11 +79,27 @@ public class RateLimitAspect {
         if (!acquired) {
             log.warn("[RateLimitAspect][限流拦截] key({}) limit({}) window({}s)", fullKey,
                     rateLimit.limit(), rateLimit.window());
+            publishRateLimitExceeded(rateLimit);
             throw rateLimit.message().isBlank()
                     ? ServiceExceptionUtil.get(GlobalErrorCodeConstants.TOO_MANY_REQUESTS)
                     : ServiceExceptionUtil.get(GlobalErrorCodeConstants.TOO_MANY_REQUESTS.code(), rateLimit.message());
         }
         return joinPoint.proceed();
+    }
+
+    /**
+     * 发布限流拒绝事件（观测不得影响业务：发布异常只记日志）
+     */
+    private void publishRateLimitExceeded(RateLimit rateLimit) {
+        if (eventPublisher == null) {
+            return;
+        }
+        try {
+            eventPublisher.publishEvent(new RateLimitExceededEvent(ServletUtils.getRoutePattern(),
+                    rateLimit.type().name().toLowerCase(), rateLimit.limit()));
+        } catch (Exception ex) {
+            log.warn("[publishRateLimitExceeded][发布限流拒绝事件失败]", ex);
+        }
     }
 
     /**

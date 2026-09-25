@@ -1,6 +1,7 @@
 package xyz.migoo.framework.mq.core.stream;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
@@ -8,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import xyz.migoo.framework.common.util.JsonUtils;
+import xyz.migoo.framework.common.observability.MqMessageConsumeFailedEvent;
+import xyz.migoo.framework.common.observability.MqMessageDeadLetteredEvent;
 import xyz.migoo.framework.mq.config.MQProperties;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
@@ -23,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -223,6 +227,8 @@ class AbstractStreamMessageListenerTest {
         StreamOperations streamOps = mock(StreamOperations.class);
         listener.setRedisTemplate(mockRedisTemplate(streamOps));
         listener.setRedisMQTemplate(new RedisMQTemplate(mock(RedisTemplate.class)));
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        listener.setEventPublisher(publisher);
 
         ObjectRecord<String, String> record = toRecord(new DemoStreamMessage());
         listener.onMessage(record);
@@ -239,6 +245,9 @@ class AbstractStreamMessageListenerTest {
         assertThat(added.getValue()).contains("\"retry-count\":\"1\"");
         // 删除原消息
         verify(streamOps).delete(record);
+        // 首次失败仍可重试 → willRetry=true，未进死信
+        verify(publisher).publishEvent(new MqMessageConsumeFailedEvent("DemoStreamMessage", true));
+        verify(publisher, never()).publishEvent(any(MqMessageDeadLetteredEvent.class));
     }
 
     @Test
@@ -247,6 +256,8 @@ class AbstractStreamMessageListenerTest {
         StreamOperations streamOps = mock(StreamOperations.class);
         listener.setRedisTemplate(mockRedisTemplate(streamOps));
         listener.setRedisMQTemplate(new RedisMQTemplate(mock(RedisTemplate.class)));
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        listener.setEventPublisher(publisher);
 
         DemoStreamMessage message = new DemoStreamMessage();
         // retry-count=3 已达到 maxRetry=3
@@ -262,6 +273,12 @@ class AbstractStreamMessageListenerTest {
         assertThat(added.getStream()).isEqualTo("DemoStreamMessage:dead_letter");
         assertThat(added.getValue()).contains("\"error-message\"").contains("\"error-time\"");
         verify(streamOps).delete(record);
+        // 事件顺序: 消费失败(willRetry=false) → 死信(原因=异常类型)
+        org.mockito.ArgumentCaptor<Object> eventCaptor = org.mockito.ArgumentCaptor.forClass(Object.class);
+        verify(publisher, times(2)).publishEvent(eventCaptor.capture());
+        assertThat(eventCaptor.getAllValues()).containsExactly(
+                new MqMessageConsumeFailedEvent("DemoStreamMessage", false),
+                new MqMessageDeadLetteredEvent("DemoStreamMessage", "IllegalStateException"));
     }
 
     @Test

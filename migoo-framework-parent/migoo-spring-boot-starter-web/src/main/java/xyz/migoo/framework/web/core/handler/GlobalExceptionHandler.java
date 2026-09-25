@@ -5,9 +5,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ServiceException;
+import xyz.migoo.framework.common.observability.ServerErrorEvent;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.common.util.object.ExceptionUtils;
@@ -42,7 +44,6 @@ import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.*;
  * @author xiaomi
  */
 @RestControllerAdvice
-@AllArgsConstructor
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -52,6 +53,23 @@ public class GlobalExceptionHandler {
 
     private final I18NMessage i18n;
 
+    /**
+     * 事件发布器（可观测性信号，可空：直连构造时允许不发布）
+     */
+    private final ApplicationEventPublisher eventPublisher;
+
+    public GlobalExceptionHandler(String applicationName, ApiErrorLogFrameworkService apiErrorLogFrameworkService,
+                                  I18NMessage i18n) {
+        this(applicationName, apiErrorLogFrameworkService, i18n, null);
+    }
+
+    public GlobalExceptionHandler(String applicationName, ApiErrorLogFrameworkService apiErrorLogFrameworkService,
+                                  I18NMessage i18n, ApplicationEventPublisher eventPublisher) {
+        this.applicationName = applicationName;
+        this.apiErrorLogFrameworkService = apiErrorLogFrameworkService;
+        this.i18n = i18n;
+        this.eventPublisher = eventPublisher;
+    }
 
     /**
      * 处理所有异常，主要是提供给 Filter 使用
@@ -219,10 +237,29 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public Result<?> defaultExceptionHandler(HttpServletRequest request, Throwable ex) {
         createExceptionLog(request, ex);
+        publishServerError(request, ex);
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
         var message = i18n.getMessage(INTERNAL_SERVER_ERROR.msg());
         return Result.error(INTERNAL_SERVER_ERROR.code(), message);
+    }
+
+    /**
+     * 发布服务端错误事件（可观测性信号，观测不得影响业务：发布异常只记日志）
+     */
+    private void publishServerError(HttpServletRequest request, Throwable ex) {
+        if (eventPublisher == null) {
+            return;
+        }
+        try {
+            eventPublisher.publishEvent(new ServerErrorEvent(
+                    ServletUtils.getRoutePattern(request),
+                    request != null ? request.getMethod() : null,
+                    ex.getClass().getSimpleName(),
+                    StringUtils.truncate(ExceptionUtils.getMessage(ex), 200)));
+        } catch (Exception ex2) {
+            log.warn("[publishServerError][发布服务端错误事件失败]", ex2);
+        }
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {

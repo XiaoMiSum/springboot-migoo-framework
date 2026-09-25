@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -83,8 +84,10 @@ public class MQAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public RedisMQTemplate redisMQTemplate(RedisTemplate<String, ?> redisTemplate,
-                                           @Autowired(required = false) List<RedisMessageInterceptor> interceptors) {
+                                           @Autowired(required = false) List<RedisMessageInterceptor> interceptors,
+                                           ApplicationEventPublisher eventPublisher) {
         RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
+        template.setEventPublisher(eventPublisher);
         if (interceptors != null && !interceptors.isEmpty()) {
             interceptors.forEach(template::addInterceptor);
             log.info("[redisMQTemplate][注册 {} 个消息拦截器]", interceptors.size());
@@ -126,7 +129,8 @@ public class MQAutoConfiguration {
             RedisTemplate<String, Object> redisTemplate,
             List<AbstractStreamMessageListener<?>> listeners,
             RedisMQTemplate redisMQTemplate,
-            MQProperties properties) {
+            MQProperties properties,
+            ApplicationEventPublisher eventPublisher) {
         // 第一步，创建 StreamMessageListenerContainer 容器
         // 创建 options 配置
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String, String>> containerOptions =
@@ -148,6 +152,8 @@ public class MQAutoConfiguration {
             // 设置 listener 对应的 redisTemplate 和 redisMQTemplate
             listener.setRedisTemplate(redisTemplate);
             listener.setRedisMQTemplate(redisMQTemplate);
+            // 注入事件发布器（可观测性信号）
+            listener.setEventPublisher(eventPublisher);
             // 创建 Consumer 对象
             Consumer consumer = Consumer.from(listener.getGroup(), consumerName);
             // 设置 Consumer 消费进度，以最小消费进度为准

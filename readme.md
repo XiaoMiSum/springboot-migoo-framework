@@ -109,6 +109,8 @@ String cached = redisKit.get(UserRedisKey.TOKEN.getKeyDefine(), userId);
 | `migoo-spring-boot-starter-mybatis`  | MyBatis-Plus 增强、分页、数据源  | [查看](docs/mybatis.md)  |
 | `migoo-spring-boot-starter-redis`    | Redis 配置、工具类               | [查看](docs/redis.md)    |
 | `migoo-spring-boot-starter-mq`       | Redis 消息队列（Stream/Pub-Sub） | [查看](docs/mq.md)       |
+| `migoo-spring-boot-starter-websocket` | WebSocket 连接管理、Token 认证  | [查看](docs/websocket.md) |
+| `migoo-spring-boot-starter-observability` | 可观测性：Metrics、Tracing、日志关联 | [查看](docs/observability.md) |
 
 ## 项目结构
 
@@ -120,7 +122,9 @@ migoo-framework-parent/
 ├── migoo-spring-boot-starter-security# 安全组件
 ├── migoo-spring-boot-starter-mybatis # MyBatis 组件
 ├── migoo-spring-boot-starter-redis   # Redis 组件
-└── migoo-spring-boot-starter-mq      # MQ 组件
+├── migoo-spring-boot-starter-mq      # MQ 组件
+├── migoo-spring-boot-starter-websocket # WebSocket 组件
+└── migoo-spring-boot-starter-observability # 可观测性组件
 ```
 
 ## 许可证

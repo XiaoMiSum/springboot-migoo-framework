@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import xyz.migoo.framework.apilog.core.ApiErrorLog;
 import xyz.migoo.framework.apilog.core.ApiErrorLogFrameworkService;
 import xyz.migoo.framework.common.exception.ErrorCode;
 import xyz.migoo.framework.common.exception.ServiceException;
+import xyz.migoo.framework.common.observability.ServerErrorEvent;
 import xyz.migoo.framework.common.pojo.Result;
 import xyz.migoo.framework.web.i18n.I18NMessage;
 
@@ -215,6 +217,25 @@ class GlobalExceptionHandlerTest {
         assertThat(log.getExceptionName()).isEqualTo(RuntimeException.class.getName());
         assertThat(log.getExceptionMessage()).isEqualTo("RuntimeException: boom");
         assertThat(log.getExceptionTime()).isNotNull();
+    }
+
+    @Test
+    void defaultExceptionHandlerPublishesServerErrorEvent() throws Exception {
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        GlobalExceptionHandler handlerWithPublisher =
+                new GlobalExceptionHandler(APPLICATION_NAME, apiErrorLogService, i18n, publisher);
+        HttpServletRequest request = request();
+        when(request.getParameterMap()).thenReturn(new HashMap<>());
+        when(request.getReader()).thenReturn(new BufferedReader(new StringReader("")));
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        handlerWithPublisher.defaultExceptionHandler(request, new IllegalStateException("boom"));
+
+        // path 取路由模板（无 MVC 匹配时回退 URI）、异常类型进 tag、message 仅随事件流转
+        verify(publisher).publishEvent(
+                new ServerErrorEvent("/api/test", "GET", "IllegalStateException", "IllegalStateException: boom"));
     }
 
     @Test

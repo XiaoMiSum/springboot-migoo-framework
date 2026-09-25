@@ -4,11 +4,14 @@ import xyz.migoo.framework.common.util.type.TypeUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import xyz.migoo.framework.common.util.JsonUtils;
+import xyz.migoo.framework.common.observability.MqMessageConsumeFailedEvent;
+import xyz.migoo.framework.common.observability.MqMessageDeadLetteredEvent;
 import xyz.migoo.framework.mq.config.MQProperties;
 import xyz.migoo.framework.mq.core.RedisMQTemplate;
 import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
@@ -79,6 +82,12 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
      */
     @Setter
     private RedisTemplate<String, ?> redisTemplate;
+
+    /**
+     * 事件发布器（可观测性信号，可空：未注入时不发布）
+     */
+    @Setter
+    private ApplicationEventPublisher eventPublisher;
 
     protected AbstractStreamMessageListener(MQProperties properties) {
         this.messageType = getMessageClass();
@@ -168,6 +177,8 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
         // ACK 消息，避免重复消费
         redisTemplate.opsForStream().acknowledge(group, message);
 
+        boolean willRetry = retryCount < maxRetry;
+        publishEvent(new MqMessageConsumeFailedEvent(streamKey, willRetry));
         if (retryCount < maxRetry) {
             // 重试：增加重试次数并重新发送到 Stream
             messageObj.addHeader("retry-count", String.valueOf(retryCount + 1));
@@ -204,11 +215,28 @@ public abstract class AbstractStreamMessageListener<T extends AbstractStreamMess
             messageObj.addHeader("error-time", String.valueOf(System.currentTimeMillis()));
 
             redisTemplate.opsForStream().add(StreamRecords.newRecord().ofObject(JsonUtils.toJsonString(messageObj)).withStreamKey(deadLetterKey));
+            publishEvent(new MqMessageDeadLetteredEvent(streamKey, e.getClass().getSimpleName()));
             log.warn("[sendToDeadLetterQueue][消息已发送到死信队列] stream={}, messageId={}, deadLetterKey={}",
                     streamKey, messageObj.getMessageId(), deadLetterKey);
         } catch (Exception ex) {
             log.error("[sendToDeadLetterQueue][发送到死信队列失败] stream={}, messageId={}, deadLetterKey={}",
                     streamKey, messageObj.getMessageId(), deadLetterKey, ex);
+        }
+    }
+
+    /**
+     * 发布可观测性信号事件（观测不得影响业务：发布异常只记日志）
+     *
+     * @param event common 中的信号事件 record
+     */
+    private void publishEvent(Object event) {
+        if (eventPublisher == null) {
+            return;
+        }
+        try {
+            eventPublisher.publishEvent(event);
+        } catch (Exception ex) {
+            log.warn("[publishEvent][发布可观测性信号事件失败] event({})", event, ex);
         }
     }
 

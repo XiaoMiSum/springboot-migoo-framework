@@ -3,6 +3,7 @@ package xyz.migoo.framework.security.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -153,8 +154,10 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
                                                            UserDetailsBridge userBridge,
                                                            AuthenticationManager authenticationManager,
                                                            SecurityProperties properties,
-                                                           LoginLockManager lockManager) {
-        return new DefaultJwtAuthenticator(tokenProvider, userBridge, authenticationManager, properties, lockManager);
+                                                           LoginLockManager lockManager,
+                                                           ApplicationEventPublisher eventPublisher) {
+        return new DefaultJwtAuthenticator(tokenProvider, userBridge, authenticationManager, properties,
+                lockManager, eventPublisher);
     }
 
     // ==================== 登录失败锁定 ====================

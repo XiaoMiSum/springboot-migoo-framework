@@ -144,6 +144,13 @@
                 <version>${migoo.framework.version}</version>
             </dependency>
 
+            <!-- 可观测性相关 -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-spring-boot-starter-observability</artifactId>
+                <version>${migoo.framework.version}</version>
+            </dependency>
+
             <!-- DB 相关 -->
             <dependency>
                 <groupId>com.baomidou</groupId>

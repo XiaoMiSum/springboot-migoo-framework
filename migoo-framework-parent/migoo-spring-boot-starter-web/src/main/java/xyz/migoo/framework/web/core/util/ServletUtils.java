@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import xyz.migoo.framework.common.util.JsonUtils;
@@ -99,6 +100,38 @@ public class ServletUtils {
         HttpServletRequest request = getRequest();
         String[] headers = {"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         return Objects.isNull(request) ? null : getClientIPByHeader(request, headers);
+    }
+
+    /**
+     * 获得当前请求的路由模板（无请求上下文时返回 {@code unknown}）
+     *
+     * <p>优先取 SpringMVC 最佳匹配模板（如 {@code /user/{id}}）而非真实 URI，
+     * 用于可观测性指标 tag 时控制基数。</p>
+     *
+     * @return 路由模板；无请求上下文时为 {@code unknown}
+     */
+    public static String getRoutePattern() {
+        return getRoutePattern(getRequest());
+    }
+
+    /**
+     * 获得指定请求的路由模板
+     *
+     * <p>取值顺序：MVC 最佳匹配模板 → 请求 URI → {@code unknown}。</p>
+     *
+     * @param request 请求
+     * @return 路由模板；请求为空或 URI 为空时为 {@code unknown}
+     */
+    public static String getRoutePattern(HttpServletRequest request) {
+        if (Objects.isNull(request)) {
+            return "unknown";
+        }
+        Object pattern = request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        if (pattern instanceof String text && !text.isBlank()) {
+            return text;
+        }
+        String uri = request.getRequestURI();
+        return Strings.isNullOrEmpty(uri) ? "unknown" : uri;
     }
 
     public static boolean isJsonRequest(ServletRequest request) {

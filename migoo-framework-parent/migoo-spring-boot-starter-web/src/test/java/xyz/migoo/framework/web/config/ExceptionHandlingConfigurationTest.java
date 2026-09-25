@@ -24,7 +24,8 @@ class ExceptionHandlingConfigurationTest {
         when(i18n.getMessage("库存不足")).thenReturn("库存不足");
 
         GlobalExceptionHandler handler =
-                new ExceptionHandlingConfiguration().globalExceptionHandler("test-app", apiErrorLog, i18n);
+                new ExceptionHandlingConfiguration().globalExceptionHandler(
+                        "test-app", apiErrorLog, i18n, mock(org.springframework.context.ApplicationEventPublisher.class));
 
         assertThat(handler).isInstanceOf(GlobalExceptionHandler.class);
         // 验证依赖注入后可以正常工作

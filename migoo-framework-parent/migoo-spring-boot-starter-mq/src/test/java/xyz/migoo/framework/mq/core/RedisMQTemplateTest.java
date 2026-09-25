@@ -1,11 +1,13 @@
 package xyz.migoo.framework.mq.core;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
 import xyz.migoo.framework.common.util.JsonUtils;
+import xyz.migoo.framework.common.observability.MqMessageSentEvent;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.message.AbstractMessage;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessage;
@@ -160,6 +162,47 @@ class RedisMQTemplateTest {
         verify(streamOps).add(captor.capture());
         assertThat(captor.getValue().getStream()).isEqualTo("DemoStreamMessage");
         assertThat(captor.getValue().getValue()).isEqualTo(JsonUtils.toJsonString(message));
+    }
+
+    @Test
+    void sendStreamMessagePublishesSentEvent() {
+        RedisTemplate<String, ?> redisTemplate = mock(RedisTemplate.class);
+        StreamOperations streamOps = mock(StreamOperations.class);
+        when(redisTemplate.opsForStream()).thenReturn(streamOps);
+        when(streamOps.add(any(ObjectRecord.class))).thenReturn(RecordId.of("1-0"));
+        RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        template.setEventPublisher(publisher);
+
+        template.send(new DemoStreamMessage());
+
+        verify(publisher).publishEvent(new MqMessageSentEvent("DemoStreamMessage"));
+    }
+
+    @Test
+    void sendChannelMessagePublishesSentEvent() {
+        RedisTemplate<String, ?> redisTemplate = mock(RedisTemplate.class);
+        RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        template.setEventPublisher(publisher);
+
+        template.send(new DemoChannelMessage());
+
+        verify(publisher).publishEvent(new MqMessageSentEvent("DemoChannelMessage"));
+    }
+
+    @Test
+    void failedSendDoesNotPublishSentEvent() {
+        RedisTemplate<String, ?> redisTemplate = mock(RedisTemplate.class);
+        when(redisTemplate.convertAndSend(anyString(), any())).thenThrow(new RuntimeException("send failed"));
+        RedisMQTemplate template = new RedisMQTemplate(redisTemplate);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        template.setEventPublisher(publisher);
+
+        assertThatThrownBy(() -> template.send(new DemoChannelMessage()))
+                .isInstanceOf(RuntimeException.class);
+
+        verify(publisher, never()).publishEvent(any(MqMessageSentEvent.class));
     }
 
     @Test
