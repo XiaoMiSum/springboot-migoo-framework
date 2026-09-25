@@ -17,6 +17,7 @@ layout: default
 | [MyBatis](mybatis.md)     | MyBatis-Plus 增强、分页、数据源  |
 | [Redis](redis.md)         | Redis 配置、工具类               |
 | [MQ](mq.md)               | Redis 消息队列（Stream/Pub-Sub） |
+| [Observability](observability.md) | 可观测性：Metrics、Tracing、日志关联 |
 
 ## 快速开始
 
@@ -80,6 +81,12 @@ layout: default
 <dependency>
 <groupId>xyz.migoo.springboot</groupId>
 <artifactId>migoo-spring-boot-starter-mq</artifactId>
+</dependency>
+
+        <!-- 可观测性组件 -->
+<dependency>
+<groupId>xyz.migoo.springboot</groupId>
+<artifactId>migoo-spring-boot-starter-observability</artifactId>
 </dependency>
 ```
 
