@@ -88,7 +88,7 @@ public interface UserErrorCode {
 
 // Controller 返回统一响应
 @GetMapping("/user")
-public Result<UserVO> getUser(@AuthUser AuthUserDetails user) {
+public Result<UserVO> getUser(@AuthenticationPrincipal AuthUserDetails user) {
     return Result.ok(userMapper.selectById(user.getId()));
 }
 

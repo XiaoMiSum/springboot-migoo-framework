@@ -67,4 +67,38 @@ public interface UserDetailsBridge extends UserDetailsService {
     default void clean(String token) {
         // 默认空实现，JWT 无状态场景无需清理
     }
+
+    /**
+     * 撤销用户的全部 token（踢出已登录用户，用于 revokeUserTokens）
+     * <p>
+     * 应用在这里记录用户级撤销状态（如: Redis 记录 userId 黑名单，TTL 不小于 token 剩余有效期）。
+     * 配合 {@link #isUserRevoked(String)} 在每次请求校验时生效。
+     *
+     * @param userId 用户编号
+     */
+    default void revokeByUserId(String userId) {
+        // 默认空实现，JWT 无状态场景无需撤销
+    }
+
+    /**
+     * 判断 token 是否已被撤销（用于 verifyToken / refreshToken 校验）
+     *
+     * @param token 待校验的 token
+     * @return true-已撤销，请求将被拒绝（401）
+     */
+    default boolean isTokenRevoked(String token) {
+        return false;
+    }
+
+    /**
+     * 判断用户是否已被踢出（用于 verifyToken / refreshToken 校验）
+     * <p>
+     * 每次请求都会调用，应用可基于 Redis 黑名单等实现。
+     *
+     * @param userId 用户编号
+     * @return true-用户已被踢出，请求将被拒绝（401）
+     */
+    default boolean isUserRevoked(String userId) {
+        return false;
+    }
 }

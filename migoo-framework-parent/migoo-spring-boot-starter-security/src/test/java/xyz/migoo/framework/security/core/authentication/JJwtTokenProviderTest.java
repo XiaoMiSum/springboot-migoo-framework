@@ -129,6 +129,36 @@ class JJwtTokenProviderTest {
                 .isInstanceOf(JwtException.class);
     }
 
+    @Test
+    void parseTokenThrowsForTokenMissingExp() {
+        // 手工构造签名有效但没有 exp claim 的 token → 不得放行（否则永久有效）
+        assertThatThrownBy(() -> tokenProvider.parseToken(buildNoExpToken()))
+                .isInstanceOf(JwtException.class)
+                .hasMessageContaining("exp");
+    }
+
+    @Test
+    void isTokenValidReturnsFalseForTokenMissingExp() {
+        assertThat(tokenProvider.isTokenValid(buildNoExpToken())).isFalse();
+    }
+
+    /**
+     * 构造签名有效但没有 exp claim 的 token（契约要求: 缺 exp 视为无效）
+     */
+    private String buildNoExpToken() {
+        SecretKey key = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        NimbusJwtEncoder encoder = new NimbusJwtEncoder(new ImmutableSecret<>(key));
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject("admin")
+                .claim("userId", "1001")
+                .claim("type", "access")
+                .issuedAt(now)
+                .build();
+        return encoder.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
+                .getTokenValue();
+    }
+
     /**
      * 使用与 {@link JJwtTokenProvider} 相同的 secret 手工构造一个签名有效、
      * 但 issuedAt/expiresAt 均已过期（expiresAt 仍在 issuedAt 之后）的 token。

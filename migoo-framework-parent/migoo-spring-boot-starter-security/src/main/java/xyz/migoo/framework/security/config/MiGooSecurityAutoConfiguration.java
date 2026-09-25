@@ -24,9 +24,11 @@ import xyz.migoo.framework.security.core.handler.AccessDeniedHandlerImpl;
 import xyz.migoo.framework.security.core.handler.AuthenticationEntryPointImpl;
 import xyz.migoo.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import xyz.migoo.framework.security.core.interceptor.TotpInterceptor;
-import xyz.migoo.framework.security.core.resolver.AuthUserMethodArgumentResolver;
+import xyz.migoo.framework.security.core.lockout.*;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
+import xyz.migoo.framework.web.core.store.StateStore;
 import xyz.migoo.framework.web.i18n.I18NMessage;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Spring Security 自动配置类
@@ -150,8 +152,64 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
     public DefaultJwtAuthenticator defaultJwtAuthenticator(JwtTokenProvider tokenProvider,
                                                            UserDetailsBridge userBridge,
                                                            AuthenticationManager authenticationManager,
-                                                           SecurityProperties properties) {
-        return new DefaultJwtAuthenticator(tokenProvider, userBridge, authenticationManager, properties);
+                                                           SecurityProperties properties,
+                                                           LoginLockManager lockManager) {
+        return new DefaultJwtAuthenticator(tokenProvider, userBridge, authenticationManager, properties, lockManager);
+    }
+
+    // ==================== 登录失败锁定 ====================
+
+    /**
+     * 固定时长锁定策略 Bean（migoo.security.login-lock.fixed.enabled 控制，默认启用）
+     */
+    @Bean
+    @ConditionalOnMissingBean(FixedDurationLockStrategy.class)
+    @ConditionalOnProperty(name = "migoo.security.login-lock.fixed.enabled", havingValue = "true", matchIfMissing = true)
+    public FixedDurationLockStrategy fixedDurationLockStrategy(StateStore stateStore,
+                                                               SecurityProperties properties) {
+        var fixed = properties.getLoginLock().getFixed();
+        return new FixedDurationLockStrategy(stateStore, fixed.getThreshold(),
+                properties.getLoginLock().getFailureWindow(), fixed.getDuration());
+    }
+
+    /**
+     * 递增时长锁定策略 Bean（migoo.security.login-lock.incremental.enabled 控制，默认启用）
+     */
+    @Bean
+    @ConditionalOnMissingBean(IncrementalDurationLockStrategy.class)
+    @ConditionalOnProperty(name = "migoo.security.login-lock.incremental.enabled", havingValue = "true", matchIfMissing = true)
+    public IncrementalDurationLockStrategy incrementalDurationLockStrategy(StateStore stateStore,
+                                                                          SecurityProperties properties) {
+        var incremental = properties.getLoginLock().getIncremental();
+        return new IncrementalDurationLockStrategy(stateStore, incremental.getThreshold(),
+                properties.getLoginLock().getFailureWindow(), incremental.getInitialDuration(),
+                incremental.getMultiplier(), incremental.getMaxDuration());
+    }
+
+    /**
+     * 滑动窗口累计锁定策略 Bean（migoo.security.login-lock.sliding-window.enabled 控制，默认启用）
+     */
+    @Bean
+    @ConditionalOnMissingBean(SlidingWindowLockStrategy.class)
+    @ConditionalOnProperty(name = "migoo.security.login-lock.sliding-window.enabled", havingValue = "true", matchIfMissing = true)
+    public SlidingWindowLockStrategy slidingWindowLockStrategy(StateStore stateStore,
+                                                               SecurityProperties properties) {
+        var slidingWindow = properties.getLoginLock().getSlidingWindow();
+        return new SlidingWindowLockStrategy(stateStore, slidingWindow.getThreshold(),
+                slidingWindow.getWindow(), slidingWindow.getDuration());
+    }
+
+    /**
+     * 登录失败锁定管理器 Bean
+     * <p>
+     * 组合容器中全部 {@link LoginLockStrategy} Bean（命中取最严），
+     * 应用注册自定义策略 Bean 即可参与组合。
+     */
+    @Bean
+    @ConditionalOnMissingBean(LoginLockManager.class)
+    public LoginLockManager loginLockManager(StateStore stateStore,
+                                             ObjectProvider<LoginLockStrategy> strategyProvider) {
+        return new DefaultLoginLockManager(stateStore, strategyProvider.orderedStream().toList());
     }
 
     /**
@@ -167,16 +225,6 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
                                                            I18NMessage i18nMessage) {
         return new JwtAuthenticationFilter(securityProperties, userDetailsFetcher,
                 globalExceptionHandler, i18nMessage);
-    }
-
-    /**
-     * 方法参数转换处理器（JWT 模式下注册）
-     */
-    @Bean
-    @ConditionalOnProperty(name = "migoo.security.mode", havingValue = "jwt", matchIfMissing = true)
-    public AuthUserMethodArgumentResolver currentUserMethodArgumentResolver(SecurityProperties securityProperties,
-                                                                            AuthUserDetailsFetcher<? extends AuthUserDetails<?, ?>> userDetailsFetcher) {
-        return new AuthUserMethodArgumentResolver(securityProperties, userDetailsFetcher);
     }
 
 }

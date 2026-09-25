@@ -51,6 +51,12 @@ public class SecurityProperties {
     private OAuth2 oauth2 = new OAuth2();
 
     /**
+     * 登录失败锁定配置（仅 JWT 模式生效）
+     */
+    @NotNull(message = "login-lock 不能为空")
+    private LoginLock loginLock = new LoginLock();
+
+    /**
      * 条件校验
      */
     @PostConstruct
@@ -135,6 +141,146 @@ public class SecurityProperties {
          * 直接指定 JWK Set 端点地址 (与 issuerUri 二选一)
          */
         private String jwkSetUri;
+    }
+
+    // ==================== 登录失败锁定配置 ====================
+
+    @Validated
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class LoginLock {
+
+        /**
+         * 登录失败锁定总开关
+         * <p>
+         * 默认开启
+         */
+        private boolean enabled = true;
+
+        /**
+         * 连续失败计数的空闲重置窗口
+         * <p>
+         * 距最后一次失败超过该时长未再失败，计数自动清零。
+         * 建议不小于固定锁定时长、且不小于递增策略最长锁定时长（保证递增跨锁定周期延续）。
+         * <p>
+         * 默认 30 分钟（作用于固定、递增两种连续计数策略）
+         */
+        @NotNull(message = "login-lock.failure-window 不能为空")
+        private Duration failureWindow = Duration.ofMinutes(30);
+
+        /**
+         * 固定时长锁定策略
+         */
+        @NotNull(message = "login-lock.fixed 不能为空")
+        private Fixed fixed = new Fixed();
+
+        /**
+         * 递增时长锁定策略
+         */
+        @NotNull(message = "login-lock.incremental 不能为空")
+        private Incremental incremental = new Incremental();
+
+        /**
+         * 滑动窗口累计锁定策略
+         */
+        @NotNull(message = "login-lock.sliding-window 不能为空")
+        private SlidingWindow slidingWindow = new SlidingWindow();
+
+        /**
+         * 固定时长锁定策略配置
+         */
+        @Validated
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class Fixed {
+
+            /**
+             * 是否启用（默认启用）
+             */
+            private boolean enabled = true;
+
+            /**
+             * 连续失败次数阈值（默认 5 次）
+             */
+            private int threshold = 5;
+
+            /**
+             * 锁定时长（默认 10 分钟）
+             */
+            @NotNull(message = "login-lock.fixed.duration 不能为空")
+            private Duration duration = Duration.ofMinutes(10);
+        }
+
+        /**
+         * 递增时长锁定策略配置
+         */
+        @Validated
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class Incremental {
+
+            /**
+             * 是否启用（默认启用）
+             */
+            private boolean enabled = true;
+
+            /**
+             * 开始锁定的连续失败次数阈值（默认 5 次）
+             */
+            private int threshold = 5;
+
+            /**
+             * 首次锁定时长（默认 1 分钟）
+             */
+            @NotNull(message = "login-lock.incremental.initial-duration 不能为空")
+            private Duration initialDuration = Duration.ofMinutes(1);
+
+            /**
+             * 每多失败一次的时长递增倍数（默认 2，即指数递增）
+             */
+            private long multiplier = 2;
+
+            /**
+             * 单次锁定时长上限（默认 1 小时）
+             */
+            @NotNull(message = "login-lock.incremental.max-duration 不能为空")
+            private Duration maxDuration = Duration.ofHours(1);
+        }
+
+        /**
+         * 滑动窗口累计锁定策略配置
+         */
+        @Validated
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class SlidingWindow {
+
+            /**
+             * 是否启用（默认启用）
+             */
+            private boolean enabled = true;
+
+            /**
+             * 窗口内累计失败次数阈值（默认 5 次，中间登录成功也计数）
+             */
+            private int threshold = 5;
+
+            /**
+             * 统计窗口时长（默认 15 分钟）
+             */
+            @NotNull(message = "login-lock.sliding-window.window 不能为空")
+            private Duration window = Duration.ofMinutes(15);
+
+            /**
+             * 锁定时长（默认 10 分钟）
+             */
+            @NotNull(message = "login-lock.sliding-window.duration 不能为空")
+            private Duration duration = Duration.ofMinutes(10);
+        }
     }
 
     // ==================== 枚举 ====================

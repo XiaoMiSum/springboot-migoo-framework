@@ -1,2 +1,3 @@
 xyz.migoo.framework.web.config.MiGooWebAutoConfiguration
+xyz.migoo.framework.web.config.MiGooWebRedisStateStoreAutoConfiguration
 xyz.migoo.framework.jackson.config.JacksonAutoConfiguration

@@ -22,6 +22,20 @@ public class MigooWebProperties {
      */
     private CacheBody cacheBody = new CacheBody();
 
+    /**
+     * 限流配置（@RateLimit 注解切面）
+     */
+    private RateLimit rateLimit = new RateLimit();
+
+    @Data
+    public static class RateLimit {
+
+        /**
+         * 是否启用 @RateLimit 注解限流切面
+         */
+        private boolean enabled = true;
+    }
+
     @Data
     public static class Cors {
 

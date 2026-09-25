@@ -60,6 +60,21 @@
             <type>jar</type>
         </dependency>
 
+        <!-- AOP（@RateLimit 限流切面） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
+            <type>jar</type>
+        </dependency>
+
+        <!-- Redis 存储（可选: 检测到时自动将计数/状态存储切换为 Redis 实现，多实例共享限流状态） -->
+        <dependency>
+            <groupId>xyz.migoo.springboot</groupId>
+            <artifactId>migoo-spring-boot-starter-redis</artifactId>
+            <optional>true</optional>
+            <type>jar</type>
+        </dependency>
+
         <!-- spring boot 配置所需依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -61,9 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
             var authUserDetails = userDetailsFetcher.verifyToken(token);
-            if (authUserDetails != null) {
-                SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
+            if (authUserDetails == null) {
+                // token 无效/过期/已撤销/用户不存在 → 认证失败，与无 token 走同一路径立即返回 401，不再依赖下游授权层兜底
+                throw ServiceExceptionUtil.get(UNAUTHORIZED);
             }
+            SecurityFrameworkUtils.setLoginUser(authUserDetails, request);
         } catch (Exception ex) {
             Result<?> result = ex instanceof AccessDeniedException e ? accessDeniedExceptionHandler(request, e)
                     : globalExceptionHandler.allExceptionHandler(request, response, ex);

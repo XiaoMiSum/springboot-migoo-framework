@@ -45,15 +45,20 @@ public class JJwtTokenProvider implements JwtTokenProvider {
 
     @Override
     public Jwt parseToken(String token) {
-        return jwtDecoder.decode(token);
+        Jwt jwt = jwtDecoder.decode(token);
+        if (jwt.getExpiresAt() == null) {
+            throw new BadJwtException("Jwt exp claim is required");
+        }
+        return jwt;
     }
 
     @Override
     public boolean isTokenValid(String token) {
+        // parseToken 的布尔包装，与 parseToken 的有效性判定保持一致
         try {
-            Jwt jwt = jwtDecoder.decode(token);
-            return jwt.getExpiresAt() != null && jwt.getExpiresAt().isAfter(Instant.now());
-        } catch (JwtException e) {
+            parseToken(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
