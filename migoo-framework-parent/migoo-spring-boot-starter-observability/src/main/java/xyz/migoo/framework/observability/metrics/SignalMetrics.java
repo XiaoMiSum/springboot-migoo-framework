@@ -65,6 +65,11 @@ public class SignalMetrics {
      */
     public static final String MQ_DEAD_LETTERED = "migoo.mq.message.dead.lettered";
 
+    /**
+     * 安全审计操作（tags: action、success）
+     */
+    public static final String AUDIT_OPERATION = "migoo.security.audit.operation";
+
     private final MeterRegistry registry;
 
     /**
@@ -150,6 +155,17 @@ public class SignalMetrics {
      */
     public void mqDeadLettered(String stream, String reason) {
         increment(MQ_DEAD_LETTERED, "stream", nullToUnknown(stream), "reason", nullToUnknown(reason));
+    }
+
+    /**
+     * 记录安全审计操作
+     *
+     * @param action  审计动作（低基数：注解 action 或 类名#方法名）
+     * @param success 操作是否成功
+     */
+    public void auditOperation(String action, boolean success) {
+        increment(AUDIT_OPERATION, "action", nullToUnknown(action),
+                "success", String.valueOf(success));
     }
 
     /**

@@ -63,6 +63,12 @@ public class SecurityProperties {
     private Headers headers = new Headers();
 
     /**
+     * 安全审计配置（@AuditLog 注解切面）
+     */
+    @NotNull(message = "audit 不能为空")
+    private Audit audit = new Audit();
+
+    /**
      * 条件校验
      */
     @PostConstruct
@@ -340,6 +346,21 @@ public class SecurityProperties {
          * 为空（默认）= 不下发（误配会阻断页面资源加载，须由使用方按需显式给出）
          */
         private String contentSecurityPolicy;
+    }
+
+    // ==================== 安全审计配置 ====================
+
+    @Validated
+    @Data
+    public static class Audit {
+
+        /**
+         * 审计切面总开关
+         * <p>
+         * true（默认）= 注册 @AuditLog 切面（migoo.audit 日志 + AuditLogEvent 事件）；
+         * false = 不注册（应用可自行注册 AuditLogAspect Bean）
+         */
+        private boolean enabled = true;
     }
 
     // ==================== 枚举 ====================

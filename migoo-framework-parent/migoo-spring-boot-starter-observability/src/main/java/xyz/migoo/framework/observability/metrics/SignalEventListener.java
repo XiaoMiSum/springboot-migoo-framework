@@ -195,4 +195,12 @@ public class SignalEventListener implements DisposableBean {
         dispatch(() -> metrics.mqDeadLettered(event.stream(), event.reason()));
     }
 
+    /**
+     * 安全审计操作
+     */
+    @EventListener
+    public void onAuditLog(AuditLogEvent event) {
+        dispatch(() -> metrics.auditOperation(event.action(), event.success()));
+    }
+
 }

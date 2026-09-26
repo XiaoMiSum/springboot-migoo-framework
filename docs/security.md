@@ -117,6 +117,11 @@ migoo:
       # 非 Spring 默认头
       referrer-policy: true              # Referrer-Policy: strict-origin-when-cross-origin
       # content-security-policy: default-src 'self'   # CSP（默认不下发，按需显式给出）
+
+    # ========== 安全审计（默认启用，见下文「安全审计日志」） ==========
+    audit:
+      # @AuditLog 注解切面总开关
+      enabled: true
 ```
 
 ---
@@ -339,6 +344,61 @@ public class AuthService {
 - 总开关 `migoo.security.login-lock.enabled=false` 完全关闭（不检查也不计数）。
 
 完整配置见「配置项」一节的 `login-lock` 块。
+
+---
+
+## 安全审计日志
+
+`@AuditLog` 标注在方法/类上，切面双通道输出「谁、从哪里、做了什么、成败、入参」：
+
+```java
+import xyz.migoo.framework.security.core.annotation.AuditLog;
+
+// 默认动作（类名#方法名）+ 记录入参
+@AuditLog
+@PostMapping("/api/users/{id}/disable")
+public Result disableUser(@PathVariable Long id) { ... }
+
+// 指定低基数动作（作指标 tag 用），不记录入参
+@AuditLog(action = "订单创建", recordParams = false)
+@PostMapping("/api/orders")
+public Result<Long> createOrder(@RequestBody OrderCreateReqBody req) { ... }
+```
+
+| 属性 | 说明 | 默认 |
+|------|------|------|
+| `action` | 审计动作（指标 tag，须低基数，勿放单号等高基数值）；留空回退 `类名#方法名` | - |
+| `recordParams` | 是否记录入参（脱敏后） | `true` |
+
+**双通道输出**：
+
+1. **审计日志**：logger 名 `migoo.audit` 输出一行 JSON，可独立路由到审计文件：
+
+```xml
+<!-- logback-spring.xml：审计日志与业务日志分离 -->
+<logger name="migoo.audit" additivity="false">
+    <appender-ref ref="AUDIT_FILE"/>
+</logger>
+```
+
+```json
+{"operator":"1(admin)","clientIp":"10.0.0.1","path":"/api/users/{id}/disable","action":"用户禁用","success":true,"errorMessage":null,"params":"[{\"mobile\":\"138****5678\"}]"}
+```
+
+2. **审计事件**：发布 `AuditLogEvent`（同字段 record），应用自行订阅落库：
+
+```java
+@EventListener
+public void onAudit(AuditLogEvent event) {
+    // 落库：操作人/IP/路由/动作/成败/入参
+}
+```
+
+- **入参安全**：只摘要 `@RequestBody` 与基本类型/字符串/枚举/时间等简单参数（自动跳过 HttpServletRequest、MultipartFile 等容器对象）；序列化经 [脱敏注解](common.md) `@Sensitive` 自动掩码，且字段名含 password/token/secret/credential/authorization 关键词时强制置 `******` 双重兜底；`recordParams=false` 或无可摘要参数时 `params` 为 null；
+- **失败也审计**：业务异常照常记录（`success=false` + `errorMessage`），异常原样抛出不吞；
+- **观测联动**：每个审计事件计为指标 `migoo.security.audit.operation`（tags: `action`、`success`），见 [observability 文档](observability.md)；
+- 日志输出/事件发布失败只记告警，不影响业务返回；
+- 总开关 `migoo.security.audit.enabled`（默认开启）；应用自定义 `AuditLogAspect` Bean 可整体覆盖。
 
 ---
 

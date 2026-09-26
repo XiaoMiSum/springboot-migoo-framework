@@ -1,3 +1,4 @@
 xyz.migoo.framework.security.config.MiGooSecurityAutoConfiguration
 xyz.migoo.framework.security.config.MiGooWebSecurityFilterChainConfiguration
 xyz.migoo.framework.security.config.OAuth2ResourceServerAutoConfiguration
+xyz.migoo.framework.security.config.AuditLogConfiguration

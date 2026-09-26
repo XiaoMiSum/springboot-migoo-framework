@@ -36,7 +36,7 @@ class SignalEventListenerTest {
     }
 
     @Test
-    void allEightEventsAreCountedWithTags() {
+    void allNineEventsAreCountedWithTags() {
         listener.onRateLimitExceeded(new RateLimitExceededEvent("/user/{id}", "ip", 10));
         listener.onAuthenticationFailed(new AuthenticationFailedEvent("BadCredentialsException"));
         listener.onAccountLocked(new AccountLockedEvent("failure_threshold"));
@@ -45,11 +45,13 @@ class SignalEventListenerTest {
         listener.onMqMessageSent(new MqMessageSentEvent("Order"));
         listener.onMqConsumeFailed(new MqMessageConsumeFailedEvent("Order", true));
         listener.onMqDeadLettered(new MqMessageDeadLetteredEvent("Order", "IllegalStateException"));
+        listener.onAuditLog(new AuditLogEvent("1(admin)", "1.2.3.4", "/users/{id}",
+                "用户禁用", true, null, null));
 
-        assertAllEightCounted();
+        assertAllNineCounted();
     }
 
-    private void assertAllEightCounted() {
+    private void assertAllNineCounted() {
         assertThat(count(SignalMetrics.RATE_LIMIT_REJECTED, "path", "/user/{id}")).isEqualTo(1.0);
         assertThat(count(SignalMetrics.LOGIN_FAILED, "reason", "BadCredentialsException")).isEqualTo(1.0);
         assertThat(count(SignalMetrics.ACCOUNT_LOCKED, "reason", "failure_threshold")).isEqualTo(1.0);
@@ -59,6 +61,8 @@ class SignalEventListenerTest {
         assertThat(count(SignalMetrics.MQ_MESSAGE_SENT, "stream", "Order")).isEqualTo(1.0);
         assertThat(count(SignalMetrics.MQ_CONSUME_FAILED, "stream", "Order", "will_retry", "true")).isEqualTo(1.0);
         assertThat(count(SignalMetrics.MQ_DEAD_LETTERED, "stream", "Order", "reason", "IllegalStateException"))
+                .isEqualTo(1.0);
+        assertThat(count(SignalMetrics.AUDIT_OPERATION, "action", "用户禁用", "success", "true"))
                 .isEqualTo(1.0);
     }
 
@@ -121,12 +125,14 @@ class SignalEventListenerTest {
             async.onMqMessageSent(new MqMessageSentEvent("Order"));
             async.onMqConsumeFailed(new MqMessageConsumeFailedEvent("Order", true));
             async.onMqDeadLettered(new MqMessageDeadLetteredEvent("Order", "IllegalStateException"));
+            async.onAuditLog(new AuditLogEvent("1(admin)", "1.2.3.4", "/users/{id}",
+                    "用户禁用", true, null, null));
         } finally {
             // destroy = shutdown + awaitTermination：排空队列后再返回，故可确定性断言
             async.destroy();
         }
 
-        assertAllEightCounted();
+        assertAllNineCounted();
     }
 
     @Test

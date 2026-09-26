@@ -251,6 +251,7 @@ Micrometer 名 → Prometheus 导出名（`_total`/单位后缀由注册表自�
 | MQ 发送 | `migoo.mq.message.sent` | Counter | `stream` | `MqMessageSentEvent` |
 | MQ 消费失败 | `migoo.mq.message.consume.failed` | Counter | `stream`、`will_retry` | `MqMessageConsumeFailedEvent` |
 | MQ 死信 | `migoo.mq.message.dead.lettered` | Counter | `stream`、`reason` | `MqMessageDeadLetteredEvent` |
+| 安全审计操作 | `migoo.security.audit.operation` | Counter | `action`、`success` | `AuditLogEvent` |
 
 通用规则：
 
