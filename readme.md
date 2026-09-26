@@ -111,6 +111,7 @@ String cached = redisKit.get(UserRedisKey.TOKEN.getKeyDefine(), userId);
 | `migoo-spring-boot-starter-mq`       | Redis 消息队列（Stream/Pub-Sub） | [查看](docs/mq.md)       |
 | `migoo-spring-boot-starter-websocket` | WebSocket 连接管理、Token 认证  | [查看](docs/websocket.md) |
 | `migoo-spring-boot-starter-observability` | 可观测性：Metrics、Tracing、日志关联 | [查看](docs/observability.md) |
+| `migoo-spring-boot-starter-springdoc` | OpenAPI 接口文档：springdoc + Swagger UI | [查看](docs/springdoc.md) |
 
 ## 项目结构
 
@@ -124,6 +125,7 @@ migoo-framework-parent/
 ├── migoo-spring-boot-starter-redis   # Redis 组件
 ├── migoo-spring-boot-starter-mq      # MQ 组件
 ├── migoo-spring-boot-starter-websocket # WebSocket 组件
+├── migoo-spring-boot-starter-springdoc # 文档组件
 └── migoo-spring-boot-starter-observability # 可观测性组件
 ```
 

@@ -82,7 +82,7 @@ jobs:
 
       - name: Publish Sub-modules Only to Maven Central
         if: inputs.skip_parent == true
-        run: mvn deploy -pl migoo-framework-parent/migoo-spring-boot-starter-common,migoo-framework-parent/migoo-spring-boot-starter-mq,migoo-framework-parent/migoo-spring-boot-starter-mybatis,migoo-framework-parent/migoo-spring-boot-starter-observability,migoo-framework-parent/migoo-spring-boot-starter-redis,migoo-framework-parent/migoo-spring-boot-starter-security,migoo-framework-parent/migoo-spring-boot-starter-web,migoo-framework-parent/migoo-spring-boot-starter-websocket -P release --settings .github/settings.xml -DskipTests --fail-at-end
+        run: mvn deploy -pl migoo-framework-parent/migoo-spring-boot-starter-common,migoo-framework-parent/migoo-spring-boot-starter-mq,migoo-framework-parent/migoo-spring-boot-starter-mybatis,migoo-framework-parent/migoo-spring-boot-starter-observability,migoo-framework-parent/migoo-spring-boot-starter-redis,migoo-framework-parent/migoo-spring-boot-starter-security,migoo-framework-parent/migoo-spring-boot-starter-springdoc,migoo-framework-parent/migoo-spring-boot-starter-web,migoo-framework-parent/migoo-spring-boot-starter-websocket -P release --settings .github/settings.xml -DskipTests --fail-at-end
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
@@ -94,7 +94,7 @@ jobs:
           VERSION=$(cd migoo-framework-parent && mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "✅ migoo-framework-parent sub-modules published successfully!"
           echo "📦 Version: $VERSION"
-          echo "📦 Modules: migoo-spring-boot-starter-common, mq, mybatis, observability, redis, security, web, websocket"
+          echo "📦 Modules: migoo-spring-boot-starter-common, mq, mybatis, observability, redis, security, springdoc, web, websocket"
           echo "🔗 Check Sonatype Portal: https://central.sonatype.com/publishing/deployments"
 
       - name: Publication Failed

@@ -18,6 +18,7 @@ layout: default
 | [Redis](redis.md)         | Redis 配置、工具类               |
 | [MQ](mq.md)               | Redis 消息队列（Stream/Pub-Sub） |
 | [Observability](observability.md) | 可观测性：Metrics、Tracing、日志关联 |
+| [Springdoc](springdoc.md) | OpenAPI 接口文档：springdoc + Swagger UI |
 
 ## 快速开始
 
@@ -87,6 +88,12 @@ layout: default
 <dependency>
 <groupId>xyz.migoo.springboot</groupId>
 <artifactId>migoo-spring-boot-starter-observability</artifactId>
+</dependency>
+
+        <!-- 接口文档组件 -->
+<dependency>
+<groupId>xyz.migoo.springboot</groupId>
+<artifactId>migoo-spring-boot-starter-springdoc</artifactId>
 </dependency>
 ```
 

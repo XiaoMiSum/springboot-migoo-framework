@@ -42,6 +42,7 @@
         <module>migoo-spring-boot-starter-observability</module>
         <module>migoo-spring-boot-starter-redis</module>
         <module>migoo-spring-boot-starter-security</module>
+        <module>migoo-spring-boot-starter-springdoc</module>
         <module>migoo-spring-boot-starter-web</module>
         <module>migoo-spring-boot-starter-websocket</module>
     </modules>
