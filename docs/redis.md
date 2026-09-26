@@ -203,6 +203,19 @@ spring:
 | `FIXED` | 仅首次 `set` 时设置 TTL，后续写入不刷新 |
 | `DYNAMIC` | 每次写入都重置 TTL（滑动窗口） |
 
+## 分布式锁与缓存选型（评估 P1#7 结论）
+
+以下两项**框架有意不内置**，降为本文档的选型指引——不为未使用的能力建立维护面，由应用按需引入、BOM 统一版本：
+
+| 能力 | 框架现状 | 建议 |
+|------|----------|------|
+| 原子占位锁 | **有**：web 组件 `StateStore.setIfAbsent`（内存/Redis 原子占位，限流与 [@Idempotent](web.md) 幂等复用同一存储） | 「同一时刻只受理一个」的短占位场景直接用，零新依赖；需要窗口/占位语义见 [web 幂等](web.md) |
+| 高级分布式锁 | **不内置**（无 watchdog 续期/可重入/阻塞重试/红锁） | 引 **Redisson**：BOM 已管理 `org.redisson:redisson-spring-boot-starter:4.2.0`，应用自行加依赖与配置即可（自带 watchdog，锁默认 30 秒自动续期），框架不感知、不接线 |
+| Spring Cache（`@Cacheable`） | **不内置**（无 `CacheManager`/`@EnableCaching` 接线） | 应用自配：`spring-boot-starter-cache` + `@EnableCaching` + `RedisCacheManager`（或本地 Caffeine，BOM 已管理 `caffeine:3.2.3`），Spring Boot 原生注解开箱即用 |
+
+- 判断口径：要**自动续期/可重入/等待队列/RedLock** → Redisson；只要**原子占位**（防重复、抢单、限窗口） → `StateStore`；
+- 两项均为评估 P1#7 的显式拍板结论：**保持框架轻量、不接线**；后续若需求收敛可再评估内置。
+
 ## 自动注册的组件
 
 | 组件 | 说明 |
