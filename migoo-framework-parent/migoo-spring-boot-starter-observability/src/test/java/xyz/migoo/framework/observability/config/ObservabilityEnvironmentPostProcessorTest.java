@@ -180,6 +180,44 @@ class ObservabilityEnvironmentPostProcessorTest {
         assertThat(environment.getProperty("logging.structured.format.file")).isNull();
     }
 
+    // ==================== 生命周期（K8s 探针 / 优雅停机） ====================
+
+    @Test
+    void writesProbesAndGracefulShutdownByDefault() {
+        StandardEnvironment environment = new StandardEnvironment();
+
+        processor.postProcessEnvironment(environment, null);
+
+        // 默认回写：探针组开箱可用 + 优雅停机（等待在途请求，避免滚动更新 502）
+        assertThat(environment.getProperty("management.endpoint.health.probes.enabled")).isEqualTo("true");
+        assertThat(environment.getProperty("server.shutdown")).isEqualTo("graceful");
+    }
+
+    @Test
+    void keepsUserLifecycleConfig() {
+        StandardEnvironment environment = new StandardEnvironment();
+        userConfig(environment, "management.endpoint.health.probes.enabled", "false");
+        userConfig(environment, "server.shutdown", "immediate");
+
+        processor.postProcessEnvironment(environment, null);
+
+        // 用户显式配置的官方键一律让位
+        assertThat(environment.getProperty("management.endpoint.health.probes.enabled")).isEqualTo("false");
+        assertThat(environment.getProperty("server.shutdown")).isEqualTo("immediate");
+    }
+
+    @Test
+    void skipsLifecycleWritebackWhenDisabled() {
+        StandardEnvironment environment = new StandardEnvironment();
+        userConfig(environment, "migoo.observability.lifecycle.probes", "false");
+        userConfig(environment, "migoo.observability.lifecycle.graceful-shutdown", "false");
+
+        processor.postProcessEnvironment(environment, null);
+
+        assertThat(environment.getProperty("management.endpoint.health.probes.enabled")).isNull();
+        assertThat(environment.getProperty("server.shutdown")).isNull();
+    }
+
     // ==================== 总开关 ====================
 
     @Test

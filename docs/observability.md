@@ -126,7 +126,7 @@ migoo-spring-boot-starter-observability/
 | 阶段 | 类 | 职责 | 关键条件 |
 |------|----|------|----------|
 | ② | `observability.config.ObservabilityMetricsConfiguration` | `MeterRegistryCustomizer<MeterRegistry>` 注入通用 tag（Boot 4.1 该接口位于 `org.springframework.boot.micrometer.metrics.autoconfigure`） | `@ConditionalOnMissingBean` 保护自定义 |
-| ② | `observability.config.ObservabilityEnvironmentPostProcessor` | 把 `migoo.observability.*` **回写** `management.*`（端点暴露、采样率、OTLP 端点与三开关）、`logging.*`（关联 pattern / expect-correlation-id），用户显式配置的官方键一律不写 | `EnvironmentPostProcessor` + `spring.factories`，`Binder` relaxed binding，属性源 `addFirst` 且**只含用户未配置的键** |
+| ② | `observability.config.ObservabilityEnvironmentPostProcessor` | 把 `migoo.observability.*` **回写** `management.*`（端点暴露、采样率、OTLP 端点与三开关、K8s 探针组）、`logging.*`（关联 pattern / expect-correlation-id、结构化格式）、`server.*`（优雅停机 `graceful`），用户显式配置的官方键一律不写 | `EnvironmentPostProcessor` + `spring.factories`，`Binder` relaxed binding，属性源 `addFirst` 且**只含用户未配置的键** |
 | ③ | `observability.trace.MicrometerTraceIdResolver` | 取 `tracer.currentSpan().context().traceId()`；无 span / Tracer 异常 → `null`（SPI 契约不抛异常） | 实现 common 的 `TraceIdResolver` |
 | ③ | `observability.config.ObservabilityTraceConfiguration` | 注册上行实现 | `@ConditionalOnBean(Tracer.class)` + `@ConditionalOnMissingBean(TraceIdResolver.class)` + `tracing.enabled` |
 | ④ | `observability.config.ObservabilitySignalConfiguration` | 装配 `SignalMetrics` 与 `SignalEventListener` | `@ConditionalOnProperty(migoo.observability.metrics.enabled)` |
@@ -287,8 +287,10 @@ Micrometer 名 → Prometheus 导出名（`_total`/单位后缀由注册表自�
 | `migoo.observability.logging.correlation` | `true` | 日志输出 traceId/spanId；为 `false` 时回写 `logging.expect-correlation-id=false` |
 | `migoo.observability.logging.correlation-pattern` | 未设置 | 回写 `logging.pattern.correlation` |
 | `migoo.observability.logging.format` | `off` | 结构化 JSON 日志：回写 `logging.structured.format.console` 与 `.file`，可选 `ecs` / `gelf` / `logstash`，MDC（traceId/spanId）自动带入，见 §5.4 |
+| `migoo.observability.lifecycle.probes` | `true` | 回写 `management.endpoint.health.probes.enabled`：`/actuator/health/liveness`、`/actuator/health/readiness` 探针组开箱可用，供 K8s livenessProbe / readinessProbe 指向 |
+| `migoo.observability.lifecycle.graceful-shutdown` | `true` | 回写 `server.shutdown=graceful`：停止接收新请求、等待在途请求完成（超时 `spring.lifecycle.timeout-per-shutdown-phase`，Boot 默认 30s），滚动更新避免 502 |
 
-**回写规则**：`management.*` 与 `logging.*` 是 Spring Boot 官方最终事实，用户显式配置时**以用户为准**——`ObservabilityEnvironmentPostProcessor` 遍历属性源判断该键是否已被配置（application.yml、环境变量、命令行等），只对**未配置**的键写默认值；即使它自己的属性源 `addFirst`（需压过 Boot 后置的 `logCorrelation` 默认源），也不会覆盖任何用户配置。`migoo.observability.enabled=false` 时整个处理器不回写。
+**回写规则**：`management.*`、`logging.*` 与 `server.*` 是 Spring Boot 官方最终事实，用户显式配置时**以用户为准**——`ObservabilityEnvironmentPostProcessor` 遍历属性源判断该键是否已被配置（application.yml、环境变量、命令行等），只对**未配置**的键写默认值；即使它自己的属性源 `addFirst`（需压过 Boot 后置的 `logCorrelation` 默认源），也不会覆盖任何用户配置。`migoo.observability.enabled=false` 时整个处理器不回写。
 
 ### 7.2 推荐配置样例
 
@@ -318,6 +320,9 @@ migoo:
     logging:
       correlation: true
       format: logstash              # 结构化 JSON（可选 ecs/gelf/logstash），traceId/spanId 自动进 JSON
+    lifecycle:
+      probes: true                  # 回写 management.endpoint.health.probes.enabled（K8s 探针组，默认开）
+      graceful-shutdown: true       # 回写 server.shutdown=graceful（优雅停机，默认开）
 
 management:
   endpoints:
@@ -327,7 +332,7 @@ management:
   endpoint:
     health:
       probes:
-        enabled: true                          # /actuator/health/liveness、/readiness（K8s 探针）
+        enabled: true                          # 默认由 lifecycle.probes 回写；显式配置亦可（官方键优先）
   tracing:
     exemplars:
       include: sampled-traces

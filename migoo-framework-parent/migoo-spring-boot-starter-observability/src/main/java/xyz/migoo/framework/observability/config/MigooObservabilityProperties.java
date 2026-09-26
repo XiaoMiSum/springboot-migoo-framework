@@ -39,6 +39,11 @@ public class MigooObservabilityProperties {
      */
     private Logging logging = new Logging();
 
+    /**
+     * 生命周期配置（K8s / 容器部署）：探针组与优雅停机
+     */
+    private Lifecycle lifecycle = new Lifecycle();
+
     @Data
     public static class Metrics {
 
@@ -137,6 +142,24 @@ public class MigooObservabilityProperties {
          * （含 traceId/spanId）写入 JSON，故开启后无需额外 encoder 配置。</p>
          */
         private Format format = Format.OFF;
+    }
+
+    @Data
+    public static class Lifecycle {
+
+        /**
+         * 是否默认启用 K8s 存活/就绪探针组（写回 management.endpoint.health.probes.enabled，
+         * 使 /actuator/health/liveness 与 /actuator/health/readiness 开箱可用，
+         * 供 K8s livenessProbe / readinessProbe 指向）
+         */
+        private boolean probes = true;
+
+        /**
+         * 是否默认启用优雅停机（写回 server.shutdown=graceful：停止接收新请求、
+         * 等待在途请求处理完成后再关闭；超时由 spring.lifecycle.timeout-per-shutdown-phase
+         * 控制，Spring Boot 默认 30s）。发布期内的滚动更新可避免 502
+         */
+        private boolean gracefulShutdown = true;
     }
 
     /**

@@ -17,7 +17,7 @@ import java.util.Map;
  * 可观测性环境后处理器 —— 「统一决策单点」的落地
  *
  * <p>把 {@code migoo.observability.*} 的集中决策<b>回写</b>为 Spring Boot 官方属性
- * （{@code management.*} / {@code logging.*}），覆盖三类决策：</p>
+ * （{@code management.*} / {@code logging.*} / {@code server.*}），覆盖五类决策：</p>
  * <ol>
  *     <li><b>端点暴露</b>：未显式配置时把 {@code health,info,prometheus} 写入
  *         {@code management.endpoints.web.exposure.include}，使 {@code /actuator/prometheus} 开箱可用；</li>
@@ -29,6 +29,9 @@ import java.util.Map;
  *         （{@code ecs} / {@code gelf} / {@code logstash}）写入
  *         {@code logging.structured.format.console} 与 {@code .file}——内置格式自动携带
  *         MDC（含 traceId/spanId），无需再配 logback encoder。</li>
+ *     <li><b>生命周期</b>：默认写 {@code management.endpoint.health.probes.enabled=true}
+ *         （K8s 存活/就绪探针组）与 {@code server.shutdown=graceful}（优雅停机，
+ *         等待在途请求完成），分别由 {@code lifecycle.probes} / {@code lifecycle.graceful-shutdown} 控制。</li>
  * </ol>
  *
  * <p><b>回写规则</b>：Spring Boot 官方属性是最终事实 —— 用户显式配置过的键一律不写；
@@ -142,6 +145,15 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
             String value = logging.getFormat().name().toLowerCase(Locale.ROOT);
             putDefault(environment, defaults, "logging.structured.format.console", value);
             putDefault(environment, defaults, "logging.structured.format.file", value);
+        }
+
+        // ⑦ 生命周期：K8s 探针组与优雅停机（属性名已在 Boot 4.1 configuration-metadata 中核实）
+        MigooObservabilityProperties.Lifecycle lifecycle = properties.getLifecycle();
+        if (lifecycle.isProbes()) {
+            putDefault(environment, defaults, "management.endpoint.health.probes.enabled", true);
+        }
+        if (lifecycle.isGracefulShutdown()) {
+            putDefault(environment, defaults, "server.shutdown", "graceful");
         }
     }
 
