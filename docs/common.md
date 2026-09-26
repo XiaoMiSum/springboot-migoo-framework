@@ -123,7 +123,7 @@ UserVO user = JsonUtils.parseObject(json, UserVO.class);
 List<UserVO> list = JsonUtils.parseArray(json, UserVO.class);
 
 // ========== 集合 ==========
-List<UserVO> voList = CollectionUtils.convertList(doList, BeanUtils::toBean);
+List<String> names = CollectionUtils.convertList(doList, UserDO::getName);
 Map<Long, UserDO> map = CollectionUtils.convertMap(list, UserDO::getId);
 List<UserDO> filtered = CollectionUtils.filterList(list, u -> u.getStatus() == 1);
 
@@ -133,8 +133,19 @@ boolean between = LocalDateTimeUtils.isBetween(time, start, end);
 long days = LocalDateTimeUtils.between(start, end);
 
 // ========== Bean 拷贝 ==========
-UserVO vo = BeanUtils.toBean(userDO, UserVO.class);
-PageResult<UserVO> voPage = BeanUtils.toBean(doPage, UserVO.class);
+// 框架不内置 Bean 拷贝工具，使用 Spring 标准 BeanUtils（org.springframework.beans.BeanUtils），
+// 或编译期方案 MapStruct
+UserVO vo = new UserVO();
+BeanUtils.copyProperties(userDO, vo);
+
+// PageResult 逐层转换
+PageResult<UserVO> voPage = new PageResult<>(
+        CollectionUtils.convertList(doPage.getList(), item -> {
+            UserVO itemVo = new UserVO();
+            BeanUtils.copyProperties(item, itemVo);
+            return itemVo;
+        }),
+        doPage.getTotal());
 
 // ========== 加解密 ==========
 String encrypted = EncryptTypeHandler.encrypt("敏感数据");

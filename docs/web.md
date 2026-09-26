@@ -72,7 +72,10 @@ public class ApiErrorLogFrameworkServiceImpl implements ApiErrorLogFrameworkServ
 
     @Override
     public void createApiErrorLog(ApiErrorLog apiErrorLog) {
-        apiErrorLogMapper.insert(BeanUtils.toBean(apiErrorLog, ApiErrorLogDO.class));
+        // Bean 拷贝用 Spring 标准 BeanUtils（org.springframework.beans.BeanUtils），框架不内置转换工具
+        ApiErrorLogDO apiErrorLogDO = new ApiErrorLogDO();
+        BeanUtils.copyProperties(apiErrorLog, apiErrorLogDO);
+        apiErrorLogMapper.insert(apiErrorLogDO);
     }
 }
 ```

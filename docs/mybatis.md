@@ -142,10 +142,10 @@ public class UserDO extends BaseUuidDO<UserDO> {
 ### 6. JSON 字段存储
 
 ```java
-@TableName("t_user")
+@TableName(value = "t_user", autoResultMap = true)
 public class UserDO extends BaseUuidDO<UserDO> {
-    // Set<Long> 自动序列化为 JSON 存储
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    // Set<Long> 序列化为 JSON 数组存储（MP 内置 JacksonTypeHandler，任意类型均可）
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Set<Long> roleIds;
 }
 ```
@@ -153,13 +153,16 @@ public class UserDO extends BaseUuidDO<UserDO> {
 ### 7. 列表字段存储
 
 ```java
-@TableName("t_user")
+@TableName(value = "t_user", autoResultMap = true)
 public class UserDO extends BaseUuidDO<UserDO> {
     // List<String> 以逗号分隔存储
     @TableField(typeHandler = StringListTypeHandler.class)
     private List<String> tags;
 }
 ```
+
+> TypeHandler 在**查询结果映射**时生效需要 `@TableName(autoResultMap = true)`（如上）；
+> 插入/更新按字段指定的 TypeHandler 写入，不受此限。
 
 ### 8. 自定义排序查询
 
