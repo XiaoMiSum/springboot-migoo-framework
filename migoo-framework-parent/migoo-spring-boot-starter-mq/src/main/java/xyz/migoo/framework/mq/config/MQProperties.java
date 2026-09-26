@@ -37,6 +37,11 @@ public class MQProperties {
      */
     private Idempotent idempotent = new Idempotent();
 
+    /**
+     * 健康检查配置（/actuator/health 的消费组积压指示器）
+     */
+    private Health health = new Health();
+
     @Data
     public static class Idempotent {
 
@@ -51,5 +56,19 @@ public class MQProperties {
          * 过期后相同 messageId 的消息可以被重新消费
          */
         private Duration expireTime = Duration.ofHours(24);
+    }
+
+    @Data
+    public static class Health {
+
+        /**
+         * 是否启用消费组 PEL 积压健康检查（由 MQHealthAutoConfiguration 读取）
+         */
+        private Boolean enabled = true;
+
+        /**
+         * PEL 积压阈值（条）：任一消费组积压超过该值时 /actuator/health 返回 OUT_OF_SERVICE
+         */
+        private long backlogThreshold = 1000L;
     }
 }

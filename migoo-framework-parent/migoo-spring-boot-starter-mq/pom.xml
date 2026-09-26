@@ -60,6 +60,15 @@
             <type>jar</type>
         </dependency>
 
+        <!-- Actuator：仅用于 MQ 消费组 PEL 积压健康检查（optional，不传递给使用方）；
+             classpath 无 actuator 时健康检查自动配置整体不装配 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <optional>true</optional>
+            <type>jar</type>
+        </dependency>
+
         <!-- 测试相关，版本由 spring-boot-dependencies BOM 管理 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

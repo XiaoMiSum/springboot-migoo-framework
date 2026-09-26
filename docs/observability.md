@@ -69,6 +69,8 @@ observability ──► common ◄── web ──► security
       └──────────────┴──► mq / mybatis / websocket / redis
 ```
 
+> 补充（⑤ 阶段）：`mq` 额外持 **第三方** `spring-boot-starter-actuator` 的 optional 依赖（仅提供消费组积压健康检查，见 §4.2/§7.3），指向的不是本仓库组件，上述「框架组件之间无反向可选依赖」的结论不受影响。
+
 ## 3. 模块与依赖设计
 
 `migoo-framework-parent/migoo-spring-boot-starter-observability/pom.xml`：
@@ -132,7 +134,7 @@ migoo-spring-boot-starter-observability/
 | ④ | `observability.metrics.SignalEventListener` | 8 个 `@EventListener` 按事件类型分方法 → 计数；可选异步（`metrics.async`，内置单线程池） | 同上 |
 | ⑤ | `observability.health.ObservabilityHealthConfiguration` | 装配 InfoContributor | `@ConditionalOnClass(InfoContributor.class)` |
 | ⑤ | `observability.health.MigooFrameworkInfoContributor` | `/actuator/info` 输出 `version`（资源过滤注入）与 `modules`（按标记类探测 classpath） | 同上 |
-| ⑤ | `observability.health.MqBacklogHealthIndicator`（可选，未实现） | 消费组 PEL 积压超阈值 → `OUT_OF_SERVICE` | mq 在 classpath |
+| ⑤ | `mq.health.MqBacklogHealthIndicator`（✅ 已落地，放在 **mq 模块**） | 逐消费组 `XPENDING`：任一积压 **超过** 阈值 → `OUT_OF_SERVICE`（等于阈值仍 UP）、Redis 查询故障 → `DOWN`（带 error 明细不抛）、`NOGROUP`（分组未创建）→ 视为 0 积压；同 `streamKey\|group` 去重只查一次 | mq 与 actuator 同在 classpath。放在 mq 而非 observability：数据就近（监听器与 Redis 均在本模块），避免 observability 反向依赖 mq/redis；actuator 为 mq 的 **optional** 依赖，经 `MQHealthAutoConfiguration`（注册于 `AutoConfiguration.imports`，条件 ASM 求值，`@ConditionalOnClass` 用 `name` 字符串形式）整体跳过装配（Boot 4 `HealthIndicator` 位于 `org.springframework.boot.health.contributor`） |
 
 ### 4.3 信号契约（common，✅ 已落地）
 
@@ -261,7 +263,8 @@ Micrometer 名 → Prometheus 导出名（`_total`/单位后缀由注册表自�
 ### 6.4 与日志、链路的联动
 
 - Exemplars（§5.5）让 `http_server_requests` 指标携带 traceId，Grafana 从指标直跳 Trace；
-- 500 事件计数 + `logback.events{level=error}` + `ServerErrorEvent` 三方对账：指标涨、日志有、链路可查。
+- 500 事件计数 + `logback.events{level=error}` + `ServerErrorEvent` 三方对账：指标涨、日志有、链路可查；
+- MQ 消费健康双视角：`mq_message_consume_failed`/`mq_message_dead_lettered` 指标反映**瞬时失败**，`MqBacklogHealthIndicator`（§7.3）的 PEL 积压反映**持续消费不动**，两者互补。
 
 ## 7. 配置项
 
@@ -355,6 +358,13 @@ scrape_configs:
 
 > 安全提醒：`/actuator/*` 需用 Security 配置限制来源（内网/网关白名单），勿直接暴露公网。
 
+### 7.3 `migoo.mq.health.*`（mq 组件属性，消费组积压健康检查）
+
+| 属性 | 默认 | 说明 |
+|------|------|------|
+| `migoo.mq.health.enabled` | `true` | 是否注册 `MqBacklogHealthIndicator`（另需 actuator 在 classpath 且存在 Stream 监听器） |
+| `migoo.mq.health.backlog-threshold` | `1000` | 任一消费组 PEL 积压**超过**该值 → `/actuator/health` 返回 `OUT_OF_SERVICE`；等于阈值仍 `UP` |
+
 ## 8. 落地顺序
 
 沿用评估结论的 ①-⑤，每步独立可验收：
@@ -393,11 +403,11 @@ scrape_configs:
 ### ⑤ InfoContributor + 文档（✅ 代码已交付，实测输出待补）
 
 - [x] `MigooFrameworkInfoContributor`（版本经资源过滤注入、模块按标记类探测）+ `ObservabilityHealthConfiguration`
-- [ ] （可选）`MqBacklogHealthIndicator`
+- [x] （可选）`mq.health.MqBacklogHealthIndicator` + `MQHealthAutoConfiguration`（`migoo.mq.health.enabled` / `backlog-threshold`，actuator 为 mq optional 依赖，缺 classpath 整体不装配）
 - [x] 本文档随实现回改（暴露默认值、事件字段、回写键、测试清单）
 - [ ] 接入样例应用后补实测输出（`/actuator/info`、`/actuator/prometheus` 样例、时序图）
 
-> 全量验收：`mvn clean verify -Dgpg.skip=true` 全绿 —— **11 模块、944 个用例、0 失败**（较骨架阶段 905 个新增 39 个）。
+> 全量验收：`mvn clean verify -Dgpg.skip=true` 全绿 —— **11 模块、958 个用例、0 失败**（较骨架阶段 905 个新增 53 个）。
 
 ## 9. 测试清单（仓库约定：纯单元测试，junit/assertj/mockito，无 `@SpringBootTest`）
 
@@ -411,6 +421,7 @@ scrape_configs:
 | ④ `SignalEventListenerTest` | 逐一投喂 8 个事件 record，`SimpleMeterRegistry` 断言计数与 tag；同事件累加；`metrics.signals.<指标名>=false` 不计数且不影响其他信号；空值兜底 `unknown`；注册表故障不抛给发布方；**异步**：关闭时排空队列后计数可确定性断言、运行在 `migoo-observability-signal-*` 命名守护线程、故障与重复 `destroy` 幂等 | ✅ 8 用例 |
 | ④ 埋点单测（各组件） | `ArgumentCaptor`/`verify` 断言字段：限流（`RateLimitAspectTest` +2）、500（`GlobalExceptionHandlerTest` +1）、登录失败/锁定/撤销（`DefaultJwtAuthenticatorTest` +6）、MQ 失败/死信（`AbstractStreamMessageListenerTest`）、发送（`RedisMQTemplateTest` +3）；另覆盖**发布失败不改变业务行为** | ✅ |
 | ⑤ `MigooFrameworkInfoContributorTest` | `Info.Builder` 输出 `migoo.version`（非占位符）与 `modules`（按测试类路径探测到 common/observability、探测不到 web） | ✅ 1 用例 |
+| ⑤ `MqBacklogHealthIndicatorTest`（mq 模块） | 阈值内 UP（含**等于阈值**边界与各明细键）、任一组超阈值 `OUT_OF_SERVICE`、同 `stream\|group` 去重只查询一次、`NOGROUP` 视为 0 积压仍 UP、Redis 故障降级 `DOWN` + error 明细不抛、无监听器 UP 且不查 Redis；另 `MQPropertiesTest` 覆盖 `migoo.mq.health.*` 默认值（enabled=true、threshold=1000）与绑定 | ✅ 6 + 2 用例 |
 
 ## 10. 发布与接线清单
 
@@ -439,6 +450,7 @@ scrape_configs:
 | 事件监听同步执行 | 发布点变慢/异常 | ✅ 发布点 try/catch、监听器（`SignalMetrics`）内部捕获，均有「发布失败不改业务行为」单测；另提供 `metrics.async=true` 异步选项（内置单线程守护线程池 + 有界队列，满则丢弃告警、关闭时先排空，8 用例覆盖），默认同步——一次 Counter 写入开销小于线程切换 |
 | 事件契约进 common | common 语义从纯工具扩展为「工具 + 跨模块契约」 | 已在 §1 记录取舍；事件零 Spring 依赖，common 仍保持零 Spring 依赖 |
 | 新模块发布遗漏 | 用户引不到（websocket 教训） | ✅ §10 检查表 + `scripts/check-publish-modules.sh` 机器校验（两个发布 workflow 前置执行，三类漏项均有反向验证） |
+| mq 积压健康检查的类加载安全与探测开销 | classpath 无 actuator 时类引用导致启动失败；健康探针频繁触发 Redis 往返 | ✅ ⑤ 独立 `MQHealthAutoConfiguration` 注册于 `AutoConfiguration.imports`（类级条件 ASM 求值、`@ConditionalOnClass(name=…)` 字符串形式不触发类加载），缺失整体不装配；查询仅每组 1 次 `XPENDING`、`NOGROUP`/故障降级不抛，6 用例覆盖 |
 
 ## 12. 关联阅读
 

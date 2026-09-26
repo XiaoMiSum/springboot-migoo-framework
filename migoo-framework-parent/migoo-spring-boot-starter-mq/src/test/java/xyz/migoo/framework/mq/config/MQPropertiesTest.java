@@ -66,4 +66,22 @@ class MQPropertiesTest {
         idempotent.setExpireTime(Duration.ofSeconds(60));
         assertThat(idempotent.getExpireTime()).isEqualTo(Duration.ofSeconds(60));
     }
+
+    @Test
+    void healthDefaults() {
+        MQProperties properties = new MQProperties();
+        assertThat(properties.getHealth()).isNotNull();
+        // 健康检查默认开启，积压阈值 1000 条
+        assertThat(properties.getHealth().getEnabled()).isTrue();
+        assertThat(properties.getHealth().getBacklogThreshold()).isEqualTo(1000L);
+    }
+
+    @Test
+    void healthSubConfigRoundtrip() {
+        MQProperties properties = new MQProperties();
+        properties.getHealth().setEnabled(false);
+        properties.getHealth().setBacklogThreshold(50L);
+        assertThat(properties.getHealth().getEnabled()).isFalse();
+        assertThat(properties.getHealth().getBacklogThreshold()).isEqualTo(50L);
+    }
 }
