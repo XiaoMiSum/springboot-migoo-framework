@@ -157,6 +157,41 @@ boolean ok = RSA.verify(content, sign, publicKey);
 
 ---
 
+## 分布式 ID
+
+`xyz.migoo.framework.common.id.IdGenerator` SPI（**零 Spring 依赖**，直接 new，或注册为 Bean 按类型注入）：
+
+| 实现 | 形态 | 特点 | 适用 |
+|---|---|---|---|
+| `UuidV7IdGenerator` | UUIDv7（RFC 9562，36 字符） | 零协调、零外部依赖；**字典序即时间序**；同毫秒 12 位计数严格单调、计数溢出自旋到下一毫秒；时钟回拨沿用上次时间戳不倒退 | VARCHAR 主键、对外编号、请求 ID |
+| `SnowflakeIdGenerator` | 19 位数字串 / `long` | `[1bit 符号][41bit 时间戳][5bit 机房][5bit 机器][12bit 序列]`，纪元 2024-01-01（约 69 年）；同毫秒序列递增、溢出自旋；**时钟回拨直接抛错**（拒绝发号而非发出重复 ID） | BIGINT 主键、订单号等纯数字场景 |
+
+```java
+// UUIDv7：零配置
+IdGenerator idGenerator = new UuidV7IdGenerator();
+String id = idGenerator.nextId();          // 例如 01901f2c-8b3e-7a41-9c6d-2f5b8e0a17d3
+
+// 雪花：多机部署须为每台机器分配唯一 workId（0 ~ 31）
+SnowflakeIdGenerator snowflake = new SnowflakeIdGenerator(0, 5);
+long id = snowflake.nextLong();            // BIGINT 主键
+String idStr = snowflake.nextId();         // 纯数字字符串形态
+```
+
+```java
+// 注册为 Bean 后按 IdGenerator 类型注入
+@Bean
+public IdGenerator idGenerator() {
+    return new UuidV7IdGenerator();
+}
+```
+
+- **排序口径**：UUIDv7 按**字符串**排序 = 时间序；雪花按 **long** 排序 = 时间序。不要把雪花转成字符串排序——位数会随时间增长（18 → 19 位），字典序会错位；
+- **雪花 workId 分配**：静态配置（每台机器唯一）或由部署环境注入；框架不内置协调（避免反向引入 redis/zk 依赖）；
+- **边界**：雪花时钟回拨抛 `IllegalStateException`，调用方等待时钟追平后重试；系统时钟早于纪元 2024-01-01 或 41 位时间位耗尽时拒绝发号；
+- 与既有主键不冲突：`BaseUuidDO` 的主键策略（uuid-creator 时间有序 UUID）保持不变，本节是给业务编号/自定义主键场景的可选能力。
+
+---
+
 ## 核心 API 一览
 
 ### Result
@@ -192,3 +227,11 @@ ErrorCode.of(code, msg)  // 工厂方法
 | `FORBIDDEN` | 403 | 权限不足 |
 | `NOT_FOUND` | 404 | 资源不存在 |
 | `INTERNAL_SERVER_ERROR` | 500 | 系统内部错误 |
+
+### IdGenerator（分布式 ID）
+
+| 方法 | 说明 |
+|------|------|
+| `IdGenerator.nextId()` | 生成下一个 ID（字符串形态） |
+| `SnowflakeIdGenerator.nextLong()` | 雪花 `long` 形态（BIGINT 主键） |
+| `UuidV7IdGenerator.nextUuid()` | UUIDv7 `UUID` 形态 |
