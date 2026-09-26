@@ -27,11 +27,25 @@ public class MigooWebProperties {
      */
     private RateLimit rateLimit = new RateLimit();
 
+    /**
+     * 幂等配置（@Idempotent 注解切面）
+     */
+    private Idempotent idempotent = new Idempotent();
+
     @Data
     public static class RateLimit {
 
         /**
          * 是否启用 @RateLimit 注解限流切面
+         */
+        private boolean enabled = true;
+    }
+
+    @Data
+    public static class Idempotent {
+
+        /**
+         * 是否启用 @Idempotent 注解幂等切面（防重复提交）
          */
         private boolean enabled = true;
     }

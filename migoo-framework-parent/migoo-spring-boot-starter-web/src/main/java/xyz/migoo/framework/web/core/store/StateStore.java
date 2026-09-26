@@ -44,6 +44,25 @@ public interface StateStore {
     void put(String key, long value, Duration ttl);
 
     /**
+     * 不存在则占位写入（幂等防重、防并发竞争场景）
+     * <p>
+     * 内置实现均为原子操作：内存实现基于 {@code ConcurrentHashMap.compute}、
+     * Redis 实现基于 {@code SET NX EX}。默认方法是「读-判-写」非原子兜底，
+     * 仅供自定义实现过渡使用，高并发场景请自行覆盖为原子实现。
+     *
+     * @param key 键
+     * @param ttl 占位过期时间
+     * @return 占位成功（此前不存在或已过期）返回 true；已存在返回 false
+     */
+    default boolean setIfAbsent(String key, Duration ttl) {
+        if (get(key) > 0) {
+            return false;
+        }
+        put(key, 1, ttl);
+        return true;
+    }
+
+    /**
      * 删除键
      *
      * @param key 键

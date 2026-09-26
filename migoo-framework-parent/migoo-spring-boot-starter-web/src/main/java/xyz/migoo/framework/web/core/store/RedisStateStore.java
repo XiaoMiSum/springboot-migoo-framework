@@ -72,6 +72,12 @@ public class RedisStateStore implements StateStore {
     }
 
     @Override
+    public boolean setIfAbsent(String key, Duration ttl) {
+        // SET key 1 NX EX ttl：原子占位（多实例共享防重窗口）
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, "1", ttl));
+    }
+
+    @Override
     public void delete(String key) {
         redisTemplate.delete(key);
     }

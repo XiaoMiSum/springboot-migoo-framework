@@ -20,7 +20,8 @@ import org.springframework.context.annotation.Import;
         ResponseBodyConfiguration.class,
         I18nConfiguration.class,
         VirtualThreadConfiguration.class,
-        RateLimitConfiguration.class
+        RateLimitConfiguration.class,
+        IdempotentConfiguration.class
 })
 public class MiGooWebAutoConfiguration {
 }

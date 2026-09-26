@@ -186,7 +186,41 @@ public Result<LoginVO> login(String username, String password) { ... }
 | `RedisStateStore` | 检测到 `RedisConnectionFactory`（引入 redis 组件）自动替换 | 多实例共享计数 |
 | `InMemoryStateStore` | 默认 | 单机开箱即用 |
 
-`StateStore` 同时服务于限流计数与 security 组件的登录失败计数/锁定状态。
+`StateStore` 同时服务于限流计数、幂等占位与 security 组件的登录失败计数/锁定状态。
+
+### 8. 幂等防重复提交（@Idempotent）
+
+标注在方法或类上，防重窗口内的相同请求直接拒绝，返回业务码 **900**（`REPEATED_REQUESTS`）：
+
+```java
+import xyz.migoo.framework.web.core.annotation.Idempotent;
+
+// 默认维度: 同一用户 60 秒内相同请求体只受理一次（防双击/重复提交）
+@Idempotent
+@PostMapping("/api/orders")
+public Result<Long> createOrder(@RequestBody OrderCreateReqBody req) { ... }
+
+// 按业务单号幂等（SpEL），窗口 5 分钟
+@Idempotent(key = "#orderId", expire = 300)
+@PostMapping("/api/pay")
+public Result<?> pay(String orderId, BigDecimal amount) { ... }
+
+// 自定义重复提示
+@Idempotent(message = "订单正在处理中，请勿重复提交")
+public Result<?> submit(@RequestBody ReqBody req) { ... }
+```
+
+| 属性 | 说明 | 默认 |
+|------|------|------|
+| `key` | 幂等键 SpEL（支持 `#参数名`、`#p0`/`#a0`），留空用默认维度 | - |
+| `expire` | 防重窗口（秒），首次成功后窗口内重复请求被拒 | `60` |
+| `message` | 重复请求提示（留空使用 i18n 消息 `common.repeat.request`） | - |
+
+- 幂等键格式 `migoo:idempotent:类名#方法名:维度值`；默认维度 = `登录用户 + 可摘要参数的 SHA-256 摘要`——只摘要 `@RequestBody` 参数与基本类型/字符串/枚举/时间等简单参数，自动跳过 HttpServletRequest、MultipartFile 等容器对象；全部不可摘要时退化为「用户 + 方法」级，建议配 `key` 精确化；
+- 失败语义与 MQ 幂等拦截器一致：**成功保留占位**（窗口内拒绝重复）、**失败释放占位**（允许重试）；执行中按 30 秒短占位过期兜底，进程崩溃后窗口到期自动恢复；
+- 占位与防重窗口均经 `StateStore`（同限流存储）：单机内存实现，检测到 Redis 自动多实例共享（**多实例部署必须引 redis 组件**，否则各实例各自占位）；
+- 总开关 `migoo.web.idempotent.enabled`（默认开启）；
+- 本注解语义是**拒绝重复**，不是**重放响应**——重复请求抛 900，不会回放首次的返回值；需要「结果回放」型幂等请自行缓存返回值。
 
 ---
 
@@ -200,6 +234,7 @@ public Result<LoginVO> login(String username, String password) { ... }
 | `CorsFilter` | CORS 过滤 | `migoo.web.cors.enabled=true` |
 | `CacheRequestBodyFilter` | 请求体缓存 | `migoo.web.cache-body.enabled=true` |
 | `RateLimitAspect` | `@RateLimit` 注解限流切面 | `migoo.web.rate-limit.enabled=true`（默认开启） |
+| `IdempotentAspect` | `@Idempotent` 注解幂等切面（防重复提交） | `migoo.web.idempotent.enabled=true`（默认开启） |
 | `StateStore` | 计数/状态存储（默认内存实现） | 无自定义 `StateStore` Bean 时 |
 | `RateLimiter` | 固定窗口限流器 | 无自定义 `RateLimiter` Bean 时 |
 | `RedisStateStore` | Redis 计数存储（多实例共享，替换内存实现） | 检测到 `RedisConnectionFactory` 时 |
@@ -224,6 +259,8 @@ migoo:
       enabled: true
       max-size: 10485760                  # 10MB
     rate-limit:                           # @RateLimit 注解限流
+      enabled: true
+    idempotent:                           # @Idempotent 注解幂等（防重复提交）
       enabled: true
 
 # Spring MVC 配置（配合 404 异常处理）

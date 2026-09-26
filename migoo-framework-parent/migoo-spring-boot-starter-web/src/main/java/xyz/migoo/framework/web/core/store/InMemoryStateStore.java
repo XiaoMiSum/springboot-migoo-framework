@@ -63,6 +63,22 @@ public class InMemoryStateStore implements StateStore {
     }
 
     @Override
+    public boolean setIfAbsent(String key, Duration ttl) {
+        long now = System.currentTimeMillis();
+        boolean[] created = new boolean[1];
+        // compute 按键原子执行：不存在/已过期才占位
+        entries.compute(key, (k, old) -> {
+            if (old == null || old.isExpired(now)) {
+                created[0] = true;
+                return new Entry(1, now + ttl.toMillis());
+            }
+            return old;
+        });
+        maybeCleanup();
+        return created[0];
+    }
+
+    @Override
     public void delete(String key) {
         entries.remove(key);
     }

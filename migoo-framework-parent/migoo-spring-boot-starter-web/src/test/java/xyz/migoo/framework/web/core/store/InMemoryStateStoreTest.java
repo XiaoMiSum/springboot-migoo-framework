@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,5 +71,59 @@ class InMemoryStateStoreTest {
         // 再过 400ms（距第二次 800ms > 600ms）: 已过期
         Thread.sleep(400);
         assertThat(store.get("k")).isZero();
+    }
+
+    @Test
+    void setIfAbsentOnlyFirstClaimWins() {
+        Duration ttl = Duration.ofMinutes(1);
+
+        // 首次占位成功，重复占位失败
+        assertThat(store.setIfAbsent("claim", ttl)).isTrue();
+        assertThat(store.setIfAbsent("claim", ttl)).isFalse();
+        assertThat(store.get("claim")).isEqualTo(1);
+
+        // 释放后可重新占位
+        store.delete("claim");
+        assertThat(store.setIfAbsent("claim", ttl)).isTrue();
+    }
+
+    @Test
+    void setIfAbsentAllowsReclaimAfterExpiry() throws InterruptedException {
+        assertThat(store.setIfAbsent("short", Duration.ofMillis(10))).isTrue();
+        assertThat(store.setIfAbsent("short", Duration.ofMillis(10))).isFalse();
+        Thread.sleep(50);
+        // 过期后可重新占位
+        assertThat(store.setIfAbsent("short", Duration.ofMillis(10))).isTrue();
+    }
+
+    @Test
+    void defaultSetIfAbsentFallsBackToGetThenPut() {
+        // 仅实现四个基础方法的自定义存储 → 走接口默认「读-判-写」兜底
+        Map<String, Long> backing = new HashMap<>();
+        StateStore custom = new StateStore() {
+            @Override
+            public long increment(String key, Duration ttl) {
+                return backing.merge(key, 1L, Long::sum);
+            }
+
+            @Override
+            public long get(String key) {
+                return backing.getOrDefault(key, 0L);
+            }
+
+            @Override
+            public void put(String key, long value, Duration ttl) {
+                backing.put(key, value);
+            }
+
+            @Override
+            public void delete(String key) {
+                backing.remove(key);
+            }
+        };
+
+        assertThat(custom.setIfAbsent("k", Duration.ofMinutes(1))).isTrue();
+        assertThat(custom.setIfAbsent("k", Duration.ofMinutes(1))).isFalse();
+        assertThat(backing).containsEntry("k", 1L);
     }
 }
