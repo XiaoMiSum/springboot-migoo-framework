@@ -1,0 +1,39 @@
+# PR/push 门禁：发布清单一致性校验 + 全量构建测试
+name: CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+
+# 同一分支/PR 的新提交取消进行中的旧构建
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 发布前校验「父 pom <modules> / BOM / -pl 清单 / Summary」四方对齐
+      # （详见 docs/observability.md §10，脚本本地也可执行）
+      - name: Check Module List Consistency
+        run: bash scripts/check-publish-modules.sh
+
+      # 父 pom 把 maven-gpg-plugin:sign 绑在 verify 阶段，CI 无密钥 → 跳过签名
+      - name: Build with Tests
+        run: mvn clean verify -Dgpg.skip=true

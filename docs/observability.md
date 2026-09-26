@@ -436,6 +436,7 @@ scrape_configs:
 - [x] 新模块 pom 含 `name/description/url/licenses/scm/developers`（Central 发布必填）
 - [x] `mvn clean verify` 全绿后再打 tag
 - [x] **机器校验**：`scripts/check-publish-modules.sh` 比对四方清单（父 pom `<modules>` / BOM `dependencyManagement` / `publish-parent.yml` 的 `-pl` / `Publication Summary` 汇总行），`publish-parent.yml` 与 `publish-dependencies.yml` 发布前各执行一次，任一漏项即 fail；本地可随时 `bash scripts/check-publish-modules.sh`
+- [x] **PR/push 门禁**：`.github/workflows/ci.yml` 在 push（master/main）与全部 PR 上执行「清单校验 + `mvn clean verify -Dgpg.skip=true`」（gpg 绑在 verify、CI 无密钥故跳过签名），同 ref 新提交自动取消旧构建——补齐评估 P0#3「无门禁则测试形同虚设」
 - [x] 本地构建注意：父 pom 把 `maven-gpg-plugin:sign` 绑在 `verify` 阶段，无 gpg 的机器用 `mvn clean verify -Dgpg.skip=true`（CI 发布流程照常签名）
 
 ## 11. 风险与取舍
