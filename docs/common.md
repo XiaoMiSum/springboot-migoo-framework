@@ -192,6 +192,37 @@ public IdGenerator idGenerator() {
 
 ---
 
+## 敏感数据脱敏（@Sensitive）
+
+`xyz.migoo.framework.common.sensitive` 包，Jackson 注解内省驱动——`JsonUtils` 与 Spring MVC 响应序列化**自动生效**，无需注册额外模块：
+
+| 策略 | 输出示例 | 说明 |
+|---|---|---|
+| `MOBILE` | `138****5678` | 手机号：前 3 后 4 |
+| `ID_CARD` | `3301**********1234` | 身份证：前 4 后 4 |
+| `EMAIL` | `a***@example.com` | 邮箱：本地部分留首字符，域名保留 |
+| `BANK_CARD` | `6222********7890` | 卡号：前 4 后 4 |
+| `PASSWORD` | `******` | 定长掩码（不泄露原长度） |
+
+```java
+public class UserVO {
+    @Sensitive(type = SensitiveType.MOBILE)
+    private String mobile;        // -> "138****5678"
+
+    @Sensitive(type = SensitiveType.PASSWORD)
+    private String password;      // -> "******"
+
+    private String nickname;      // 未标注，原样输出
+}
+```
+
+- 只作用于**序列化**（输出方向），反序列化不还原——入参无需脱敏；
+- 数值字段（如 Long 卡号）同样适用，脱敏后以**字符串**形态输出；
+- null 原样输出 JSON null；长度不足以保留两侧时整体掩码；非邮箱格式（无 `@`）整体掩码；
+- 非 JSON 场景独立调用：`SensitiveDataUtil.mask(value, SensitiveType.MOBILE)`。
+
+---
+
 ## 核心 API 一览
 
 ### Result
@@ -235,3 +266,10 @@ ErrorCode.of(code, msg)  // 工厂方法
 | `IdGenerator.nextId()` | 生成下一个 ID（字符串形态） |
 | `SnowflakeIdGenerator.nextLong()` | 雪花 `long` 形态（BIGINT 主键） |
 | `UuidV7IdGenerator.nextUuid()` | UUIDv7 `UUID` 形态 |
+
+### @Sensitive / SensitiveDataUtil（脱敏）
+
+| 方法 | 说明 |
+|------|------|
+| `@Sensitive(type = ...)` | 字段脱敏，Jackson 序列化自动生效 |
+| `SensitiveDataUtil.mask(value, type)` | 独立脱敏调用（非 JSON 场景） |
