@@ -103,7 +103,42 @@ migoo:
         threshold: 5
         window: PT15M
         duration: PT10M
+
+    # ========== 安全响应头（默认启用，见下文「安全响应头」） ==========
+    headers:
+      # 总开关（false = 完全禁用，等同旧版 .headers(disable)）
+      enabled: true
+      # Spring Security 默认头集，逐项可关
+      content-type-options: true         # X-Content-Type-Options: nosniff
+      frame-options: true                # X-Frame-Options: DENY（防点击劫持）
+      hsts: true                         # HSTS（仅 HTTPS 请求携带）
+      cache-control: true                # Cache-Control: no-cache/no-store
+      xss-protection: true               # X-XSS-Protection（Spring 默认写 0）
+      # 非 Spring 默认头
+      referrer-policy: true              # Referrer-Policy: strict-origin-when-cross-origin
+      # content-security-policy: default-src 'self'   # CSP（默认不下发，按需显式给出）
 ```
+
+---
+
+## 安全响应头
+
+过滤链默认**启用安全响应头**（旧版本为显式 `.headers(disable)` 全关，这是一次行为变化）：
+
+| 头 | 默认值 | 防什么 | 开关（`migoo.security.headers.*`） |
+|---|---|---|---|
+| `X-Content-Type-Options` | `nosniff` | 上传内容被浏览器当脚本执行 | `content-type-options` |
+| `X-Frame-Options` | `DENY` | 点击劫持（第三方页面 iframe 套壳诱导点击） | `frame-options` |
+| `Strict-Transport-Security` | `max-age=3153653600; includeSubDomains` | HTTPS 降级剥离；**仅 HTTPS 请求携带**，本地 HTTP 调试不受影响 | `hsts` |
+| `Cache-Control` | `no-cache, no-store, ...` | 敏感响应被中间层/浏览器缓存 | `cache-control` |
+| `X-XSS-Protection` | `0`（Spring Security 默认关闭旧过滤器） | 旧版浏览器 XSS 过滤器 | `xss-protection` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | URL 参数/token 随 Referer 泄露第三方（框架补充，非 Spring 默认） | `referrer-policy` |
+| `Content-Security-Policy` | 不下发 | XSS（误配会阻断页面资源，须显式给出指令才开启） | `content-security-policy` |
+
+装配策略是**「要关的才碰」**：仅对显式关闭的头调用 `disable`，其余保持 Spring Security 默认头集。
+
+- `migoo.security.headers.enabled=false` → 完全禁用响应头（等同旧版行为，纯内网无浏览器交互的 API 可关闭）；
+- 需要 COOP/COEP/CORP 等其他头时，可自定义 `SecurityFilterChain` Bean 覆盖（本组件的链带 `@ConditionalOnMissingBean`）。
 
 ---
 

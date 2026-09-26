@@ -57,6 +57,12 @@ public class SecurityProperties {
     private LoginLock loginLock = new LoginLock();
 
     /**
+     * 安全响应头配置
+     */
+    @NotNull(message = "headers 不能为空")
+    private Headers headers = new Headers();
+
+    /**
      * 条件校验
      */
     @PostConstruct
@@ -281,6 +287,59 @@ public class SecurityProperties {
             @NotNull(message = "login-lock.sliding-window.duration 不能为空")
             private Duration duration = Duration.ofMinutes(10);
         }
+    }
+
+    // ==================== 安全响应头配置 ====================
+
+    @Validated
+    @Data
+    public static class Headers {
+
+        /**
+         * 响应头总开关
+         * <p>
+         * true（默认）= 启用响应头（Spring Security 默认头集 + 框架补充项）；
+         * false = 完全禁用，等同旧版 {@code .headers(disable)}（纯内网 API 可关闭）
+         */
+        private boolean enabled = true;
+
+        /**
+         * X-Content-Type-Options: nosniff —— 禁止浏览器把上传内容当脚本/样式执行
+         */
+        private boolean contentTypeOptions = true;
+
+        /**
+         * X-Frame-Options: DENY —— 防点击劫持（第三方页面 iframe 套壳诱导点击）
+         */
+        private boolean frameOptions = true;
+
+        /**
+         * Strict-Transport-Security —— 强制浏览器后续走 HTTPS，防 SSL 剥离；
+         * 仅 HTTPS 请求携带，本地 HTTP 调试不受影响
+         */
+        private boolean hsts = true;
+
+        /**
+         * Cache-Control: no-cache/no-store —— 防止敏感响应被中间层/浏览器缓存
+         */
+        private boolean cacheControl = true;
+
+        /**
+         * X-XSS-Protection —— 旧版浏览器 XSS 过滤器头（Spring Security 默认写 0，即关闭该过滤器）
+         */
+        private boolean xssProtection = true;
+
+        /**
+         * Referrer-Policy: strict-origin-when-cross-origin —— 防 URL 参数/token 随 Referer
+         * 泄露给第三方站点（非 Spring Security 默认头，由框架补充）
+         */
+        private boolean referrerPolicy = true;
+
+        /**
+         * Content-Security-Policy 指令，例如 {@code default-src 'self'}；
+         * 为空（默认）= 不下发（误配会阻断页面资源加载，须由使用方按需显式给出）
+         */
+        private String contentSecurityPolicy;
     }
 
     // ==================== 枚举 ====================

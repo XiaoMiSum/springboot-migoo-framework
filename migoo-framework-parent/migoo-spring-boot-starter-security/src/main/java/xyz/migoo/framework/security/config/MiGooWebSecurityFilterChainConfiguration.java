@@ -10,12 +10,14 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import xyz.migoo.framework.security.core.filter.JwtAuthenticationFilter;
 
 /**
@@ -51,8 +53,8 @@ public class MiGooWebSecurityFilterChainConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 // 基于 token 机制，所以不需要 Session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 禁用 headers（无需缓存控制等）
-                .headers(AbstractHttpConfigurer::disable)
+                // 安全响应头：按 migoo.security.headers.* 开关装配（默认恢复安全头集）
+                .headers(headers -> applyHeaders(headers, properties.getHeaders()))
                 // 异常处理
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint(authenticationEntryPoint)
@@ -83,6 +85,49 @@ public class MiGooWebSecurityFilterChainConfiguration {
         }
 
         return httpSecurity.build();
+    }
+
+    /**
+     * 按配置装配安全响应头
+     * <p>
+     * 装配策略：<b>要关的才碰</b>——仅对显式关闭的头调用 {@code disable}，
+     * 其余保持 Spring Security 默认头集（nosniff / X-Frame-Options: DENY /
+     * HSTS（仅 HTTPS 请求携带）/ Cache-Control / X-XSS-Protection）；
+     * {@code Referrer-Policy} 与 {@code Content-Security-Policy} 非 Spring 默认头，
+     * 分别由 {@code referrer-policy}（默认开）与 {@code content-security-policy}（默认空=不下发）按需启用。
+     *
+     * @param headers    响应头配置器
+     * @param properties 响应头属性（{@code migoo.security.headers.*}）
+     */
+    static void applyHeaders(HeadersConfigurer<HttpSecurity> headers, SecurityProperties.Headers properties) {
+        // 总开关关闭：完全禁用响应头（等同旧版行为）
+        if (!properties.isEnabled()) {
+            headers.disable();
+            return;
+        }
+        if (!properties.isContentTypeOptions()) {
+            headers.contentTypeOptions(config -> config.disable());
+        }
+        if (!properties.isFrameOptions()) {
+            headers.frameOptions(config -> config.disable());
+        }
+        if (!properties.isHsts()) {
+            headers.httpStrictTransportSecurity(config -> config.disable());
+        }
+        if (!properties.isCacheControl()) {
+            headers.cacheControl(config -> config.disable());
+        }
+        if (!properties.isXssProtection()) {
+            headers.xssProtection(config -> config.disable());
+        }
+        if (properties.isReferrerPolicy()) {
+            headers.referrerPolicy(config ->
+                    config.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+        }
+        String contentSecurityPolicy = properties.getContentSecurityPolicy();
+        if (contentSecurityPolicy != null && !contentSecurityPolicy.isBlank()) {
+            headers.contentSecurityPolicy(config -> config.policyDirectives(contentSecurityPolicy));
+        }
     }
 
 }
