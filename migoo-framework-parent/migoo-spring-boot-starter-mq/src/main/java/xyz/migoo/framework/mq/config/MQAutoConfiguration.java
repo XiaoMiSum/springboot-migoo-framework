@@ -25,6 +25,7 @@ import xyz.migoo.framework.mq.core.interceptor.IdempotentMessageInterceptor;
 import xyz.migoo.framework.mq.core.interceptor.RedisMessageInterceptor;
 import xyz.migoo.framework.mq.core.pubsub.AbstractChannelMessageListener;
 import xyz.migoo.framework.mq.core.stream.AbstractStreamMessageListener;
+import xyz.migoo.framework.mq.core.stream.StreamReclaimTask;
 import xyz.migoo.framework.redis.config.RedisAutoConfiguration;
 
 import java.net.InetAddress;
@@ -158,6 +159,8 @@ public class MQAutoConfiguration {
             Consumer consumer = Consumer.from(listener.getGroup(), consumerName);
             // 设置 Consumer 消费进度，以最小消费进度为准
             StreamOffset<String> streamOffset = StreamOffset.create(listener.getStreamKey(), ReadOffset.lastConsumed());
+            // 注入消费者名：认领任务将 PEL 消息认领到该消费者名下
+            listener.setConsumerName(consumerName);
             // 设置 Consumer 监听
             StreamMessageListenerContainer.StreamReadRequestBuilder<String> builder = StreamMessageListenerContainer.StreamReadRequest
                     .builder(streamOffset).consumer(consumer)
@@ -170,6 +173,27 @@ public class MQAutoConfiguration {
                     listener.getStreamKey(), listener.getClass().getName(), listener.getGroup(), consumerName);
         });
         return container;
+    }
+
+    /**
+     * 创建 PEL 消息认领与退避重投任务
+     * <p>
+     * 消费失败的消息留在 PEL 等待退避重投、消费者崩溃后的孤儿消息由此认领，
+     * 重投次数受 {@code migoo.mq.max-retry} 约束
+     *
+     * @param listeners  Stream 监听器列表
+     * @param properties MQ 配置（读取 {@code migoo.mq.reclaim.*}）
+     * @return 认领任务
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(AbstractStreamMessageListener.class)
+    @ConditionalOnProperty(prefix = "migoo.mq.reclaim", name = "enabled",
+            havingValue = "true", matchIfMissing = true)
+    public StreamReclaimTask streamReclaimTask(List<AbstractStreamMessageListener<?>> listeners,
+                                               MQProperties properties) {
+        MQProperties.Reclaim reclaim = properties.getReclaim();
+        return new StreamReclaimTask(listeners, reclaim.getBackoff(), reclaim.getInterval());
     }
 
     /**

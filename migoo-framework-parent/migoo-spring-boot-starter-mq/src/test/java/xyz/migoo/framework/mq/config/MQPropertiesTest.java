@@ -84,4 +84,25 @@ class MQPropertiesTest {
         assertThat(properties.getHealth().getEnabled()).isFalse();
         assertThat(properties.getHealth().getBacklogThreshold()).isEqualTo(50L);
     }
+
+    @Test
+    void reclaimDefaults() {
+        MQProperties properties = new MQProperties();
+        assertThat(properties.getReclaim()).isNotNull();
+        // 认领与退避重投默认开启：退避 5s、轮询 5s
+        assertThat(properties.getReclaim().getEnabled()).isTrue();
+        assertThat(properties.getReclaim().getBackoff()).isEqualTo(Duration.ofSeconds(5));
+        assertThat(properties.getReclaim().getInterval()).isEqualTo(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void reclaimSubConfigRoundtrip() {
+        MQProperties properties = new MQProperties();
+        properties.getReclaim().setEnabled(false);
+        properties.getReclaim().setBackoff(Duration.ofSeconds(30));
+        properties.getReclaim().setInterval(Duration.ofSeconds(10));
+        assertThat(properties.getReclaim().getEnabled()).isFalse();
+        assertThat(properties.getReclaim().getBackoff()).isEqualTo(Duration.ofSeconds(30));
+        assertThat(properties.getReclaim().getInterval()).isEqualTo(Duration.ofSeconds(10));
+    }
 }

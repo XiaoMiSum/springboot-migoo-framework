@@ -2,7 +2,12 @@ package xyz.migoo.framework.mq.core.stream;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Range;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.PendingMessage;
+import org.springframework.data.redis.connection.stream.PendingMessages;
+import org.springframework.data.redis.connection.stream.Record;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -222,7 +228,7 @@ class AbstractStreamMessageListenerTest {
     }
 
     @Test
-    void onMessageRetriesWhenConsumptionFails() {
+    void onMessageLeavesMessageInPelWhenRetriesRemain() {
         FailingStreamListener listener = new FailingStreamListener(defaultProperties());
         StreamOperations streamOps = mock(StreamOperations.class);
         listener.setRedisTemplate(mockRedisTemplate(streamOps));
@@ -234,17 +240,10 @@ class AbstractStreamMessageListenerTest {
         listener.onMessage(record);
 
         assertThat(listener.received).hasSize(1);
-        // ACK 原消息
-        verify(streamOps).acknowledge("test-group", record);
-        // 重试：重新写入 Stream，携带递增后的 retry-count
-        org.mockito.ArgumentCaptor<ObjectRecord<String, String>> addCaptor =
-                org.mockito.ArgumentCaptor.forClass(ObjectRecord.class);
-        verify(streamOps).add(addCaptor.capture());
-        ObjectRecord<String, String> added = addCaptor.getValue();
-        assertThat(added.getStream()).isEqualTo("DemoStreamMessage");
-        assertThat(added.getValue()).contains("\"retry-count\":\"1\"");
-        // 删除原消息
-        verify(streamOps).delete(record);
+        // 退避重试：不 ACK、不删除、不立即重投 —— 消息留在 PEL 等待 StreamReclaimTask 退避认领
+        verify(streamOps, never()).acknowledge("test-group", record);
+        verify(streamOps, never()).add(any(ObjectRecord.class));
+        verify(streamOps, never()).delete(record);
         // 首次失败仍可重试 → willRetry=true，未进死信
         verify(publisher).publishEvent(new MqMessageConsumeFailedEvent("DemoStreamMessage", true));
         verify(publisher, never()).publishEvent(any(MqMessageDeadLetteredEvent.class));
@@ -309,5 +308,155 @@ class AbstractStreamMessageListenerTest {
 
         assertThatThrownBy(() -> listener.onMessage(record))
                 .isInstanceOf(NullPointerException.class);
+    }
+
+    // ==================== PEL 认领与退避重投 ====================
+
+    @Test
+    void reclaimRequeuesPelMessageWithIncrementedRetryCount() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        listener.setConsumerName("consumer-1");
+        StreamOperations streamOps = mock(StreamOperations.class);
+        listener.setRedisTemplate(mockRedisTemplate(streamOps));
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        listener.setEventPublisher(publisher);
+
+        // PEL 中消息 retry-count=0，闲置 30s（超过退避 5s）
+        DemoStreamMessage message = new DemoStreamMessage();
+        message.setContent("retry-me");
+        MapRecord<String, Object, Object> claimed = claimedRecord(JsonUtils.toJsonString(message));
+        stubPending(streamOps, pendingOf("10-0"));
+        when(streamOps.claim(eq("DemoStreamMessage"), eq("test-group"), eq("consumer-1"),
+                eq(Duration.ofSeconds(5)), eq(RecordId.of("10-0"))))
+                .thenReturn(List.of(claimed));
+
+        int handled = listener.reclaimPending(Duration.ofSeconds(5));
+
+        // 重投：retry-count 递增为 1，消息回到 Stream
+        assertThat(handled).isEqualTo(1);
+        org.mockito.ArgumentCaptor<ObjectRecord<String, String>> addCaptor =
+                org.mockito.ArgumentCaptor.forClass(ObjectRecord.class);
+        verify(streamOps).add(addCaptor.capture());
+        ObjectRecord<String, String> added = addCaptor.getValue();
+        assertThat(added.getStream()).isEqualTo("DemoStreamMessage");
+        assertThat(added.getValue()).contains("\"retry-count\":\"1\"");
+        // 先重投后 ACK；delete-after-ack 默认 false → 原消息保留
+        verify(streamOps).acknowledge("test-group", claimed);
+        verify(streamOps, never()).delete(claimed);
+        // 认领重投不产生新的失败/死信事件
+        verify(publisher, never()).publishEvent(any(MqMessageDeadLetteredEvent.class));
+        verify(publisher, never()).publishEvent(any(MqMessageConsumeFailedEvent.class));
+    }
+
+    @Test
+    void reclaimSendsExhaustedMessageToDeadLetter() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        listener.setConsumerName("consumer-1");
+        StreamOperations streamOps = mock(StreamOperations.class);
+        listener.setRedisTemplate(mockRedisTemplate(streamOps));
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        listener.setEventPublisher(publisher);
+
+        // retry-count=3 已达 maxRetry=3：孤儿消息不再重投，兜底转死信
+        DemoStreamMessage message = new DemoStreamMessage();
+        message.addHeader("retry-count", "3");
+        MapRecord<String, Object, Object> claimed = claimedRecord(JsonUtils.toJsonString(message));
+        stubPending(streamOps, pendingOf("10-0"));
+        when(streamOps.claim(eq("DemoStreamMessage"), eq("test-group"), eq("consumer-1"),
+                eq(Duration.ofSeconds(5)), eq(RecordId.of("10-0"))))
+                .thenReturn(List.of(claimed));
+
+        int handled = listener.reclaimPending(Duration.ofSeconds(5));
+
+        assertThat(handled).isEqualTo(1);
+        org.mockito.ArgumentCaptor<ObjectRecord<String, String>> addCaptor =
+                org.mockito.ArgumentCaptor.forClass(ObjectRecord.class);
+        verify(streamOps).add(addCaptor.capture());
+        ObjectRecord<String, String> added = addCaptor.getValue();
+        assertThat(added.getStream()).isEqualTo("DemoStreamMessage:dead_letter");
+        assertThat(added.getValue()).contains("\"error-message\"").contains("\"error-time\"");
+        verify(streamOps).acknowledge("test-group", claimed);
+        // 死信事件：原因=合成异常类型
+        verify(publisher).publishEvent(new MqMessageDeadLetteredEvent("DemoStreamMessage", "IllegalStateException"));
+    }
+
+    @Test
+    void reclaimAcksUnparseableMessageWithoutRequeue() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        listener.setConsumerName("consumer-1");
+        StreamOperations streamOps = mock(StreamOperations.class);
+        listener.setRedisTemplate(mockRedisTemplate(streamOps));
+
+        // 毒消息：无法解析 → ACK 丢弃，不重投、不进死信循环
+        MapRecord<String, Object, Object> claimed = claimedRecord("{{invalid-json");
+        stubPending(streamOps, pendingOf("10-0"));
+        when(streamOps.claim(eq("DemoStreamMessage"), eq("test-group"), eq("consumer-1"),
+                eq(Duration.ofSeconds(5)), eq(RecordId.of("10-0"))))
+                .thenReturn(List.of(claimed));
+
+        int handled = listener.reclaimPending(Duration.ofSeconds(5));
+
+        assertThat(handled).isEqualTo(1);
+        verify(streamOps, never()).add(any(ObjectRecord.class));
+        verify(streamOps).acknowledge("test-group", claimed);
+    }
+
+    @Test
+    void reclaimNoopWhenNoPendingMessages() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        listener.setConsumerName("consumer-1");
+        StreamOperations streamOps = mock(StreamOperations.class);
+        listener.setRedisTemplate(mockRedisTemplate(streamOps));
+        stubPending(streamOps, new PendingMessages("test-group", List.of()));
+
+        int handled = listener.reclaimPending(Duration.ofSeconds(5));
+
+        // 无闲置消息：直接返回，不产生任何写操作
+        assertThat(handled).isEqualTo(0);
+        verify(streamOps, never()).add(any(ObjectRecord.class));
+        verify(streamOps, never()).acknowledge(eq("test-group"), any(Record.class));
+    }
+
+    @Test
+    void reclaimReturnsZeroWhenRedisFails() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        listener.setConsumerName("consumer-1");
+        StreamOperations streamOps = mock(StreamOperations.class);
+        listener.setRedisTemplate(mockRedisTemplate(streamOps));
+        when(streamOps.pending(eq("DemoStreamMessage"), eq("test-group"), any(Range.class),
+                eq(100L), eq(Duration.ofSeconds(5))))
+                .thenThrow(new RuntimeException("connection refused"));
+
+        // 自愈任务不外抛异常，降级返回 0
+        assertThat(listener.reclaimPending(Duration.ofSeconds(5))).isEqualTo(0);
+    }
+
+    @Test
+    void reclaimReturnsZeroWhenRedisTemplateNotSet() {
+        RecordingStreamListener listener = new RecordingStreamListener(defaultProperties());
+        assertThat(listener.reclaimPending(Duration.ofSeconds(5))).isEqualTo(0);
+    }
+
+    // ==================== 认领测试夹具 ====================
+
+    /** 构造含单条 PEL 记录的 XPENDING 结果 */
+    private PendingMessages pendingOf(String recordId) {
+        return new PendingMessages("test-group", List.of(
+                new PendingMessage(RecordId.of(recordId),
+                        org.springframework.data.redis.connection.stream.Consumer.from("test-group", "old-consumer"),
+                        Duration.ofSeconds(30), 1L)));
+    }
+
+    /** 构造 XCLAIM 认领到的单字段记录（值为消息 JSON） */
+    private MapRecord<String, Object, Object> claimedRecord(String json) {
+        return MapRecord.<String, Object, Object>create("DemoStreamMessage", java.util.Map.of("message", json))
+                .withId(RecordId.of("10-0"));
+    }
+
+    /** stub XPENDING：闲置过滤 5s、单轮上限 100 条 */
+    private void stubPending(StreamOperations streamOps, PendingMessages pending) {
+        when(streamOps.pending(eq("DemoStreamMessage"), eq("test-group"), any(Range.class),
+                eq(100L), eq(Duration.ofSeconds(5))))
+                .thenReturn(pending);
     }
 }

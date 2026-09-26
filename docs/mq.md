@@ -13,6 +13,7 @@ MQ 组件，基于 Redis 实现消息队列，支持 Stream（可靠投递）和
 | `AbstractStreamMessageListener` 构造函数需传入 `MQProperties` | Stream Listener 需新增构造函数 | `public XxxListener(MQProperties p) { super(p); }` |
 | `RedisMessageUtils` 已废弃 | 直接调用绕过拦截器链 | 改用 `RedisMQTemplate.send()` |
 | ACK 后消息默认保留 | Stream 消费后消息不再自动删除 | 设置 `delete-after-ack: true` 可恢复旧行为 |
+| 消费失败改为「退避重投」（PEL 认领） | 失败消息不再立即重投，约 `reclaim.backoff ~ backoff+interval` 后重投；消费者崩溃的孤儿消息自动认领 | 无需迁移；要旧行为设 `migoo.mq.reclaim.enabled: false` |
 
 ## 快速开始
 
@@ -115,12 +116,17 @@ public class OrderCreatedListener extends AbstractStreamMessageListener<OrderCre
 }
 ```
 
-#### 4. 重试与死信
+#### 4. 重试与死信（退避 + PEL 认领）
 
 框架自动处理重试：
 
 - 消费失败自动重试，最多 `migoo.mq.max-retry` 次（默认 3）
 - 超过重试次数自动进入死信队列 `<channel>:dead_letter`
+- **失败不再立即重投**：消息留在消费组 PEL，闲置超过 `migoo.mq.reclaim.backoff`（默认 5s）后由 `StreamReclaimTask` 认领重投（轮询间隔 `reclaim.interval` 默认 5s），避免业务故障时的失败风暴
+- **孤儿消息自动认领**：消费者崩溃/重启后未 ACK 的消息此前会永久滞留 PEL，现由同一机制认领重投，次数同样受 `max-retry` 约束，不会无限循环
+- 重投顺序为「先重投、后 ACK」：中途故障宁可重复投递（幂等拦截器按 `messageId` 去重）也不丢失
+- 无法解析的毒消息在认领时直接 ACK 丢弃（记 error 日志）
+- ⚠ `reclaim.backoff` 应大于业务最长处理时长，否则处理中的消息可能被重复认领
 - `MessageAlreadyConsumedException`（幂等跳过）不计入重试
 
 #### 5. 消息保留策略
@@ -234,6 +240,13 @@ migoo:
     idempotent:
       enabled: true                     # 幂等拦截开关（默认开启）
       expire-time: 24h                  # 幂等 Key 过期时间
+    reclaim:
+      enabled: true                     # PEL 认领与退避重投开关（默认开启）
+      backoff: 5s                       # 退避时长：PEL 闲置超过才认领重投（须大于最长处理时长）
+      interval: 5s                      # 认领轮询间隔（实际重投延迟 ≈ backoff ~ backoff+interval）
+    health:
+      enabled: true                     # /actuator/health 积压健康检查（需 actuator 在 classpath）
+      backlog-threshold: 1000           # 任一消费组积压超过该值 → OUT_OF_SERVICE
 ```
 
 ## 自动注册的组件
@@ -244,3 +257,5 @@ migoo:
 | `IdempotentMessageInterceptor` | `idempotent.enabled=true`（默认），支持自定义 Bean 覆盖 |
 | `StreamMessageListenerContainer` | 存在 `AbstractStreamMessageListener` Bean 时 |
 | `RedisMessageListenerContainer` | 存在 `AbstractChannelMessageListener` Bean 时 |
+| `StreamReclaimTask` | 存在 Stream 监听器且 `migoo.mq.reclaim.enabled=true`（默认） |
+| `MqBacklogHealthIndicator`（`MQHealthAutoConfiguration`） | actuator 与 Stream 监听器同时就绪且 `migoo.mq.health.enabled=true`（默认） |
