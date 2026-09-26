@@ -63,6 +63,20 @@ public class MigooObservabilityProperties {
          * 未列出的信号跟随 {@link #enabled}
          */
         private Map<String, Boolean> signals = new LinkedHashMap<>();
+
+        /**
+         * 信号事件是否异步计数。
+         *
+         * <p>false（默认）= 在发布方线程同步计数（计数本身仅一次 Map/Counter 写，开销可忽略）；
+         * true = 投递到模块内置的单线程守护线程池，业务线程立即返回，队列满则丢弃事件
+         * （观测永不阻塞业务）。切换后计数存在毫秒级延迟。</p>
+         */
+        private boolean async = false;
+
+        /**
+         * 异步计数的队列容量（{@link #async} = true 时生效），满则丢弃并记录告警
+         */
+        private int asyncQueueCapacity = 8192;
     }
 
     @Data
@@ -114,5 +128,40 @@ public class MigooObservabilityProperties {
          * 留空使用 Spring Boot 默认的 [traceId-spanId]
          */
         private String correlationPattern;
+
+        /**
+         * 结构化日志（JSON）输出格式，写回 logging.structured.format.console / .file；
+         * {@link Format#OFF}（默认）= 沿用 Spring Boot 纯文本日志
+         *
+         * <p>三种内置格式（ecs / gelf / logstash）都会把 MDC 的全部键值对
+         * （含 traceId/spanId）写入 JSON，故开启后无需额外 encoder 配置。</p>
+         */
+        private Format format = Format.OFF;
+    }
+
+    /**
+     * 结构化日志格式（Spring Boot 内置的三种 JSON 格式）
+     */
+    public enum Format {
+
+        /**
+         * 不启用，沿用 Spring Boot 默认的纯文本日志
+         */
+        OFF,
+
+        /**
+         * Elastic Common Schema（ECS）JSON
+         */
+        ECS,
+
+        /**
+         * Graylog Extended Log Format JSON
+         */
+        GELF,
+
+        /**
+         * Logstash JSON（ELK 通用）
+         */
+        LOGSTASH
     }
 }

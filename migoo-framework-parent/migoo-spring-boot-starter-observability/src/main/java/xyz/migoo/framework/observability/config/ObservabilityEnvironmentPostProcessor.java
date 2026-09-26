@@ -10,6 +10,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -23,7 +24,11 @@ import java.util.Map;
  *     <li><b>采样与 OTLP</b>：采样率、OTLP 端点（可由 {@code /v1/traces} 推导 metrics/logs 端点）、
  *         三类 OTLP 导出总开关（Boot 4.1 默认全开、指向本机 :4318，无 Collector 须一键关闭）；</li>
  *     <li><b>日志关联</b>：{@code logging.correlation=false} 时关闭 Boot 的关联 ID 期望
- *         （{@code logging.expect-correlation-id}），或自定义 {@code logging.pattern.correlation}。</li>
+ *         （{@code logging.expect-correlation-id}），或自定义 {@code logging.pattern.correlation}；</li>
+ *     <li><b>结构化日志</b>：{@code logging.format} 非 OFF 时把 Boot 的 JSON 日志格式
+ *         （{@code ecs} / {@code gelf} / {@code logstash}）写入
+ *         {@code logging.structured.format.console} 与 {@code .file}——内置格式自动携带
+ *         MDC（含 traceId/spanId），无需再配 logback encoder。</li>
  * </ol>
  *
  * <p><b>回写规则</b>：Spring Boot 官方属性是最终事实 —— 用户显式配置过的键一律不写；
@@ -129,6 +134,14 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
             putDefault(environment, defaults, "logging.expect-correlation-id", false);
         } else if (logging.getCorrelationPattern() != null && !logging.getCorrelationPattern().isBlank()) {
             putDefault(environment, defaults, "logging.pattern.correlation", logging.getCorrelationPattern());
+        }
+
+        // ⑥ 结构化日志（JSON）：Boot 内置格式会把 MDC（含 traceId/spanId）全量写入 JSON，
+        //    因此开启后无需再配置 logback encoder；console 与 file 两处端点同时回写
+        if (logging.getFormat() != MigooObservabilityProperties.Format.OFF) {
+            String value = logging.getFormat().name().toLowerCase(Locale.ROOT);
+            putDefault(environment, defaults, "logging.structured.format.console", value);
+            putDefault(environment, defaults, "logging.structured.format.file", value);
         }
     }
 

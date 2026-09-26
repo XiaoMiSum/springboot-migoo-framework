@@ -12,7 +12,9 @@ import xyz.migoo.framework.observability.metrics.SignalMetrics;
  * 信号指标订阅配置
  *
  * <p>订阅 common 中的信号事件（限流/认证/MQ/500）并计数，
- * {@code migoo.observability.metrics.enabled=false} 时整体不装配（此时各组件发布的事件无人消费）。</p>
+ * {@code migoo.observability.metrics.enabled=false} 时整体不装配（此时各组件发布的事件无人消费）；
+ * {@code migoo.observability.metrics.async=true} 时计数切到内置单线程池（业务线程立即返回，
+ * 队列满丢弃），默认同步。</p>
  *
  * @author xiaomi
  */
@@ -38,12 +40,15 @@ public class ObservabilitySignalConfiguration {
      * 信号事件订阅器 Bean
      *
      * @param signalMetrics 信号指标注册中心
+     * @param properties    可观测性配置（读取 {@code metrics.async} 与 {@code metrics.async-queue-capacity}）
      * @return 事件订阅器
      */
     @Bean
     @ConditionalOnMissingBean(SignalEventListener.class)
-    public SignalEventListener signalEventListener(SignalMetrics signalMetrics) {
-        return new SignalEventListener(signalMetrics);
+    public SignalEventListener signalEventListener(SignalMetrics signalMetrics,
+                                                   MigooObservabilityProperties properties) {
+        MigooObservabilityProperties.Metrics metrics = properties.getMetrics();
+        return new SignalEventListener(signalMetrics, metrics.isAsync(), metrics.getAsyncQueueCapacity());
     }
 
 }

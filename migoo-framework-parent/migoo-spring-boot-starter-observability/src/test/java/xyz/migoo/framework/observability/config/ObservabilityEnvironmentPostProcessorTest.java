@@ -141,6 +141,45 @@ class ObservabilityEnvironmentPostProcessorTest {
         assertThat(environment.getProperty("logging.pattern.correlation")).isEqualTo("[%X{traceId:-}] ");
     }
 
+    // ==================== 结构化（JSON）日志 ====================
+
+    @Test
+    void structuredFormatWritesConsoleAndFile() {
+        StandardEnvironment environment = new StandardEnvironment();
+        userConfig(environment, "migoo.observability.logging.format", "logstash");
+
+        processor.postProcessEnvironment(environment, null);
+
+        // console 与 file 两个日志端点同时回写，MDC（traceId/spanId）由 Boot 内置格式自动携带
+        assertThat(environment.getProperty("logging.structured.format.console")).isEqualTo("logstash");
+        assertThat(environment.getProperty("logging.structured.format.file")).isEqualTo("logstash");
+    }
+
+    @Test
+    void keepsUserStructuredFormatConfig() {
+        StandardEnvironment environment = new StandardEnvironment();
+        userConfig(environment, "migoo.observability.logging.format", "ecs");
+        userConfig(environment, "logging.structured.format.console", "logstash");
+
+        processor.postProcessEnvironment(environment, null);
+
+        // 用户显式配置的官方键让位
+        assertThat(environment.getProperty("logging.structured.format.console")).isEqualTo("logstash");
+        // file 未配置，仍回写
+        assertThat(environment.getProperty("logging.structured.format.file")).isEqualTo("ecs");
+    }
+
+    @Test
+    void structuredFormatOffWritesNothing() {
+        StandardEnvironment environment = new StandardEnvironment();
+        userConfig(environment, "migoo.observability.logging.format", "off");
+
+        processor.postProcessEnvironment(environment, null);
+
+        assertThat(environment.getProperty("logging.structured.format.console")).isNull();
+        assertThat(environment.getProperty("logging.structured.format.file")).isNull();
+    }
+
     // ==================== 总开关 ====================
 
     @Test

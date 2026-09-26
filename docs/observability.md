@@ -129,7 +129,7 @@ migoo-spring-boot-starter-observability/
 | ③ | `observability.config.ObservabilityTraceConfiguration` | 注册上行实现 | `@ConditionalOnBean(Tracer.class)` + `@ConditionalOnMissingBean(TraceIdResolver.class)` + `tracing.enabled` |
 | ④ | `observability.config.ObservabilitySignalConfiguration` | 装配 `SignalMetrics` 与 `SignalEventListener` | `@ConditionalOnProperty(migoo.observability.metrics.enabled)` |
 | ④ | `observability.metrics.SignalMetrics` | 指标名常量 + 懒创建 `Counter`；单信号开关 + 异常只记日志 | 每信号一个开关（§7.1 `metrics.signals`） |
-| ④ | `observability.metrics.SignalEventListener` | 8 个 `@EventListener` 按事件类型分方法 → 计数 | 同上 |
+| ④ | `observability.metrics.SignalEventListener` | 8 个 `@EventListener` 按事件类型分方法 → 计数；可选异步（`metrics.async`，内置单线程池） | 同上 |
 | ⑤ | `observability.health.ObservabilityHealthConfiguration` | 装配 InfoContributor | `@ConditionalOnClass(InfoContributor.class)` |
 | ⑤ | `observability.health.MigooFrameworkInfoContributor` | `/actuator/info` 输出 `version`（资源过滤注入）与 `modules`（按标记类探测 classpath） | 同上 |
 | ⑤ | `observability.health.MqBacklogHealthIndicator`（可选，未实现） | 消费组 PEL 积压超阈值 → `OUT_OF_SERVICE` | mq 在 classpath |
@@ -197,7 +197,8 @@ observability: MicrometerTraceIdResolver implements TraceIdResolver（唯一实�
 - Boot 在 Micrometer Tracing 存在时**默认**输出关联 ID，格式 `[traceId-spanId]`（其 `LogCorrelationEnvironmentPostProcessor` 以后置默认源提供 `logging.expect-correlation-id = management.tracing.export.enabled`，默认 `true`）；
 - 自定义用 `logging.pattern.correlation`，例如带应用名：`${spring.application.name:}[%X{traceId:-}] `（尾随空格与 logger 名分隔）；`migoo.observability.logging.correlation-pattern` 即回写该键；
 - `migoo.observability.logging.correlation=false` 时环境后处理器回写 `logging.expect-correlation-id=false`（其属性源 `addFirst`，压过 Boot 后置的 `logCorrelation` 默认源，且仍让位于用户显式配置）；
-- logback 无需额外 appender；结构化日志（JSON）可再把 MDC 字段带入 encoder（后续可选项）。
+- **结构化（JSON）日志**：`migoo.observability.logging.format` 设为 `ecs` / `gelf` / `logstash`，环境后处理器回写 `logging.structured.format.console` 与 `.file`（用户已配置官方键则让位），默认 `off` 沿用纯文本。Boot 4.1 内置的三种 JSON 格式都会把 **MDC 的全部键值对**（含 `traceId` / `spanId`）写进 JSON，因此**无需再配 logback encoder**；需要对齐 ECS 命名时用 Boot 的 `logging.structured.json.rename.traceId=trace.id` 即可，不再依赖 MDC pattern；
+- logback 无需额外 appender（纯文本与 JSON 两种模式均开箱即用）。
 
 ### 5.5 传播与采样
 
@@ -273,6 +274,8 @@ Micrometer 名 → Prometheus 导出名（`_total`/单位后缀由注册表自�
 | `migoo.observability.metrics.prometheus-exposure` | `true` | 自动把 `health,info,prometheus` 加入 actuator web 端点暴露清单 |
 | `migoo.observability.metrics.common-tags` | `{}` | 全指标通用 tag |
 | `migoo.observability.metrics.signals.<指标名>` | 未设置=跟随上级 | 单信号开关，key 为 Micrometer 指标名（如 `migoo.ratelimit.rejected`），见 §6.3 |
+| `migoo.observability.metrics.async` | `false` | 信号计数异步化：投递到内置单线程守护线程池（有界队列，满则丢弃并告警，`destroy` 先排空队列）。默认同步——一次 Counter 写入的开销小于线程切换，见 §11 |
+| `migoo.observability.metrics.async-queue-capacity` | `8192` | 异步队列容量（`async=true` 时生效） |
 | `migoo.observability.tracing.enabled` | `true` | 桥接与 X-Trace-Id 兼容开关 |
 | `migoo.observability.tracing.sampling-probability` | 未设置 | 回写 `management.tracing.sampling.probability` |
 | `migoo.observability.tracing.otlp-endpoint` | 未设置 | 回写 `management.opentelemetry.tracing.export.otlp.endpoint`；含 `/v1/traces` 时推导 metrics/logs 端点，见 §5.6 |
@@ -280,6 +283,7 @@ Micrometer 名 → Prometheus 导出名（`_total`/单位后缀由注册表自�
 | `migoo.observability.tracing.propagate-x-trace-id` | `true` | 响应头回写 `X-Trace-Id`（由 web 的 `FilterConfiguration` 读取） |
 | `migoo.observability.logging.correlation` | `true` | 日志输出 traceId/spanId；为 `false` 时回写 `logging.expect-correlation-id=false` |
 | `migoo.observability.logging.correlation-pattern` | 未设置 | 回写 `logging.pattern.correlation` |
+| `migoo.observability.logging.format` | `off` | 结构化 JSON 日志：回写 `logging.structured.format.console` 与 `.file`，可选 `ecs` / `gelf` / `logstash`，MDC（traceId/spanId）自动带入，见 §5.4 |
 
 **回写规则**：`management.*` 与 `logging.*` 是 Spring Boot 官方最终事实，用户显式配置时**以用户为准**——`ObservabilityEnvironmentPostProcessor` 遍历属性源判断该键是否已被配置（application.yml、环境变量、命令行等），只对**未配置**的键写默认值；即使它自己的属性源 `addFirst`（需压过 Boot 后置的 `logCorrelation` 默认源），也不会覆盖任何用户配置。`migoo.observability.enabled=false` 时整个处理器不回写。
 
@@ -310,6 +314,7 @@ migoo:
       propagate-x-trace-id: true
     logging:
       correlation: true
+      format: logstash              # 结构化 JSON（可选 ecs/gelf/logstash），traceId/spanId 自动进 JSON
 
 management:
   endpoints:
@@ -398,12 +403,12 @@ scrape_configs:
 
 | 用例 | 断言 | 状态 |
 |------|------|------|
-| `MigooObservabilityPropertiesTest` | 三组子配置默认值、setter 绑定、每实例独立 | ✅ 3 用例 |
+| `MigooObservabilityPropertiesTest` | 三组子配置默认值（含 `async=false`、`async-queue-capacity=8192`、`format=off`）、setter 绑定、每实例独立 | ✅ 3 用例 |
 | ② `ObservabilityMetricsConfigurationTest` | 直接调 `@Bean` 方法：通用 tag 对新建指标生效；空 map 时无副作用（`@ConditionalOnMissingBean` 属自动配置条件，纯单测不覆盖） | ✅ 2 用例 |
-| ② `ObservabilityEnvironmentPostProcessorTest` | 未配置 → 补 `health,info,prometheus`；用户已配置 exposure/采样 → 不覆盖；`otlp-enabled` 三开关联动且显式配置的键让位；`otlp-endpoint` 推导 metrics/logs；`correlation=false` 压过 Boot `logCorrelation` 源；`enabled=false` 一概不写 | ✅ 11 用例 |
+| ② `ObservabilityEnvironmentPostProcessorTest` | 未配置 → 补 `health,info,prometheus`；用户已配置 exposure/采样 → 不覆盖；`otlp-enabled` 三开关联动且显式配置的键让位；`otlp-endpoint` 推导 metrics/logs；`correlation=false` 压过 Boot `logCorrelation` 源；`format` 回写 console+file 且官方键让位、`off` 不写；`enabled=false` 一概不写 | ✅ 14 用例 |
 | ③ `MicrometerTraceIdResolverTest` | mock `Tracer`/`TraceContext` 返回 traceId；无 span 返回 `null`；Tracer 抛异常不外抛（SPI 契约） | ✅ 3 用例 |
 | ③ `TraceIdFilterTest`（web 模块） | 取值顺序（MDC → resolver → 上游头 → UUID）、resolver 优先于 `X-Trace-Id`、不覆盖/不清理 tracing 写入的 MDC、响应头 = 最终 MDC 值、`propagate=false` 不回写、异常路径 finally 清理 | ✅ 10 用例 |
-| ④ `SignalEventListenerTest` | 逐一投喂 8 个事件 record，`SimpleMeterRegistry` 断言计数与 tag；同事件累加；`metrics.signals.<指标名>=false` 不计数且不影响其他信号；空值兜底 `unknown`；注册表故障不抛给发布方 | ✅ 5 用例 |
+| ④ `SignalEventListenerTest` | 逐一投喂 8 个事件 record，`SimpleMeterRegistry` 断言计数与 tag；同事件累加；`metrics.signals.<指标名>=false` 不计数且不影响其他信号；空值兜底 `unknown`；注册表故障不抛给发布方；**异步**：关闭时排空队列后计数可确定性断言、运行在 `migoo-observability-signal-*` 命名守护线程、故障与重复 `destroy` 幂等 | ✅ 8 用例 |
 | ④ 埋点单测（各组件） | `ArgumentCaptor`/`verify` 断言字段：限流（`RateLimitAspectTest` +2）、500（`GlobalExceptionHandlerTest` +1）、登录失败/锁定/撤销（`DefaultJwtAuthenticatorTest` +6）、MQ 失败/死信（`AbstractStreamMessageListenerTest`）、发送（`RedisMQTemplateTest` +3）；另覆盖**发布失败不改变业务行为** | ✅ |
 | ⑤ `MigooFrameworkInfoContributorTest` | `Info.Builder` 输出 `migoo.version`（非占位符）与 `modules`（按测试类路径探测到 common/observability、探测不到 web） | ✅ 1 用例 |
 
@@ -419,6 +424,7 @@ scrape_configs:
 - [x] 各 pom 版本号 `1.3.18` 全仓一致（硬编码，发版需全量替换）
 - [x] 新模块 pom 含 `name/description/url/licenses/scm/developers`（Central 发布必填）
 - [x] `mvn clean verify` 全绿后再打 tag
+- [x] **机器校验**：`scripts/check-publish-modules.sh` 比对四方清单（父 pom `<modules>` / BOM `dependencyManagement` / `publish-parent.yml` 的 `-pl` / `Publication Summary` 汇总行），`publish-parent.yml` 与 `publish-dependencies.yml` 发布前各执行一次，任一漏项即 fail；本地可随时 `bash scripts/check-publish-modules.sh`
 - [x] 本地构建注意：父 pom 把 `maven-gpg-plugin:sign` 绑在 `verify` 阶段，无 gpg 的机器用 `mvn clean verify -Dgpg.skip=true`（CI 发布流程照常签名）
 
 ## 11. 风险与取舍
@@ -430,9 +436,9 @@ scrape_configs:
 | `traceId` MDC 双写（Filter vs Tracing） | 日志 traceId 不确定 | ✅ ③ 不覆盖策略 + SPI 解耦依赖（`TraceIdFilterTest` 10 用例，含链路中补写场景） |
 | 采样率默认 0.1 | 排障时 90% 请求无 trace | 文档给 `sampling-probability: 1.0` 排障样例 |
 | tag 基数失控（URI/IP/username） | Prometheus 时序爆炸、内存涨 | §6.3 护栏 + 评审新指标必查 tags（`path` 取 `HandlerMapping` 最佳匹配模板，兜底 URI → `unknown`） |
-| 事件监听同步执行 | 发布点变慢/异常 | ✅ 发布点 try/catch、监听器（`SignalMetrics`）内部捕获，均有「发布失败不改业务行为」单测；确需异步再评估 `@Async` |
+| 事件监听同步执行 | 发布点变慢/异常 | ✅ 发布点 try/catch、监听器（`SignalMetrics`）内部捕获，均有「发布失败不改业务行为」单测；另提供 `metrics.async=true` 异步选项（内置单线程守护线程池 + 有界队列，满则丢弃告警、关闭时先排空，8 用例覆盖），默认同步——一次 Counter 写入开销小于线程切换 |
 | 事件契约进 common | common 语义从纯工具扩展为「工具 + 跨模块契约」 | 已在 §1 记录取舍；事件零 Spring 依赖，common 仍保持零 Spring 依赖 |
-| 新模块发布遗漏 | 用户引不到（websocket 教训） | §10 检查表，建议后续在 CI 加「模块数 vs 发布清单数」一致性校验 |
+| 新模块发布遗漏 | 用户引不到（websocket 教训） | ✅ §10 检查表 + `scripts/check-publish-modules.sh` 机器校验（两个发布 workflow 前置执行，三类漏项均有反向验证） |
 
 ## 12. 关联阅读
 

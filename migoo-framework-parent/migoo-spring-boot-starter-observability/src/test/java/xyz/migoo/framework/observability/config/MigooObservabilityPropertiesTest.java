@@ -25,6 +25,9 @@ class MigooObservabilityPropertiesTest {
         assertThat(metrics.isPrometheusExposure()).isTrue();
         assertThat(metrics.getCommonTags()).isEmpty();
         assertThat(metrics.getSignals()).isEmpty();
+        // 默认同步计数，队列容量给出兜底值
+        assertThat(metrics.isAsync()).isFalse();
+        assertThat(metrics.getAsyncQueueCapacity()).isEqualTo(8192);
 
         MigooObservabilityProperties.Tracing tracing = properties.getTracing();
         assertThat(tracing).isNotNull();
@@ -39,6 +42,8 @@ class MigooObservabilityPropertiesTest {
         assertThat(logging).isNotNull();
         assertThat(logging.isCorrelation()).isTrue();
         assertThat(logging.getCorrelationPattern()).isNull();
+        // 默认不启用结构化（JSON）日志，沿用 Boot 纯文本
+        assertThat(logging.getFormat()).isEqualTo(MigooObservabilityProperties.Format.OFF);
     }
 
     @Test
@@ -52,6 +57,8 @@ class MigooObservabilityPropertiesTest {
         metrics.setPrometheusExposure(false);
         metrics.setCommonTags(Map.of("application", "demo"));
         metrics.setSignals(Map.of("ratelimit.rejected", false));
+        metrics.setAsync(true);
+        metrics.setAsyncQueueCapacity(100);
 
         MigooObservabilityProperties.Tracing tracing = properties.getTracing();
         tracing.setEnabled(false);
@@ -63,12 +70,15 @@ class MigooObservabilityPropertiesTest {
         MigooObservabilityProperties.Logging logging = properties.getLogging();
         logging.setCorrelation(false);
         logging.setCorrelationPattern("[%X{traceId:-}] ");
+        logging.setFormat(MigooObservabilityProperties.Format.LOGSTASH);
 
         assertThat(properties.isEnabled()).isFalse();
         assertThat(metrics.isEnabled()).isFalse();
         assertThat(metrics.isPrometheusExposure()).isFalse();
         assertThat(metrics.getCommonTags()).containsEntry("application", "demo");
         assertThat(metrics.getSignals()).containsEntry("ratelimit.rejected", false);
+        assertThat(metrics.isAsync()).isTrue();
+        assertThat(metrics.getAsyncQueueCapacity()).isEqualTo(100);
         assertThat(tracing.isEnabled()).isFalse();
         assertThat(tracing.getSamplingProbability()).isEqualTo(1.0D);
         assertThat(tracing.getOtlpEndpoint()).isEqualTo("http://localhost:4318/v1/traces");
@@ -76,6 +86,7 @@ class MigooObservabilityPropertiesTest {
         assertThat(tracing.isPropagateXTraceId()).isFalse();
         assertThat(logging.isCorrelation()).isFalse();
         assertThat(logging.getCorrelationPattern()).isEqualTo("[%X{traceId:-}] ");
+        assertThat(logging.getFormat()).isEqualTo(MigooObservabilityProperties.Format.LOGSTASH);
     }
 
     @Test
