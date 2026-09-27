@@ -4,7 +4,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21+-orange)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-brightgreen)](https://spring.io/projects/spring-boot)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.xiaomisum/migoo)](https://central.sonatype.com/artifact/xyz.migoo.springboot/migoo-framework-dependencies)
+[![Maven Central](https://img.shields.io/maven-central/v/xyz.migoo.springboot/migoo-framework-dependencies)](https://central.sonatype.com/artifact/xyz.migoo.springboot/migoo-framework-dependencies)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## 特性
@@ -21,13 +21,12 @@
 ### 1. 引入 BOM
 
 ```xml
-
 <dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-framework-dependencies</artifactId>
-            <version>1.3.18</version>
+            <version>1.4.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -38,7 +37,6 @@
 ### 2. 按需引入组件
 
 ```xml
-
 <dependencies>
     <!-- 公共组件 -->
     <dependency>
@@ -93,9 +91,7 @@ public Result<UserVO> getUser(@AuthenticationPrincipal AuthUserDetails user) {
 }
 
 // Redis 缓存操作
-redisKit.
-
-set(UserRedisKey.TOKEN.getKeyDefine(),token,userId);
+redisKit.set(UserRedisKey.TOKEN.getKeyDefine(), token, userId);
 String cached = redisKit.get(UserRedisKey.TOKEN.getKeyDefine(), userId);
 ```
 
@@ -116,18 +112,39 @@ String cached = redisKit.get(UserRedisKey.TOKEN.getKeyDefine(), userId);
 ## 项目结构
 
 ```
-migoo-framework-parent/
-├── migoo-framework-dependencies      # BOM 统一版本管理
-├── migoo-spring-boot-starter-common  # 公共组件
-├── migoo-spring-boot-starter-web     # Web 组件
-├── migoo-spring-boot-starter-security# 安全组件
-├── migoo-spring-boot-starter-mybatis # MyBatis 组件
-├── migoo-spring-boot-starter-redis   # Redis 组件
-├── migoo-spring-boot-starter-mq      # MQ 组件
-├── migoo-spring-boot-starter-websocket # WebSocket 组件
-├── migoo-spring-boot-starter-springdoc # 文档组件
-└── migoo-spring-boot-starter-observability # 可观测性组件
+springboot-migoo-framework/
+├── pom.xml                          # 根聚合 pom
+├── migoo-framework-dependencies/    # BOM 统一版本管理
+├── migoo-framework-parent/          # 父 pom + 各 starter
+│   ├── migoo-spring-boot-starter-common          # 公共组件
+│   ├── migoo-spring-boot-starter-web             # Web 组件
+│   ├── migoo-spring-boot-starter-security        # 安全组件
+│   ├── migoo-spring-boot-starter-mybatis         # MyBatis 组件
+│   ├── migoo-spring-boot-starter-redis           # Redis 组件
+│   ├── migoo-spring-boot-starter-mq              # MQ 组件
+│   ├── migoo-spring-boot-starter-websocket       # WebSocket 组件
+│   ├── migoo-spring-boot-starter-springdoc       # 接口文档组件
+│   └── migoo-spring-boot-starter-observability   # 可观测性组件
+├── examples/                        # 示例工程（最小可用 Web / CORS 四档 / 安全登录）
+├── docs/                            # 组件文档
+├── scripts/                         # 发布清单一致性、聚合覆盖率门禁脚本
+├── .github/workflows/               # CI / 发布 / CodeQL / OWASP / API 兼容性
+├── CHANGELOG.md                     # 版本变更日志（BREAKING 标注）
+└── readme.md
 ```
+
+## 质量门禁
+
+| 门禁 | 位置 | 说明 |
+|------|------|------|
+| 构建 + 测试 | `.github/workflows/ci.yml` | `mvn clean verify`（含 JaCoCo 单模块行/分支 ≥50%）+ 聚合行覆盖 ≥75% |
+| 清单/版本一致性 | `scripts/check-publish-modules.sh` | 父 pom/BOM/发布清单四方对齐 + 版本号全仓一致 + CHANGELOG 条目 |
+| 静态分析 | `.github/workflows/codeql.yml` | CodeQL Java 语义分析（push/PR/每周） |
+| 依赖漏洞 | `.github/workflows/dependency-check.yml` | OWASP dependency-check，CVSS ≥7 失败（每月+手动） |
+| API 兼容性 | `.github/workflows/api-compat.yml` | japicmp 对比上一发布版，报告归档 |
+| 依赖升级 | `.github/dependabot.yml` | Maven + Actions 每周 |
+
+详见 [CHANGELOG](CHANGELOG.md) 与 [贡献指南](CONTRIBUTING.md)。
 
 ## 许可证
 

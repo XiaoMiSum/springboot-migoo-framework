@@ -1,6 +1,7 @@
 package xyz.migoo.framework.web.config;
 
 import org.junit.jupiter.api.Test;
+import xyz.migoo.framework.web.core.cors.CorsMode;
 
 import java.util.List;
 
@@ -20,10 +21,13 @@ class MigooWebPropertiesTest {
 
         assertThat(cors).isNotNull();
         assertThat(cors.isEnabled()).isTrue();
-        assertThat(cors.getAllowedOrigins()).containsExactly("*");
+        // 安全默认：STRICT 模式 + 空来源列表 + 不携带凭证
+        assertThat(cors.getMode()).isEqualTo(CorsMode.STRICT);
+        assertThat(cors.getAllowedOrigins()).isEmpty();
+        assertThat(cors.getAllowedOriginPatterns()).isEmpty();
         assertThat(cors.getAllowedMethods()).containsExactly("*");
         assertThat(cors.getAllowedHeaders()).containsExactly("*");
-        assertThat(cors.isAllowCredentials()).isTrue();
+        assertThat(cors.isAllowCredentials()).isFalse();
         assertThat(cors.getMaxAge()).isEqualTo(1800L);
     }
 

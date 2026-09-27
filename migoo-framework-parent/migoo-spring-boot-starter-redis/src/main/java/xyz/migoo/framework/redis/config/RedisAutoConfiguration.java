@@ -1,10 +1,11 @@
 package xyz.migoo.framework.redis.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,17 +16,19 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @author xiaomi
  * Created on 2021/11/21 14:05
  */
-@Configuration
+@AutoConfiguration(before = DataRedisAutoConfiguration.class)
 @Slf4j
-@AutoConfigureBefore(DataRedisAutoConfiguration.class)
 public class RedisAutoConfiguration {
 
 
     /**
      * 创建 RedisTemplate Bean，使用 JSON 序列化方式
+     * <p>
+     * 应用自定义 {@code redisTemplate} Bean 时本默认值不生效（按 Bean 名称回退）
      */
     @Bean
     @Primary
+    @ConditionalOnMissingBean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         // 创建 RedisTemplate 对象
         var template = new RedisTemplate<String, Object>();

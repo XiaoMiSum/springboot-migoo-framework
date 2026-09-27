@@ -1,6 +1,6 @@
 package xyz.migoo.framework.mq.config;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,7 +31,7 @@ import java.util.List;
  * @author xiaomi
  * @see MqBacklogHealthIndicator
  */
-@AutoConfigureAfter(MQAutoConfiguration.class)
+@AutoConfiguration(after = MQAutoConfiguration.class)
 @EnableConfigurationProperties(MQProperties.class)
 @ConditionalOnClass(name = "org.springframework.boot.health.contributor.HealthIndicator")
 @ConditionalOnBean(AbstractStreamMessageListener.class)

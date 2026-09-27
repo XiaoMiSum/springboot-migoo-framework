@@ -5,7 +5,7 @@
     <parent>
         <artifactId>migoo-framework-parent</artifactId>
         <groupId>xyz.migoo.springboot</groupId>
-        <version>1.3.18</version>
+        <version>1.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>migoo-spring-boot-starter-mybatis</artifactId>
@@ -50,10 +50,10 @@
             <artifactId>uuid-creator</artifactId>
         </dependency>
 
+        <!-- 必须传递给使用方（分页 PageParam/PageResult、StringUtils 等硬引用） -->
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-common</artifactId>
-            <optional>true</optional>
             <type>jar</type>
         </dependency>
 
@@ -62,12 +62,6 @@
             <artifactId>jsqlparser</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>xyz.migoo.springboot</groupId>
-            <artifactId>migoo-spring-boot-starter-web</artifactId>
-            <scope>provided</scope>
-            <type>jar</type>
-        </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -97,6 +91,11 @@
         </dependency>
 
         <!-- ========== 单元测试 ========== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

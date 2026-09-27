@@ -46,13 +46,13 @@ const socket = new WebSocket('ws://localhost:8080/ws?token=your-jwt-token');
     <artifactId>migoo-spring-boot-starter-websocket</artifactId>
 </dependency>
 
-<!-- security 模块（可选，用于 token 验证） -->
+<!-- security 模块（websocket 传递引入，握手 token 验证必需；显式声明可省略） -->
 <dependency>
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-spring-boot-starter-security</artifactId>
 </dependency>
 
-<!-- redis 模块（可选，用于分布式 WebSocket） -->
+<!-- redis 模块（可选，仅分布式 WebSocket 需要，见下） -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -505,7 +505,7 @@ client.sendBinary(binaryData);
 | `LocalWebSocketSessionManager` | 单机会话管理器 | `distributed=false`（默认） |
 | `DistributedWebSocketSessionManager` | 分布式会话管理器 | `distributed=true` + Redis 在 classpath |
 | `MiGooWebSocketHandler` | 消息处理器 | `migoo.websocket.enabled=true` |
-| `WebSocketAuthInterceptor` | Token 认证拦截器 | security 模块存在 |
+| `WebSocketAuthInterceptor` | Token 认证拦截器 | security 在 classpath 且应用已实现 `UserDetailsBridge` |
 | `WebSocketConfigurer` | WebSocket 配置（支持多端点） | `migoo.websocket.enabled=true` |
 
 ## 功能特性

@@ -438,11 +438,12 @@ scrape_configs:
 - [x] `.github/workflows/publish-parent.yml` → `Publish Sub-modules Only` 的 `-pl`（80 行）与 `Publication Summary`（92 行）
 - [x] `readme.md` → 组件文档表格、项目结构树
 - [x] `docs/index.md` → 组件表格、按需引入示例
-- [x] 各 pom 版本号 `1.3.18` 全仓一致（硬编码，发版需全量替换）
+- [x] 各 pom 版本号 `1.4.0` 全仓一致（硬编码，发版需全量替换；**已由脚本机器校验**：全仓字面 `<version>`、BOM/父 pom 的 `migoo.framework.version` 属性、`CHANGELOG.md` 条目三方对齐，另 `japicmp.old.version` 发版时需同步更新）
 - [x] 新模块 pom 含 `name/description/url/licenses/scm/developers`（Central 发布必填）
 - [x] `mvn clean verify` 全绿后再打 tag
 - [x] **机器校验**：`scripts/check-publish-modules.sh` 比对四方清单（父 pom `<modules>` / BOM `dependencyManagement` / `publish-parent.yml` 的 `-pl` / `Publication Summary` 汇总行），`publish-parent.yml` 与 `publish-dependencies.yml` 发布前各执行一次，任一漏项即 fail；本地可随时 `bash scripts/check-publish-modules.sh`
-- [x] **PR/push 门禁**：`.github/workflows/ci.yml` 在 push（master/main）与全部 PR 上执行「清单校验 + `mvn clean verify -Dgpg.skip=true`」（gpg 绑在 verify、CI 无密钥故跳过签名），同 ref 新提交自动取消旧构建——补齐评估 P0#3「无门禁则测试形同虚设」
+- [x] **PR/push 门禁**：`.github/workflows/ci.yml` 在 push（master/main）与全部 PR 上执行「清单/版本一致性校验 + `mvn clean verify -Dgpg.skip=true` + 聚合覆盖率门禁」（gpg 绑在 verify、CI 无密钥故跳过签名；verify 阶段含 JaCoCo 单模块行/分支 ≥50% 卡点，`scripts/check-coverage.sh` 再卡全仓行覆盖 ≥75%），同 ref 新提交自动取消旧构建——补齐评估 P0#3「无门禁则测试形同虚设」
+- [x] **专项门禁**：CodeQL（语义分析，push/PR/每周）、OWASP dependency-check（每月+手动，CVSS ≥7 失败）、japicmp API 兼容性报告（`-Pjapicmp`，输出到 `target/japicmp/`）、Dependabot（Maven + Actions 每周）
 - [x] 本地构建注意：父 pom 把 `maven-gpg-plugin:sign` 绑在 `verify` 阶段，无 gpg 的机器用 `mvn clean verify -Dgpg.skip=true`（CI 发布流程照常签名）
 
 ## 11. 风险与取舍

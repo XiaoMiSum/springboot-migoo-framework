@@ -1,11 +1,12 @@
 package xyz.migoo.framework.security.config;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,6 +27,7 @@ import xyz.migoo.framework.security.core.handler.AuthenticationEntryPointImpl;
 import xyz.migoo.framework.security.core.handler.LogoutSuccessHandlerImpl;
 import xyz.migoo.framework.security.core.interceptor.TotpInterceptor;
 import xyz.migoo.framework.security.core.lockout.*;
+import xyz.migoo.framework.security.utils.PasswordUtils;
 import xyz.migoo.framework.web.core.handler.GlobalExceptionHandler;
 import xyz.migoo.framework.web.core.store.StateStore;
 import xyz.migoo.framework.web.i18n.I18NMessage;
@@ -39,8 +41,9 @@ import org.springframework.beans.factory.ObjectProvider;
  *
  * @author xiaomi
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(SecurityProperties.class)
+@ImportRuntimeHints(SecurityRuntimeHints.class)
 public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
 
     /**
@@ -105,8 +108,20 @@ public class MiGooSecurityAutoConfiguration implements WebMvcConfigurer {
      * @see <a href="http://stackabuse.com/password-encoding-with-spring-security/">Password Encoding with Spring Security</a>
      */
     @Bean
+    @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 密码工具 Bean（静态方法入口的初始化点）
+     * <p>
+     * 框架不启用组件扫描，{@code PasswordUtils} 由此注册并注入编码器
+     */
+    @Bean
+    @ConditionalOnMissingBean(PasswordUtils.class)
+    public PasswordUtils passwordUtils(PasswordEncoder passwordEncoder) {
+        return new PasswordUtils(passwordEncoder);
     }
 
     /**

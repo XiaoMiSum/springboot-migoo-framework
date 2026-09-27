@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>xyz.migoo.examples</groupId>
+    <artifactId>migoo-examples</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>migoo-examples</name>
+    <description>migoo-framework 示例工程（独立于主 reactor，不参与发布）</description>
+
+    <!--
+        示例工程独立于主构建：
+        1. 不在根 pom 的 <modules> 中，主构建 / 发布流程完全不受影响
+        2. 运行前需先在仓库根执行 mvn install -DskipTests 装载框架构件到本地仓库
+           （或等待 1.4.0 发布到 Maven Central）
+    -->
+    <modules>
+        <module>example-web</module>
+        <module>example-security</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Spring MVC 参数名解析（@RequestParam 省略 name、@AuthenticationPrincipal 等）依赖 -parameters -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>4.1.0</spring.boot.version>
+        <!-- 框架版本：与仓库发布版保持一致 -->
+        <migoo.framework.version>1.4.0</migoo.framework.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 引入框架 BOM（内含 spring-boot-dependencies，测试依赖版本由此管理） -->
+            <dependency>
+                <groupId>xyz.migoo.springboot</groupId>
+                <artifactId>migoo-framework-dependencies</artifactId>
+                <version>${migoo.framework.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

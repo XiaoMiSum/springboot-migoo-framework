@@ -5,7 +5,7 @@
     <parent>
         <artifactId>migoo-framework-parent</artifactId>
         <groupId>xyz.migoo.springboot</groupId>
-        <version>1.3.18</version>
+        <version>1.4.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -53,11 +53,11 @@
             <type>jar</type>
         </dependency>
 
-        <!-- Web 相关 -->
+        <!-- Web 相关：必须传递给使用方（security 硬引用 web 的 GlobalExceptionHandler/StateStore/
+             ServletUtils/I18NMessage，optional 会导致 NoClassDefFoundError） -->
         <dependency>
             <groupId>xyz.migoo.springboot</groupId>
             <artifactId>migoo-spring-boot-starter-web</artifactId>
-            <optional>true</optional>
             <type>jar</type>
         </dependency>
         <!-- spring boot 配置所需依赖 -->
@@ -92,6 +92,11 @@
         </dependency>
 
         <!-- 测试相关，版本由 spring-boot-dependencies BOM 管理 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

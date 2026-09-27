@@ -8,6 +8,8 @@
 #   1. 父 pom <modules>  ↔  publish-parent.yml 的 mvn deploy -pl 清单（双向）
 #   2. 父 pom <modules>  ↔  BOM migoo-framework-dependencies 的 dependencyManagement（双向）
 #   3. publish-parent.yml 的「📦 Modules:」汇总行是否逐个列出所有模块（短名或全名）
+#   4. 全仓 pom 字面版本号 / migoo.framework.version 属性 / CHANGELOG.md 条目三方一致
+#      （examples/ 示例工程独立版本 1.0.0-SNAPSHOT，不参与发布版本校验）
 #
 # 用法（本地或 CI）：bash scripts/check-publish-modules.sh
 #
@@ -106,10 +108,46 @@ else
     done < "$work_dir/modules"
 fi
 
+# 5) 版本号一致性：发布范围（除 examples/）的 pom 字面 <version> / migoo.framework.version 属性 / CHANGELOG 必须同一版本
+#    背景：版本号在全仓硬编码，漏改任一处会导致用户引到 404 或父子 pom 解析失败
+root_version=$(grep -oE '<version>[^$<]+</version>' "$ROOT/pom.xml" | head -n 1 | sed -E 's|.*<version>([^<]+)</version>.*|\1|')
+
+if [ -z "$root_version" ]; then
+    fail "根 pom.xml 未解析到版本号"
+else
+    echo "基准版本: $root_version"
+
+    while IFS= read -r pom; do
+        while IFS= read -r v; do
+            if [ "$v" != "$root_version" ]; then
+                fail "版本号不一致: $pom 中为 ${v}（根 pom 为 ${root_version}）"
+            fi
+        done < <(grep -oE '<version>[^$<]+</version>' "$pom" | sed -E 's|.*<version>([^<]+)</version>.*|\1|')
+    done < <(find "$ROOT" -name pom.xml -not -path '*/target/*' -not -path "$ROOT/examples/*" | sort)
+
+    # BOM / 父 pom 的 migoo.framework.version 属性
+    for pom in "$BOM_POM" "$PARENT_POM"; do
+        prop=$(grep -oE '<migoo\.framework\.version>[^<]+</migoo\.framework\.version>' "$pom" \
+            | sed -E 's|.*>([^<]+)<.*|\1|' || true)
+        if [ -z "$prop" ]; then
+            fail "$pom 未声明 migoo.framework.version 属性"
+        elif [ "$prop" != "$root_version" ]; then
+            fail "$pom 的 migoo.framework.version=${prop}，与根 pom $root_version 不一致"
+        fi
+    done
+
+    # CHANGELOG 必须有当前版本条目（否则本次发布变更无处可查）
+    if [ ! -f "$ROOT/CHANGELOG.md" ]; then
+        fail "缺少 CHANGELOG.md（发布需记录变更）"
+    elif ! grep -qE "^#+ *.*$root_version" "$ROOT/CHANGELOG.md"; then
+        fail "CHANGELOG.md 未包含当前版本 $root_version 的条目"
+    fi
+fi
+
 if [ "$FAILED" -ne 0 ]; then
     echo ""
     echo "❌ 模块清单一致性校验失败，请同步更新父 pom、BOM 与 .github/workflows/publish-parent.yml"
     exit 1
 fi
 
-echo "🎉 模块数与发布清单数一致（父 pom / BOM / 发布 -pl / Summary 四方对齐）"
+echo "🎉 模块数与发布清单数一致（父 pom / BOM / 发布 -pl / Summary 四方对齐），版本号全仓一致（${root_version}）"

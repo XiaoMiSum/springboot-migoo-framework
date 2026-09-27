@@ -2,6 +2,7 @@ package xyz.migoo.framework.web.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import xyz.migoo.framework.web.core.cors.CorsMode;
 
 import java.util.List;
 
@@ -59,9 +60,26 @@ public class MigooWebProperties {
         private boolean enabled = true;
 
         /**
-         * 允许的来源（支持 * 通配符）
+         * 来源限制模式（见 {@code xyz.migoo.framework.web.core.cors.CorsMode}）
+         * <p>
+         * STRICT（默认）= 仅放行下方列表中列出的来源，列表为空则不放行任何跨域；
+         * OPEN = 放行所有来源但强制关闭凭证（Token 型开放平台 API 适用）；
+         * PATTERN = 按 {@link #allowedOriginPatterns} 模式匹配（自有子域名生态适用）；
+         * DYNAMIC = 交由应用注册的 CorsOriginPredicate Bean 逐请求判定（动态域名开放平台适用）
          */
-        private List<String> allowedOrigins = List.of("*");
+        private CorsMode mode = CorsMode.STRICT;
+
+        /**
+         * 允许的精确来源列表（STRICT 模式），如 {@code https://admin.example.com}
+         * <p>
+         * 默认为空 = 不放行任何跨域来源（安全默认）
+         */
+        private List<String> allowedOrigins = List.of();
+
+        /**
+         * 允许的来源模式列表（PATTERN 模式），如 {@code https://*.example.com}
+         */
+        private List<String> allowedOriginPatterns = List.of();
 
         /**
          * 允许的请求方法
@@ -74,9 +92,11 @@ public class MigooWebProperties {
         private List<String> allowedHeaders = List.of("*");
 
         /**
-         * 是否允许携带凭证
+         * 是否允许携带凭证（Cookie/HTTP 认证）
+         * <p>
+         * 默认关闭。开启时禁止来源为 {@code *} 或 {@code *} 模式（规范不允许，启动时校验拦截）
          */
-        private boolean allowCredentials = true;
+        private boolean allowCredentials = false;
 
         /**
          * 预检请求的最大缓存时间（秒）

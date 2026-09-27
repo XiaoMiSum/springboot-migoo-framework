@@ -51,7 +51,7 @@ migoo:
   security:
     # 安全模式: jwt 或 oauth2
     mode: jwt
-    # 登出 URL
+    # 登出 URL（默认 /logout）
     logout-url: /auth/logout
     # 免认证 URL
     permit-all-urls:
@@ -62,6 +62,8 @@ migoo:
     # ========== JWT 模式配置 ==========
     jwt:
       # JWT 签名密钥（HMAC-SHA256，必填）
+      # ⚠️ 启动期熵校验：至少 32 字节，否则启动失败（fail-fast）
+      #    生成建议：openssl rand -base64 48
       secret-key: your-jwt-secret-key
       # Token 请求头（默认 Authorization）
       header-name: Authorization
@@ -284,6 +286,31 @@ String userId = SecurityFrameworkUtils.getLoginUserId();
 @PreAuthorize("hasRole('ADMIN')")
 @Secured("ROLE_ADMIN")
 ```
+
+#### 5. 密码编码（PasswordEncoder / PasswordUtils）
+
+```yaml
+# 框架默认注册 BCryptPasswordEncoder（@ConditionalOnMissingBean）
+# 应用需要 Argon2/scrypt 等算法时，自行注册 PasswordEncoder Bean 即可覆盖
+```
+
+```java
+// 应用自定义编码器（覆盖框架默认值）
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new Argon2PasswordEncoder();
+}
+```
+
+```java
+// PasswordUtils 由 MiGooSecurityAutoConfiguration 注册（1.4.0 起不再是 @Component），
+// 自动注入应用侧的 PasswordEncoder，编码/校验使用同一算法
+String encoded = PasswordUtils.encode("raw-password");
+boolean ok = PasswordUtils.matches("raw-password", encoded);
+```
+
+> 1.4.0 变更：`PasswordUtils` 从 `@Component` 改为自动配置注册 —— 框架不启用组件扫描，
+> 依赖扫描注册的用法需要改为注入容器中的 `PasswordUtils` Bean（或直接注入 `PasswordEncoder`）。
 
 ---
 

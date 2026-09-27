@@ -2,7 +2,7 @@ package xyz.migoo.framework.mq.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +36,7 @@ import java.util.List;
  * <p>
  * 支持 Redis Pub/Sub（广播模式）和 Redis Stream（集群消费模式）
  */
-@AutoConfigureAfter(RedisAutoConfiguration.class)
+@AutoConfiguration(after = RedisAutoConfiguration.class)
 @EnableConfigurationProperties(MQProperties.class)
 @Slf4j
 public class MQAutoConfiguration {

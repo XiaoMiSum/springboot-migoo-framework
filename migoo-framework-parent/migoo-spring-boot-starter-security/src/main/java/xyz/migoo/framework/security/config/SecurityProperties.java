@@ -28,9 +28,11 @@ public class SecurityProperties {
 
     /**
      * 登出url
+     * <p>
+     * 默认 /logout，保证文档中的最小配置可直接启动
      */
     @NotEmpty(message = "logout-url 登出url地址不能为空")
-    private String logoutUrl;
+    private String logoutUrl = "/logout";
 
     /**
      * 用户可以任意访问的url
@@ -76,6 +78,11 @@ public class SecurityProperties {
         if (mode == SecurityMode.JWT) {
             if (jwt.getSecretKey() == null || jwt.getSecretKey().isBlank()) {
                 throw new IllegalStateException("JWT 模式下 migoo.security.jwt.secret-key 不能为空");
+            }
+            // HS256 密钥熵校验：低于 32 字节的 HMAC 密钥易被暴力破解
+            if (jwt.getSecretKey().getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 32) {
+                throw new IllegalStateException("migoo.security.jwt.secret-key 长度不足：HS256 要求至少 32 字节，"
+                        + "建议使用 `openssl rand -base64 48` 生成随机密钥");
             }
         }
         if (mode == SecurityMode.OAUTH2) {

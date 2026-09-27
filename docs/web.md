@@ -11,7 +11,7 @@ Web 组件，提供全局异常处理、统一响应封装、TraceId 注入、i1
 | 步骤 | 说明 |
 |------|------|
 | 1. 引入依赖 | 添加 `migoo-spring-boot-starter-web` |
-| 2. 零配置生效 | 全局异常处理、TraceId、CORS、请求体缓存自动生效 |
+| 2. 零配置生效 | 全局异常处理、TraceId、请求体缓存自动生效；CORS 过滤器注册但默认不放行任何跨域（安全默认，见 §6） |
 | 3. 定义错误码 | 创建 `ErrorCode` 常量，业务异常抛出 `ServiceException` |
 | 4. 返回 Result | Controller 返回 `Result.ok(data)` 统一响应格式 |
 
@@ -122,23 +122,59 @@ migoo:
       max-size: 10485760  # 最大缓存大小（字节），默认 10MB
 ```
 
-### 6. CORS 跨域配置
+### 6. CORS 跨域配置（四档模式）
 
-默认允许所有来源。可通过配置自定义：
+**安全默认**：`mode=strict` 且允许来源为空 = **不放行任何跨域来源**；跨域能力必须按场景显式选择模式。
+CORS 只做**来源准入**，不做身份认证（登录态校验由 security 组件负责，两者边界不混用）。
+
+| 模式 | 适用场景 | 需要的配置 |
+|------|----------|-----------|
+| `strict`（默认） | 固定域名的后台/前台 | `allowed-origins` 或 `allowed-origin-patterns` 精确白名单，为空则禁止跨域 |
+| `open` | Token 型开放平台 API（无凭证） | 无需来源配置；强制 `allow-credentials=false` |
+| `pattern` | 自有子域名生态 | `allowed-origin-patterns`，如 `https://*.example.com` |
+| `dynamic` | 动态域名开放平台（域名不可枚举） | 应用注册一个 `CorsOriginPredicate` Bean 逐请求判定 |
 
 ```yaml
 migoo:
   web:
     cors:
-      enabled: true                      # 是否开启，默认 true
-      allowed-origins:                   # 允许的来源，默认 ["*"]
-        - https://example.com
+      enabled: true                        # 是否装配 CORS 过滤器，默认 true
+      mode: strict                         # strict | open | pattern | dynamic，默认 strict
+      allowed-origins:                     # strict 模式：精确来源白名单，默认 []（= 禁止跨域）
         - https://admin.example.com
-      allowed-methods: ["GET", "POST"]   # 允许的 HTTP 方法，默认 ["*"]
-      allowed-headers: ["*"]             # 允许的请求头，默认 ["*"]
-      allow-credentials: true            # 是否允许携带凭证，默认 true
-      max-age: 1800                      # 预检请求缓存时间（秒），默认 1800
+      allowed-origin-patterns:             # pattern 模式：来源模式，如 https://*.example.com
+        - https://*.example.com
+      allowed-methods: ["GET", "POST"]     # 默认 ["*"]
+      allowed-headers: ["*"]               # 默认 ["*"]
+      allow-credentials: false             # 是否携带凭证（Cookie），默认 false
+      max-age: 1800                        # 预检缓存时间（秒），默认 1800
 ```
+
+`dynamic` 模式示例（动态域名开放平台，一次接入后新域名由应用注册表决定）：
+
+```java
+// 应用注册来源准入谓词：查询开放平台注册表判定该域名是否已登记
+@Bean
+public CorsOriginPredicate tenantOriginPredicate(TenantRepository tenants) {
+    return origin -> tenants.existsByOrigin(origin);
+}
+```
+
+```yaml
+migoo:
+  web:
+    cors:
+      mode: dynamic
+      allow-credentials: true   # Cookie 场景；具体放行域名完全由谓词决定
+```
+
+**启动期校验（非法配置 fail-fast，拒绝带病上线）**：
+
+- `allowed-origins` / `allowed-origin-patterns` 含 `*` 且 `allow-credentials=true` → 启动失败
+  （规范禁止该组合，等价于向任意站点开放携带凭证的跨域）
+- `mode=pattern` 但未配置 `allowed-origin-patterns` → 启动失败
+- `mode=dynamic` 但容器中没有 `CorsOriginPredicate` Bean → 启动失败
+- `mode=open` + `allow-credentials=true` → 启动失败（Cookie 场景请改用 `dynamic`）
 
 ### 7. 接口限流（@RateLimit）
 
@@ -231,7 +267,7 @@ public Result<?> submit(@RequestBody ReqBody req) { ... }
 | `GlobalExceptionHandler` | 全局异常处理 | Servlet Web 环境 |
 | `ResponseBodyStorageAdvice` | Result 存入 RequestAttribute | Servlet Web 环境 |
 | `ResponseBodyI18nAdvice` | 响应体 i18n 消息解析 | Servlet Web 环境 |
-| `CorsFilter` | CORS 过滤 | `migoo.web.cors.enabled=true` |
+| `CorsFilter` | CORS 过滤（四档模式，见 §6；默认 STRICT 空来源 = 已注册但不放行跨域） | `migoo.web.cors.enabled=true` |
 | `CacheRequestBodyFilter` | 请求体缓存 | `migoo.web.cache-body.enabled=true` |
 | `RateLimitAspect` | `@RateLimit` 注解限流切面 | `migoo.web.rate-limit.enabled=true`（默认开启） |
 | `IdempotentAspect` | `@Idempotent` 注解幂等切面（防重复提交） | `migoo.web.idempotent.enabled=true`（默认开启） |
@@ -248,12 +284,14 @@ public Result<?> submit(@RequestBody ReqBody req) { ... }
 # Web 模块完整配置
 migoo:
   web:
-    cors:                                 # CORS 跨域
+    cors:                                 # CORS 跨域（四档模式，见 §6）
       enabled: true
-      allowed-origins: ["*"]
+      mode: strict                        # strict | open | pattern | dynamic
+      allowed-origins: []                 # strict 白名单，默认空 = 不放行跨域
+      allowed-origin-patterns: []         # pattern 模式来源模式
       allowed-methods: ["*"]
       allowed-headers: ["*"]
-      allow-credentials: true
+      allow-credentials: false            # 默认关闭；开启时禁止 * 来源
       max-age: 1800
     cache-body:                           # 请求体缓存
       enabled: true

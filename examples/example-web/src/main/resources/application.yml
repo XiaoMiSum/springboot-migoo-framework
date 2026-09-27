@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: example-web
+
+migoo:
+  web:
+    cors:
+      # ===== CORS 四档来源限制模式（只做来源限制，不做鉴权）=====
+      # strict  : 默认。显式白名单，逐条枚举 allowed-origins（后台管理端等固定域名场景）
+      # open     : 不限制来源（Token 开放平台场景，跨域域名不可枚举且无凭证）
+      # pattern  : Ant 风格通配（如 https://*.example.com），需配置 allowed-origin-patterns
+      # dynamic  : 逐请求回调 CorsOriginPredicate Bean（见 DynamicCorsPredicateConfig）
+      mode: strict
+      allowed-origins:
+        - http://localhost:3000
+      # allow-credentials: true     # 需要 Cookie/Authorization 凭证时开启；禁止与 * 来源共用（启动即 fail-fast）
+      # allowed-methods: [GET, POST, PUT, DELETE, OPTIONS]
+      # allowed-headers: ["*"]
+      # max-age: 1800
+
+      # ===== pattern 模式示例（mode 改为 pattern 后生效）=====
+      # allowed-origin-patterns:
+      #   - https://*.example.com
+
+      # ===== dynamic 模式示例（mode 改为 dynamic 后生效，谓词见 DynamicCorsPredicateConfig）=====

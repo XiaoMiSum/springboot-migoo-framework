@@ -9,8 +9,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import xyz.migoo.framework.mybatis.core.handler.DefaultFieldHandler;
 import xyz.migoo.framework.mybatis.core.handler.UTCLocalDateTimeHandler;
 import xyz.migoo.framework.mybatis.core.handler.UUIDTypeHandler;
@@ -22,12 +23,13 @@ import java.util.UUID;
  * @author xiaomi
  * Created on 2021/11/23 20:19
  */
-@Configuration
 @AutoConfiguration(before = MybatisPlusAutoConfiguration.class)
 @MapperScan(value = {"xyz.migoo.framework.**"}, annotationClass = Mapper.class, lazyInitialization = "${mybatis.lazy-initialization:false}")
+@ImportRuntimeHints(MybatisRuntimeHints.class)
 public class MybatisAutoConfiguration {
 
     @Bean
+    @ConditionalOnMissingBean(MybatisPlusInterceptor.class)
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         // 分页插件
@@ -36,6 +38,7 @@ public class MybatisAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(ConfigurationCustomizer.class)
     public ConfigurationCustomizer mybatisConfigurationCustomizer() {
         return configuration -> {
             TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
@@ -49,6 +52,7 @@ public class MybatisAutoConfiguration {
 
 
     @Bean
+    @ConditionalOnMissingBean(MetaObjectHandler.class)
     public MetaObjectHandler defaultMetaObjectHandler() {
         // 自动填充参数类
         return new DefaultFieldHandler();

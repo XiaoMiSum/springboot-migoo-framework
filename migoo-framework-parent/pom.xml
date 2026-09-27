@@ -6,7 +6,7 @@
 
     <groupId>xyz.migoo.springboot</groupId>
     <artifactId>migoo-framework-parent</artifactId>
-    <version>1.3.18</version>
+    <version>1.4.0</version>
 
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -48,7 +48,7 @@
     </modules>
 
     <properties>
-        <migoo.framework.version>1.3.18</migoo.framework.version>
+        <migoo.framework.version>1.4.0</migoo.framework.version>
         <!-- Maven 相关 -->
         <clean.version>3.4.0</clean.version>
         <compiler.version>3.13.0</compiler.version>
@@ -56,6 +56,10 @@
         <javadoc.version>3.11.2</javadoc.version>
         <source.version>3.3.1</source.version>
         <surefire.version>3.5.2</surefire.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <japicmp.version>0.26.2</japicmp.version>
+        <!-- japicmp 对比基线：上一发布版本（每次发版需同步更新，见 scripts/check-publish-modules.sh 校验） -->
+        <japicmp.old.version>1.3.18</japicmp.old.version>
         <gpg-plugin.version>3.2.7</gpg-plugin.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
@@ -104,6 +108,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire.version}</version>
+                </plugin>
+
+                <!-- 覆盖率采集与门禁：prepare-agent 注入探针，verify 阶段生成报告并按阈值卡点 -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
                 </plugin>
 
                 <plugin>
@@ -185,6 +196,54 @@
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <!-- 门禁：单模块行/分支覆盖率底线 50%（当前最低 51.9%，只许升不许降）
+                         聚合门槛见 scripts/check-coverage.sh（CI 执行，总行覆盖 ≥ 75%） -->
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <haltOnFailure>true</haltOnFailure>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.50</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
             </plugin>
@@ -199,6 +258,57 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <profiles>
+        <!--
+            API 兼容性报告（japicmp）：与 japicmp.old.version 对比二进制/源码兼容性，报告输出到 target/japicmp/。
+            用法：mvn verify -Pjapicmp -Dgpg.skip=true（CI 的 api-compat workflow 每次执行）
+            默认仅报告不卡点（1.4.0 为计划内的 BREAKING 版本）；需要卡点时把
+            breakBuildOnBinaryIncompatibleModifications 改为 true。
+        -->
+        <profile>
+            <id>japicmp</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.siom79.japicmp</groupId>
+                        <artifactId>japicmp-maven-plugin</artifactId>
+                        <version>${japicmp.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>cmp</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <oldVersion>
+                                <dependency>
+                                    <groupId>xyz.migoo.springboot</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${japicmp.old.version}</version>
+                                </dependency>
+                            </oldVersion>
+                            <newVersion>
+                                <file>
+                                    <path>${project.build.directory}/${project.build.finalName}.jar</path>
+                                </file>
+                            </newVersion>
+                            <parameter>
+                                <onlyModified>true</onlyModified>
+                                <!-- 上一版缺失（如新模块）时跳过而非失败 -->
+                                <ignoreMissingOldVersion>true</ignoreMissingOldVersion>
+                                <skipPomModules>true</skipPomModules>
+                                <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                            </parameter>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>

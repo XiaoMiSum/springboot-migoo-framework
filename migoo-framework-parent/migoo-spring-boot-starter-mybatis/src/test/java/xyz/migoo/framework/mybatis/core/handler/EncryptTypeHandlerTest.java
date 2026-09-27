@@ -36,10 +36,37 @@ class EncryptTypeHandlerTest {
     }
 
     @Test
-    void encryptProducesNonPlainText() {
+    void encryptProducesV1GcmCiphertext() {
         String encrypted = EncryptTypeHandler.encrypt("hello");
         assertThat(encrypted).isNotBlank();
         assertThat(encrypted).isNotEqualTo("hello");
+        // 新写入一律为 v1 GCM 前缀格式（随机 IV，同明文多次加密结果不同）
+        assertThat(encrypted).startsWith(EncryptTypeHandler.VERSION_PREFIX);
+        assertThat(EncryptTypeHandler.encrypt("hello")).isNotEqualTo(encrypted);
+    }
+
+    @Test
+    void roundTripEncryptDecrypt() {
+        assertThat(EncryptTypeHandler.decrypt(EncryptTypeHandler.encrypt("hello"))).isEqualTo("hello");
+        assertThat(EncryptTypeHandler.decrypt(EncryptTypeHandler.encrypt("中文敏感数据")))
+                .isEqualTo("中文敏感数据");
+        assertThat(EncryptTypeHandler.decrypt(EncryptTypeHandler.encrypt(""))).isEmpty();
+    }
+
+    @Test
+    void decryptReadsLegacyEcbCiphertext() throws Exception {
+        // 生成历史格式密文：AES/ECB/PKCS5Padding + MD5 单轮派生（旧实现）
+        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding");
+        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+        byte[] digest = md.digest("test-encrypt-password".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        byte[] key = new byte[16];
+        System.arraycopy(digest, 0, key, 0, Math.min(digest.length, 16));
+        cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, new javax.crypto.spec.SecretKeySpec(key, "AES"));
+        String legacy = java.util.Base64.getEncoder().encodeToString(
+                cipher.doFinal("legacy-value".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+
+        // 无 v1 前缀 → 走历史解密路径，旧数据平滑迁移
+        assertThat(EncryptTypeHandler.decrypt(legacy)).isEqualTo("legacy-value");
     }
 
     @Test
@@ -51,7 +78,8 @@ class EncryptTypeHandlerTest {
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(ps).setString(org.mockito.ArgumentMatchers.eq(1), captor.capture());
         assertThat(captor.getValue()).isNotEqualTo("hello");
-        assertThat(captor.getValue()).isEqualTo(EncryptTypeHandler.encrypt("hello"));
+        assertThat(captor.getValue()).startsWith(EncryptTypeHandler.VERSION_PREFIX);
+        assertThat(EncryptTypeHandler.decrypt(captor.getValue())).isEqualTo("hello");
     }
 
     @Test

@@ -47,6 +47,11 @@ import static xyz.migoo.framework.common.exception.GlobalErrorCodeConstants.*;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    /**
+     * spring-security 访问拒绝异常全限定名（web 组件不依赖 security，按名识别，见 {@link #isAccessDenied}）
+     */
+    private static final String ACCESS_DENIED_TYPE = "org.springframework.security.access.AccessDeniedException";
+
     private final String applicationName;
 
     private final ApiErrorLogFrameworkService apiErrorLogFrameworkService;
@@ -236,12 +241,40 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = Exception.class)
     public Result<?> defaultExceptionHandler(HttpServletRequest request, Throwable ex) {
+        // 访问拒绝（方法级 @PreAuthorize/@Secured 越权等）→ 403，属预期的权限失败而非服务端错误：
+        // 不落 API 错误日志、不发布 SERVER_ERROR 事件，与过滤器层 AccessDeniedHandler 保持同一语义
+        if (isAccessDenied(ex)) {
+            log.warn("[defaultExceptionHandler][访问({}) 权限不足]", ServletUtils.getRoutePattern(request), ex);
+            return Result.error(FORBIDDEN.code(), i18n.getMessage(FORBIDDEN.msg()));
+        }
         createExceptionLog(request, ex);
         publishServerError(request, ex);
         // 返回 ERROR CommonResult
         log.error(ex.getMessage(), ex);
         var message = i18n.getMessage(INTERNAL_SERVER_ERROR.msg());
         return Result.error(INTERNAL_SERVER_ERROR.code(), message);
+    }
+
+    /**
+     * 判定是否为「访问拒绝」类异常
+     * <p>
+     * web 组件不依赖 spring-security，无法直接 instanceof，故沿 cause 链与类层次按全限定名识别
+     * {@code org.springframework.security.access.AccessDeniedException}（及其子类
+     * {@code AuthorizationDeniedException}），使方法级权限校验失败返回 403 而非被兜底成 500。
+     * 类层次经 {@link Class#getSuperclass()} 逐级取名，类缺失时不触发加载，web-only 应用不受影响。
+     */
+    private static boolean isAccessDenied(Throwable ex) {
+        Throwable current = ex;
+        // depth 上限防御 cause 环，正常异常链远短于此
+        for (int depth = 0; current != null && depth < 10; depth++) {
+            for (Class<?> type = current.getClass(); type != null; type = type.getSuperclass()) {
+                if (ACCESS_DENIED_TYPE.equals(type.getName())) {
+                    return true;
+                }
+            }
+            current = current.getCause() == current ? null : current.getCause();
+        }
+        return false;
     }
 
     /**
@@ -263,6 +296,10 @@ public class GlobalExceptionHandler {
     }
 
     private void createExceptionLog(HttpServletRequest request, Throwable e) {
+        // 未接入 ApiErrorLogFrameworkService（可选扩展点）时跳过落库
+        if (apiErrorLogFrameworkService == null) {
+            return;
+        }
         // 插入错误日志
         ApiErrorLog errorLog = new ApiErrorLog();
         try {

@@ -137,7 +137,17 @@ public class UserDO extends BaseUuidDO<UserDO> {
 }
 ```
 
-加密密钥通过环境变量 `mybatis-plus.encryptor.password` 或 JVM 参数 `-Dmybatis-plus.encryptor.password=xxx` 配置。
+加密密钥按以下优先级读取（**推荐用环境变量，口令不进代码仓库**）：
+
+1. JVM 系统属性：`-Dmybatis-plus.encryptor.password=xxx`
+2. 环境变量：`MIGOO_ENCRYPTOR_PASSWORD`（推荐）
+3. 遗留环境变量：`mybatis-plus.encryptor.password`（兼容历史部署）
+
+**密文格式（1.4.0 起）**：新写入的密文为 `v1:` 前缀的 AES-256-GCM（PBKDF2-SHA256 12 万轮派生密钥），
+自带完整性校验；**无 `v1:` 前缀的历史密文自动走遗留 ECB+MD5 兼容解密**，存量数据无需迁移，
+读写一轮后自然升级为新格式。
+
+> 迁移提示：更换密钥前需先把存量密文按旧密钥解密重写，否则旧密文将无法解密。
 
 ### 6. JSON 字段存储
 
@@ -232,7 +242,9 @@ mybatis-plus:
 ```
 
 ```bash
-# 加密密钥配置（可选）
+# 加密密钥配置（可选；推荐环境变量方式）
+export MIGOO_ENCRYPTOR_PASSWORD='openssl rand -base64 48 生成的强口令'
+# 或 JVM 参数方式
 -Dmybatis-plus.encryptor.password=your-encrypt-key
 ```
 

@@ -1,0 +1,24 @@
+# 依赖与 Actions 版本自动更新（每周）
+version: 2
+updates:
+  # Maven 依赖：BOM 中声明的第三方依赖与插件
+  - package-ecosystem: maven
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - maven
+
+  # GitHub Actions 版本
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions

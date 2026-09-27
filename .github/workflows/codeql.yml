@@ -1,0 +1,53 @@
+# CodeQL 静态分析：Java 语义分析，扫出注入/不安全反序列化/路径穿越等漏洞模式
+name: CodeQL
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  schedule:
+    # 每周一 03:26 UTC 全量重扫（含历史分支）
+    - cron: '26 3 * * 1'
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (java)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+          build-mode: manual
+
+      # 手动构建（compile 即可满足 CodeQL 抽取需求，比 verify 快）
+      - name: Build
+        run: mvn -B clean compile -DskipTests -Dgpg.skip=true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: '/language:java'

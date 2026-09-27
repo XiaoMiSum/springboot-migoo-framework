@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: example-security
+
+migoo:
+  security:
+    # 安全模式：jwt（框架自建 token 签发/验证）| oauth2（对接授权服务器）
+    mode: jwt
+    # 登出 URL（默认 /logout）
+    logout-url: /auth/logout
+    # 免认证 URL
+    permit-all-urls:
+      - /auth/login
+      - /auth/refresh
+      - /public/**
+
+    jwt:
+      # ⚠️ 示例密钥，仅用于本地演示；至少 32 字节，否则启动失败（fail-fast）
+      #    生产环境生成方式：openssl rand -base64 48，并经环境变量注入
+      secret-key: example-demo-secret-key-change-me-0123456789abcdef
+      # access-token-expires: PT30M
+      # refresh-token-expires: P7D
+
+    # 登录失败锁定（默认启用：连续失败 5 次锁 10 分钟）
+    login-lock:
+      enabled: true
