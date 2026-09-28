@@ -36,7 +36,7 @@ jobs:
         run: bash scripts/check-publish-modules.sh
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
