@@ -53,6 +53,12 @@
 - 新增 `examples/` 示例工程（最小可用 Web 应用、CORS 四档模式演示、安全登录示例），含 `@SpringBootTest` 端到端冒烟
 - `readme.md` 修复：项目结构树按真实仓库布局重写、断行代码修正、Maven Central badge 坐标修正、新增质量门禁表
 
+### 🐛 缺陷修复
+
+- `RateLimitAspect` 修复 Spring 7 下复合切点（`@annotation || @within`）的注解参数绑定为空导致 NPE、
+  被限流接口全部 500：通知不再以形参绑定注解，改由方法体内按「方法注解 → 类注解」解析，
+  切点表达式与语义不变；新增 `RateLimitAspectAopTest` 走真实 Spring AOP 代理回归（方法级 + 类级）
+
 ### 📄 文档
 
 - `docs/web.md`、`docs/security.md`、`docs/mybatis.md`、`docs/index.md`、`docs/websocket.md` 与本次行为变更同步

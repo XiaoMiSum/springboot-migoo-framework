@@ -5,9 +5,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -71,8 +73,21 @@ public class RateLimitAspect {
         this.eventPublisher = eventPublisher;
     }
 
-    @Around(value = "@annotation(rateLimit) || @within(rateLimit)", argNames = "joinPoint,rateLimit")
-    public Object around(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
+    /**
+     * 限流通知
+     * <p>
+     * Spring 7 起，复合切点（{@code ||}）不再回填注解参数绑定，形参绑定会拿到 {@code null}，
+     * 故此处不绑定注解、改由 {@link #resolveRateLimit(ProceedingJoinPoint)} 在方法体内解析；
+     * 切点表达式与「方法注解 / 类注解」语义保持不变。
+     *
+     * @param joinPoint 被切方法
+     * @return 被切方法（或其所在类）上的 {@link RateLimit} 注解
+     */
+    @Around(value = "@annotation(xyz.migoo.framework.web.core.annotation.RateLimit)"
+            + " || @within(xyz.migoo.framework.web.core.annotation.RateLimit)",
+            argNames = "joinPoint")
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        RateLimit rateLimit = resolveRateLimit(joinPoint);
         String fullKey = buildMethodKey(joinPoint) + ":" + buildDimensionKey(rateLimit, joinPoint);
         boolean acquired = rateLimiter.tryAcquire(fullKey, rateLimit.limit(),
                 Duration.ofSeconds(Math.max(rateLimit.window(), 1)));
@@ -85,6 +100,30 @@ public class RateLimitAspect {
                     : ServiceExceptionUtil.get(GlobalErrorCodeConstants.TOO_MANY_REQUESTS.code(), rateLimit.message());
         }
         return joinPoint.proceed();
+    }
+
+    /**
+     * 解析被切方法的 {@link RateLimit}：方法注解优先，未标注时取所在类（{@code @within} 语义）。
+     * <p>
+     * 经 {@link AopUtils#getMostSpecificMethod} 先定位实现类方法，避免 JDK 动态代理下
+     * 只看到接口方法而漏掉实现上的注解。
+     */
+    private RateLimit resolveRateLimit(ProceedingJoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        Object target = joinPoint.getTarget();
+        Class<?> targetClass = target != null ? target.getClass() : method.getDeclaringClass();
+        Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
+
+        RateLimit rateLimit = AnnotationUtils.findAnnotation(specificMethod, RateLimit.class);
+        if (rateLimit == null && target != null) {
+            rateLimit = AnnotationUtils.findAnnotation(targetClass, RateLimit.class);
+        }
+        if (rateLimit == null) {
+            // 切点已匹配却解析不到注解，属内部不一致：快速失败便于定位，不静默放行
+            throw new IllegalStateException("@RateLimit 切点匹配但未解析到注解: " + joinPoint.getSignature());
+        }
+        return rateLimit;
     }
 
     /**

@@ -36,33 +36,30 @@ class RateLimitAspectTest {
 
     @Test
     void keyDimensionSpelLimitsPerUser() throws Throwable {
-        RateLimit rateLimit = annotation("login", String.class);
         // limit=2: 同一用户名第 3 次被拒，其他用户名不受影响
-        assertThat(aspect.around(joinPoint("login", "user1"), rateLimit)).isEqualTo("ok");
-        assertThat(aspect.around(joinPoint("login", "user1"), rateLimit)).isEqualTo("ok");
-        assertThatThrownBy(() -> aspect.around(joinPoint("login", "user1"), rateLimit))
+        assertThat(aspect.around(joinPoint("login", "user1"))).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("login", "user1"))).isEqualTo("ok");
+        assertThatThrownBy(() -> aspect.around(joinPoint("login", "user1")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 429);
-        assertThat(aspect.around(joinPoint("login", "user2"), rateLimit)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("login", "user2"))).isEqualTo("ok");
     }
 
     @Test
     void ipDimensionLimitsWhenNoRequestContext() throws Throwable {
         // 无请求上下文时 IP 维度取 unknown，仍按同一 key 限流
-        RateLimit rateLimit = annotation("ipLimited");
-        assertThat(aspect.around(joinPoint("ipLimited"), rateLimit)).isEqualTo("ok");
-        assertThatThrownBy(() -> aspect.around(joinPoint("ipLimited"), rateLimit))
+        assertThat(aspect.around(joinPoint("ipLimited"))).isEqualTo("ok");
+        assertThatThrownBy(() -> aspect.around(joinPoint("ipLimited")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 429);
     }
 
     @Test
     void customMessageIsUsedWhenProvided() throws Throwable {
-        RateLimit rateLimit = annotation("custom", String.class);
         for (int i = 0; i < 5; i++) {
-            aspect.around(joinPoint("custom", "n"), rateLimit);
+            aspect.around(joinPoint("custom", "n"));
         }
-        assertThatThrownBy(() -> aspect.around(joinPoint("custom", "n"), rateLimit))
+        assertThatThrownBy(() -> aspect.around(joinPoint("custom", "n")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 429)
                 .hasFieldOrPropertyWithValue("message", "操作过于频繁");
@@ -70,8 +67,7 @@ class RateLimitAspectTest {
 
     @Test
     void missingKeyExpressionFailsFast() throws Throwable {
-        RateLimit rateLimit = annotation("missingKey");
-        assertThatThrownBy(() -> aspect.around(joinPoint("missingKey"), rateLimit))
+        assertThatThrownBy(() -> aspect.around(joinPoint("missingKey")))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("key SpEL");
     }
@@ -81,10 +77,9 @@ class RateLimitAspectTest {
         ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
         RateLimitAspect aspectWithPublisher =
                 new RateLimitAspect(new DefaultRateLimiter(new InMemoryStateStore()), publisher);
-        RateLimit rateLimit = annotation("ipLimited");
 
-        aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit);
-        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit))
+        aspectWithPublisher.around(joinPoint("ipLimited"));
+        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 429);
 
@@ -99,10 +94,9 @@ class RateLimitAspectTest {
         doThrow(new IllegalStateException("listener failed")).when(publisher).publishEvent(any());
         RateLimitAspect aspectWithPublisher =
                 new RateLimitAspect(new DefaultRateLimiter(new InMemoryStateStore()), publisher);
-        RateLimit rateLimit = annotation("ipLimited");
 
-        aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit);
-        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited"), rateLimit))
+        aspectWithPublisher.around(joinPoint("ipLimited"));
+        assertThatThrownBy(() -> aspectWithPublisher.around(joinPoint("ipLimited")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 429);
     }
@@ -131,11 +125,6 @@ class RateLimitAspectTest {
         public String missingKey() {
             return "ok";
         }
-    }
-
-    private RateLimit annotation(String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        Method method = Target.class.getMethod(methodName, parameterTypes);
-        return method.getAnnotation(RateLimit.class);
     }
 
     /**
