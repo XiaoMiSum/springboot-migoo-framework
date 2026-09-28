@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 发布前校验「模块数 vs 发布清单数」：父 pom <modules> / BOM / -pl 清单 / Summary 四方对齐
       # （BOM 漏声明某个 starter，用户 import 后同样引不到；详见 docs/observability.md §10）
