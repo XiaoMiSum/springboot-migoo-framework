@@ -55,7 +55,7 @@
         <publishing.version>0.9.0</publishing.version>
         <javadoc.version>3.11.2</javadoc.version>
         <source.version>3.3.1</source.version>
-        <surefire.version>3.5.2</surefire.version>
+        <surefire.version>3.6.0</surefire.version>
         <jacoco.version>0.8.12</jacoco.version>
         <japicmp.version>0.26.2</japicmp.version>
         <!-- japicmp 对比基线：上一发布版本（每次发版需同步更新，见 scripts/check-publish-modules.sh 校验） -->
