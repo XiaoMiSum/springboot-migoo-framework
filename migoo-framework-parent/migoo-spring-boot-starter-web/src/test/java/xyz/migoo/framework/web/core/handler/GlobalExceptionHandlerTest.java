@@ -220,6 +220,43 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void defaultExceptionStillCreatesErrorLogWhenRequestBodyAlreadyConsumed() throws Exception {
+        HttpServletRequest request = request();
+        when(request.getParameterMap()).thenReturn(new HashMap<>());
+        // @RequestBody 已消费请求流，Tomcat 拒绝再切到 getReader（线上复现的场景）
+        when(request.getReader()).thenThrow(
+                new IllegalStateException("getInputStream() has already been called for this request"));
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        Result<?> result = handler.defaultExceptionHandler(request, new NullPointerException("boom"));
+
+        assertThat(result.getCode()).isEqualTo(500);
+        ArgumentCaptor<ApiErrorLog> captor = ArgumentCaptor.forClass(ApiErrorLog.class);
+        verify(apiErrorLogService).createApiErrorLog(captor.capture());
+        // 异常日志必须落库：请求体读不到只降级该字段，不能让整条日志丢失
+        assertThat(captor.getValue().getExceptionName()).isEqualTo(NullPointerException.class.getName());
+        assertThat(captor.getValue().getRequestParams()).contains("\"body\":null");
+    }
+
+    @Test
+    void defaultExceptionStillCreatesErrorLogWhenRequestParamsUnreadable() throws Exception {
+        HttpServletRequest request = request();
+        when(request.getParameterMap()).thenThrow(new IllegalStateException("parameter map unavailable"));
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        handler.defaultExceptionHandler(request, new RuntimeException("boom"));
+
+        ArgumentCaptor<ApiErrorLog> captor = ArgumentCaptor.forClass(ApiErrorLog.class);
+        verify(apiErrorLogService).createApiErrorLog(captor.capture());
+        assertThat(captor.getValue().getRequestParams()).isNull();
+        assertThat(captor.getValue().getExceptionMessage()).isEqualTo("RuntimeException: boom");
+    }
+
+    @Test
     void defaultExceptionHandlerPublishesServerErrorEvent() throws Exception {
         ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
         GlobalExceptionHandler handlerWithPublisher =

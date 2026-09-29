@@ -2,6 +2,7 @@ package xyz.migoo.framework.web.core.util;
 
 import com.google.common.base.Strings;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
@@ -11,6 +12,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import xyz.migoo.framework.common.util.JsonUtils;
 import xyz.migoo.framework.common.util.network.NetworkUtils;
+import xyz.migoo.framework.web.core.wrapper.CachedBodyHttpServletRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -150,16 +152,37 @@ public class ServletUtils {
         }
     }
 
+    /**
+     * 读取请求体字节数组
+     *
+     * @param request 请求
+     * @return 请求体；请求流已被消费或读取失败时返回 {@code null}
+     */
     public static byte[] getBodyBytes(ServletRequest request) {
         try {
             InputStream is = request.getInputStream();
             return is.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | IllegalStateException e) {
+            // getReader/getInputStream 二选一（Tomcat 不允许切换），日志等旁路读取必须降级而非抛出
+            return null;
         }
     }
 
+    /**
+     * 读取请求体字符串
+     *
+     * <p>优先取 {@link CachedBodyHttpServletRequest} 的缓存体：请求往往被安全过滤器等外层包装件层层包裹，
+     * 缓存件不在最外层，需逐层下钻；无缓存时回退读取 reader。</p>
+     *
+     * @param request 请求
+     * @return 请求体；请求体已被消费（{@code @RequestBody} 已调用 {@code getInputStream()}）或读取失败时返回 {@code null}
+     */
     public static String getBody(ServletRequest request) {
+        CachedBodyHttpServletRequest cached = findCachedBody(request);
+        if (cached != null) {
+            byte[] body = cached.getCachedBody();
+            return body == null ? null : new String(body, StandardCharsets.UTF_8);
+        }
         try (final BufferedReader reader = request.getReader()) {
             StringBuilder sb = new StringBuilder();
             String line;
@@ -167,9 +190,27 @@ public class ServletUtils {
                 sb.append(line);
             }
             return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | IllegalStateException e) {
+            // 同 getBodyBytes：请求体已被上游消费时不可再读，返回 null 让调用方按「无请求体」处理
+            return null;
         }
+    }
+
+    /**
+     * 在请求包装链中查找请求体缓存件
+     *
+     * @param request 请求（可能位于包装链任意一层）
+     * @return 缓存件；未缓存时返回 {@code null}
+     */
+    private static CachedBodyHttpServletRequest findCachedBody(ServletRequest request) {
+        ServletRequest current = request;
+        while (current != null) {
+            if (current instanceof CachedBodyHttpServletRequest cached) {
+                return cached;
+            }
+            current = current instanceof ServletRequestWrapper wrapper ? wrapper.getRequest() : null;
+        }
+        return null;
     }
 
     public static Map<String, String> getParamMap(ServletRequest request) {

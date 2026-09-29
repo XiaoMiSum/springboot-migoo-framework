@@ -5,11 +5,13 @@ import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import xyz.migoo.framework.web.core.wrapper.CachedBodyHttpServletRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -28,6 +30,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -207,6 +210,36 @@ class ServletUtilsTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getInputStream()).thenReturn(inputStream("hello body"));
         assertThat(new String(ServletUtils.getBodyBytes(request), StandardCharsets.UTF_8)).isEqualTo("hello body");
+    }
+
+    @Test
+    void getBodyReturnsNullWhenRequestStreamAlreadyConsumed() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getReader()).thenThrow(
+                new IllegalStateException("getInputStream() has already been called for this request"));
+
+        assertThat(ServletUtils.getBody(request)).isNull();
+    }
+
+    @Test
+    void getBodyBytesReturnsNullWhenRequestStreamAlreadyConsumed() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getInputStream()).thenThrow(
+                new IllegalStateException("getReader() has already been called for this request"));
+
+        assertThat(ServletUtils.getBodyBytes(request)).isNull();
+    }
+
+    @Test
+    void getBodyPrefersCachedBodyUnderOuterWrappers() throws Exception {
+        HttpServletRequest raw = mock(HttpServletRequest.class);
+        when(raw.getInputStream()).thenReturn(inputStream("{\"a\":1}"));
+        // 安全过滤器等会在缓存件外层继续包装，缓存件不在最外层
+        HttpServletRequest wrapped = new HttpServletRequestWrapper(
+                new HttpServletRequestWrapper(new CachedBodyHttpServletRequest(raw, 1024)));
+
+        assertThat(ServletUtils.getBody(wrapped)).isEqualTo("{\"a\":1}");
+        verify(raw, never()).getReader();
     }
 
     // ========== getHeaders ==========

@@ -328,12 +328,30 @@ public class GlobalExceptionHandler {
         // 设置其它字段
         errorLog.setApplicationName(applicationName);
         errorLog.setRequestUrl(request.getRequestURI());
-        Map<String, Object> requestParams = new HashMap<>();
-        requestParams.put("query", ServletUtils.getParamMap(request));
-        requestParams.put("body", ServletUtils.getBody(request));
-        errorLog.setRequestParams(JsonUtils.toJsonString(requestParams));
+        errorLog.setRequestParams(requestParams(request));
         errorLog.setRequestMethod(request.getMethod());
         errorLog.setUserIp(ServletUtils.getClientIP(request));
         errorLog.setExceptionTime(new Date());
+    }
+
+    /**
+     * 序列化请求参数（query + body）
+     * <p>
+     * 仅是排查线索，读取失败（请求流被消费、参数解析异常等）时降级为 {@code null}，
+     * 不得连带中断异常日志落库——否则真正要排查的异常反而丢失。
+     *
+     * @param request 请求
+     * @return 请求参数 JSON；读取失败返回 {@code null}
+     */
+    private String requestParams(HttpServletRequest request) {
+        try {
+            Map<String, Object> requestParams = new HashMap<>();
+            requestParams.put("query", ServletUtils.getParamMap(request));
+            requestParams.put("body", ServletUtils.getBody(request));
+            return JsonUtils.toJsonString(requestParams);
+        } catch (Throwable th) {
+            log.warn("[requestParams][url({}) 读取请求参数失败]", request.getRequestURI(), th);
+            return null;
+        }
     }
 }
