@@ -45,9 +45,7 @@ class AuditLogAspectTest {
 
     @Test
     void successRecordsOperatorPathActionAndParams() throws Throwable {
-        AuditLog auditLog = annotation("create", OrderReq.class);
-
-        Object result = aspect.around(joinPoint("create", new OrderReq()), auditLog);
+        Object result = aspect.around(joinPoint("create", new OrderReq()));
 
         assertThat(result).isEqualTo("ok");
         AuditLogEvent event = publishedEvent();
@@ -66,11 +64,10 @@ class AuditLogAspectTest {
 
     @Test
     void failureRecordsErrorAndRethrows() throws Throwable {
-        AuditLog auditLog = annotation("boom", OrderReq.class);
         ProceedingJoinPoint failing = joinPoint("boom", new OrderReq());
         when(failing.proceed()).thenThrow(new IllegalStateException("boom"));
 
-        assertThatThrownBy(() -> aspect.around(failing, auditLog))
+        assertThatThrownBy(() -> aspect.around(failing))
                 .isInstanceOf(IllegalStateException.class);
 
         AuditLogEvent event = publishedEvent();
@@ -81,21 +78,21 @@ class AuditLogAspectTest {
 
     @Test
     void explicitActionOverridesMethodKey() throws Throwable {
-        aspect.around(joinPoint("pay", "order-1"), annotation("pay", String.class));
+        aspect.around(joinPoint("pay", "order-1"));
 
         assertThat(publishedEvent().action()).isEqualTo("支付");
     }
 
     @Test
     void recordParamsFalseOmitsParams() throws Throwable {
-        aspect.around(joinPoint("disable", "user-1"), annotation("disable", String.class));
+        aspect.around(joinPoint("disable", "user-1"));
 
         assertThat(publishedEvent().params()).isNull();
     }
 
     @Test
     void sensitiveKeywordsAreRedacted() throws Throwable {
-        aspect.around(joinPoint("login", new CredentialReq()), annotation("login", CredentialReq.class));
+        aspect.around(joinPoint("login", new CredentialReq()));
 
         AuditLogEvent event = publishedEvent();
         // 非敏感字段保留，敏感关键词字段整体置 ******（password/refreshToken 双双命中）
@@ -105,7 +102,7 @@ class AuditLogAspectTest {
 
     @Test
     void containerOnlyArgsProduceNullParams() throws Throwable {
-        aspect.around(joinPoint("upload", new NotPayload()), annotation("upload", NotPayload.class));
+        aspect.around(joinPoint("upload", new NotPayload()));
 
         AuditLogEvent event = publishedEvent();
         // 纯容器参数不可摘要 → params 置空，审计本体照常输出
@@ -195,11 +192,6 @@ class AuditLogAspectTest {
         public String boom(@RequestBody OrderReq req) {
             return "ok";
         }
-    }
-
-    private AuditLog annotation(String methodName, Class<?>... parameterTypes)
-            throws NoSuchMethodException {
-        return Target.class.getMethod(methodName, parameterTypes).getAnnotation(AuditLog.class);
     }
 
     /**

@@ -58,6 +58,9 @@
 - `RateLimitAspect` 修复 Spring 7 下复合切点（`@annotation || @within`）的注解参数绑定为空导致 NPE、
   被限流接口全部 500：通知不再以形参绑定注解，改由方法体内按「方法注解 → 类注解」解析，
   切点表达式与语义不变；新增 `RateLimitAspectAopTest` 走真实 Spring AOP 代理回归（方法级 + 类级）
+- `AuditLogAspect` 修复同类问题：方法级 `@AuditLog` 在复合切点下绑定为空导致 NPE、被审计接口全部 500，
+  通知改为方法体内按「方法注解 → 类注解」解析，切点表达式与语义不变；
+  新增 `AuditLogAspectAopTest` 走真实 Spring AOP 代理回归（方法级 + 类级）
 
 ### 📄 文档
 
