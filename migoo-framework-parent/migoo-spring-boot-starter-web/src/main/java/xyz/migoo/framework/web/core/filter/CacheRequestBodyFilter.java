@@ -38,13 +38,15 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
             } catch (NumberFormatException ignored) {
             }
         }
+        CachedBodyHttpServletRequest wrappedRequest;
         try {
-            var wrappedRequest = new CachedBodyHttpServletRequest(request, maxCacheBodySize);
-            filterChain.doFilter(wrappedRequest, response);
+            wrappedRequest = new CachedBodyHttpServletRequest(request, maxCacheBodySize);
         } catch (IOException e) {
-            // 如果读取失败 则直接使用原始请求
+            // 构造时读取流失败，回退到原始请求
             filterChain.doFilter(request, response);
+            return;
         }
+        filterChain.doFilter(wrappedRequest, response);
     }
 
     @Override

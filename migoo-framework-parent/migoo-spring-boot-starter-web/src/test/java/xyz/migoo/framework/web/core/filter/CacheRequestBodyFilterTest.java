@@ -15,8 +15,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -177,6 +180,20 @@ class CacheRequestBodyFilterTest {
         ArgumentCaptor<ServletRequest> captor = ArgumentCaptor.forClass(ServletRequest.class);
         verify(filterChain).doFilter(captor.capture(), any());
         assertThat(captor.getValue()).isSameAs(request);
+    }
+
+    @Test
+    void doesNotReExecuteChainWhenDownstreamThrowsIOException() throws Exception {
+        // filterChain 抛出 IOException 时不应重复执行下游链
+        HttpServletRequest request = jsonRequest("{\"name\":\"migoo\"}");
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+        doThrow(new IOException("downstream error")).when(filterChain).doFilter(any(), any());
+
+        assertThatThrownBy(() -> new CacheRequestBodyFilter(1024).doFilter(request, response, filterChain))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("downstream error");
+        verify(filterChain, times(1)).doFilter(any(), any());
     }
 
     /** 构造一个 Content-Type 为 application/json、可读的 request mock */

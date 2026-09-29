@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,11 +83,24 @@ class CachedBodyHttpServletRequestTest {
     }
 
     @Test
-    void bodyLargerThanMaxSizeThrowsIOException() throws Exception {
-        // maxSize=5，body 长度 10，超出上限抛出 IOException
-        assertThatThrownBy(() -> new CachedBodyHttpServletRequest(requestWithBody("1234567890"), 5))
-                .isInstanceOf(IOException.class)
-                .hasMessageContaining("Request body exceeds maximum cache size: 5 bytes");
+    void bodyLargerThanMaxSizeDegradesToOverflowMode() throws Exception {
+        // maxSize=5，body 长度 10，超出上限不抛异常，降级为溢出模式
+        CachedBodyHttpServletRequest wrapper = new CachedBodyHttpServletRequest(requestWithBody("1234567890"), 5);
+
+        // getCachedBody 返回 null（请求体未完整缓存）
+        assertThat(wrapper.getCachedBody()).isNull();
+        // 请求体仍可通过组合流完整读取一次（前缀 + 原始流剩余）
+        assertThat(new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8)).isEqualTo("1234567890");
+    }
+
+    @Test
+    void overflowModePreservesFullBodyAcrossLargeInput() throws Exception {
+        // body 远大于 read buffer(8192)，验证前缀 + 原始流剩余拼接后完整无损
+        String body = "a".repeat(10000);
+        CachedBodyHttpServletRequest wrapper = new CachedBodyHttpServletRequest(requestWithBody(body), 5000);
+
+        assertThat(wrapper.getCachedBody()).isNull();
+        assertThat(new String(wrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8)).isEqualTo(body);
     }
 
     @Test
