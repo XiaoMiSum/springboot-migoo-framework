@@ -110,7 +110,7 @@ String message = i18n.getMessage("user.exists", "13800138000");
 
 ### 5. 请求体缓存（自动生效）
 
-`CacheRequestBodyFilter` 自动将请求体包装为 `CachedBodyHttpServletRequest`，支持重复读取（仅 JSON，默认最大 10MB）。
+`CacheRequestBodyFilter` 自动将请求体包装为 `CachedBodyHttpServletRequest`，支持重复读取（JSON / XML / text 及无 Content-Type 请求，默认最大 10MB）。GET/HEAD、表单（`application/x-www-form-urlencoded`）、文件上传（`multipart/*`）及二进制类型不缓存。
 
 可通过配置调整缓存行为：
 

@@ -49,7 +49,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        // 只处理 json 请求内容
-        return !ServletUtils.isJsonRequest(request);
+        // GET/HEAD、表单、文件上传、二进制不缓存；仅缓存结构化文本及无 Content-Type 的请求
+        return !ServletUtils.isCacheableRequestBody(request);
     }
 }

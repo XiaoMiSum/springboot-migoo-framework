@@ -141,6 +141,32 @@ public class ServletUtils {
         return contentType != null && contentType.toLowerCase().startsWith(MediaType.APPLICATION_JSON_VALUE);
     }
 
+    /**
+     * 判断请求体是否应被缓存：仅缓存结构化文本（JSON/XML/text）及无 Content-Type 的请求，
+     * 排除 GET/HEAD（无请求体）、表单（Tomcat 从原始流解析参数）、文件上传与二进制类型。
+     */
+    public static boolean isCacheableRequestBody(HttpServletRequest request) {
+        String method = request.getMethod();
+        if ("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method)) {
+            return false;
+        }
+        String contentType = request.getContentType();
+        if (contentType == null || contentType.isBlank()) {
+            // 无 Content-Type（如 axios 空 body POST）仍需缓存，避免后续 getReader/getInputStream 互斥
+            return true;
+        }
+        String lower = contentType.toLowerCase();
+        if (lower.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
+            return false;
+        }
+        if (lower.startsWith("multipart/")) {
+            return false;
+        }
+        return lower.startsWith(MediaType.APPLICATION_JSON_VALUE)
+                || lower.startsWith(MediaType.APPLICATION_XML_VALUE)
+                || lower.startsWith("text/");
+    }
+
 
     private static void write(HttpServletResponse response, String text) {
         response.setContentType("application/json;charset=utf-8");
