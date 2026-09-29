@@ -61,6 +61,9 @@
 - `AuditLogAspect` 修复同类问题：方法级 `@AuditLog` 在复合切点下绑定为空导致 NPE、被审计接口全部 500，
   通知改为方法体内按「方法注解 → 类注解」解析，切点表达式与语义不变；
   新增 `AuditLogAspectAopTest` 走真实 Spring AOP 代理回归（方法级 + 类级）
+- `IdempotentAspect` 修复同类问题：方法级 `@Idempotent` 在复合切点下绑定为空导致 NPE、被防重保护的接口全部 500，
+  通知改为方法体内按「方法注解 → 类注解」解析，切点表达式与语义不变；
+  新增 `IdempotentAspectAopTest` 走真实 Spring AOP 代理回归（方法级 + 类级）
 
 ### 📄 文档
 

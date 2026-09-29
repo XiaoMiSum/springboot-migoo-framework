@@ -46,55 +46,48 @@ class IdempotentAspectTest {
 
     @Test
     void firstRequestSucceedsThenDuplicateRejected() throws Throwable {
-        Idempotent idempotent = annotation("create", OrderReq.class);
-
-        assertThat(aspect.around(joinPoint("create", new OrderReq("A")), idempotent)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("create", new OrderReq("A")))).isEqualTo("ok");
         // 防重窗口内相同请求体重复 → 900
-        assertThatThrownBy(() -> aspect.around(joinPoint("create", new OrderReq("A")), idempotent))
+        assertThatThrownBy(() -> aspect.around(joinPoint("create", new OrderReq("A"))))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 900);
     }
 
     @Test
     void differentPayloadIsNotBlocked() throws Throwable {
-        Idempotent idempotent = annotation("create", OrderReq.class);
-        aspect.around(joinPoint("create", new OrderReq("A")), idempotent);
+        aspect.around(joinPoint("create", new OrderReq("A")));
 
         // 不同请求体 → 参数摘要不同 → 放行
-        assertThat(aspect.around(joinPoint("create", new OrderReq("B")), idempotent)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("create", new OrderReq("B")))).isEqualTo("ok");
     }
 
     @Test
     void failureReleasesClaimAllowsRetry() throws Throwable {
-        Idempotent idempotent = annotation("create", OrderReq.class);
         ProceedingJoinPoint failing = joinPoint("create", new OrderReq("A"));
         when(failing.proceed()).thenThrow(new IllegalStateException("boom"));
 
-        assertThatThrownBy(() -> aspect.around(failing, idempotent))
+        assertThatThrownBy(() -> aspect.around(failing))
                 .isInstanceOf(IllegalStateException.class);
 
         // 失败释放占位 → 重试放行
-        assertThat(aspect.around(joinPoint("create", new OrderReq("A")), idempotent)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("create", new OrderReq("A")))).isEqualTo("ok");
     }
 
     @Test
     void spelKeyIsolatesByExpressionValue() throws Throwable {
-        Idempotent idempotent = annotation("pay", String.class);
-
-        assertThat(aspect.around(joinPoint("pay", "order-1"), idempotent)).isEqualTo("ok");
-        assertThatThrownBy(() -> aspect.around(joinPoint("pay", "order-1"), idempotent))
+        assertThat(aspect.around(joinPoint("pay", "order-1"))).isEqualTo("ok");
+        assertThatThrownBy(() -> aspect.around(joinPoint("pay", "order-1")))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 900);
         // 不同 SpEL 维度互不影响
-        assertThat(aspect.around(joinPoint("pay", "order-2"), idempotent)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("pay", "order-2"))).isEqualTo("ok");
     }
 
     @Test
     void customMessageIsUsedWhenProvided() throws Throwable {
-        Idempotent idempotent = annotation("custom", OrderReq.class);
-        aspect.around(joinPoint("custom", new OrderReq("A")), idempotent);
+        aspect.around(joinPoint("custom", new OrderReq("A")));
 
-        assertThatThrownBy(() -> aspect.around(joinPoint("custom", new OrderReq("A")), idempotent))
+        assertThatThrownBy(() -> aspect.around(joinPoint("custom", new OrderReq("A"))))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 900)
                 .hasFieldOrPropertyWithValue("message", "请勿重复提交");
@@ -102,11 +95,9 @@ class IdempotentAspectTest {
 
     @Test
     void nonPayloadArgsFallBackToMethodLevelKey() throws Throwable {
-        Idempotent idempotent = annotation("upload", NotPayload.class);
-
-        assertThat(aspect.around(joinPoint("upload", new NotPayload()), idempotent)).isEqualTo("ok");
+        assertThat(aspect.around(joinPoint("upload", new NotPayload()))).isEqualTo("ok");
         // 无可摘要参数 → 退化为「登录用户 + 方法」级幂等
-        assertThatThrownBy(() -> aspect.around(joinPoint("upload", new NotPayload()), idempotent))
+        assertThatThrownBy(() -> aspect.around(joinPoint("upload", new NotPayload())))
                 .isInstanceOf(ServiceException.class)
                 .hasFieldOrPropertyWithValue("code", 900);
     }
@@ -116,7 +107,7 @@ class IdempotentAspectTest {
         StateStore spied = spy(stateStore);
         IdempotentAspect spiedAspect = new IdempotentAspect(spied);
 
-        spiedAspect.around(joinPoint("create", new OrderReq("A")), annotation("create", OrderReq.class));
+        spiedAspect.around(joinPoint("create", new OrderReq("A")));
 
         // migoo:idempotent:类名#方法名:维度值（无请求上下文 → anonymous + 参数摘要）
         verify(spied).setIfAbsent(
@@ -133,8 +124,8 @@ class IdempotentAspectTest {
         IdempotentAspect spiedAspect = new IdempotentAspect(spied);
 
         // expire=60s → 占位封顶 30s；expire=5s → 占位取 5s
-        spiedAspect.around(joinPoint("create", new OrderReq("A")), annotation("create", OrderReq.class));
-        spiedAspect.around(joinPoint("quick", new OrderReq("B")), annotation("quick", OrderReq.class));
+        spiedAspect.around(joinPoint("create", new OrderReq("A")));
+        spiedAspect.around(joinPoint("quick", new OrderReq("B")));
 
         ArgumentCaptor<Duration> ttl = ArgumentCaptor.forClass(Duration.class);
         verify(spied, times(2)).setIfAbsent(anyString(), ttl.capture());
@@ -189,11 +180,6 @@ class IdempotentAspectTest {
         public String quick(@RequestBody OrderReq req) {
             return "ok";
         }
-    }
-
-    private Idempotent annotation(String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        Method method = Target.class.getMethod(methodName, parameterTypes);
-        return method.getAnnotation(Idempotent.class);
     }
 
     /**
