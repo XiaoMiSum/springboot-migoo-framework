@@ -48,7 +48,7 @@
         <!-- 工具类相关 -->
         <bcprov.version>1.84</bcprov.version>
         <guava.version>33.7.1-jre</guava.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <jackson.version>3.1.0</jackson.version>
         <jackson2.version>2.21.2</jackson2.version>
         <mapstruct.version>1.6.3</mapstruct.version>
