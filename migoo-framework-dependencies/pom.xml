@@ -50,7 +50,7 @@
         <guava.version>33.7.1-jre</guava.version>
         <lombok.version>1.18.38</lombok.version>
         <jackson.version>3.1.0</jackson.version>
-        <jackson2.version>2.21.2</jackson2.version>
+        <jackson2.version>2.22.3</jackson2.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <uuid-creator.version>6.1.1</uuid-creator.version>
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
