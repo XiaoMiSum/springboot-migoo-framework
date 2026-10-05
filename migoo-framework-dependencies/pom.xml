@@ -37,7 +37,7 @@
     <properties>
         <migoo.framework.version>1.4.0</migoo.framework.version>
         <!-- 统一依赖管理 -->
-        <spring.boot.version>4.1.0</spring.boot.version>
+        <spring.boot.version>4.1.1</spring.boot.version>
         <!-- 文档相关 -->
         <springdoc.version>3.1.1</springdoc.version>
         <!-- DB 相关 -->
