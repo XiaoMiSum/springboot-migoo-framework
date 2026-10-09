@@ -37,7 +37,7 @@ jobs:
       # 父 pom 把 maven-gpg-plugin:sign 绑在 verify 阶段，CI 无密钥 → 跳过签名
       # verify 阶段同时执行 JaCoCo prepare-agent / report / check（单模块行+分支 ≥50%）
       - name: Build with Tests
-        run: mvn clean verify -Dgpg.skip=true
+        run: ./mvnw clean verify -Dgpg.skip=true
 
       # 聚合门禁：全仓行覆盖率 ≥ 75%（防止单模块底线之上的缓慢劣化）
       - name: Coverage Gate
@@ -69,7 +69,7 @@ jobs:
           cache: maven
 
       - name: Install framework to local repository
-        run: mvn install -DskipTests -Dgpg.skip=true
+        run: ./mvnw install -DskipTests -Dgpg.skip=true
 
       - name: Build and test examples
-        run: mvn -f examples/pom.xml verify
+        run: ./mvnw -f examples/pom.xml verify

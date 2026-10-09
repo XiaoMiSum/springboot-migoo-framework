@@ -45,7 +45,7 @@ jobs:
 
       # 手动构建（compile 即可满足 CodeQL 抽取需求，比 verify 快）
       - name: Build
-        run: mvn -B clean compile -DskipTests -Dgpg.skip=true
+        run: ./mvnw -B clean compile -DskipTests -Dgpg.skip=true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

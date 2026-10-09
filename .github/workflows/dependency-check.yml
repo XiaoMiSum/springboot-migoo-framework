@@ -34,7 +34,7 @@ jobs:
           if [ -n "${{ secrets.NVD_API_KEY }}" ]; then
             NVD_ARGS="-DnvdApiKey=${{ secrets.NVD_API_KEY }}"
           fi
-          mvn -B org.owasp:dependency-check-maven:13.0.0:check \
+          ./mvnw -B org.owasp:dependency-check-maven:13.0.0:check \
             -DfailBuildOnCVSS=7 \
             -Dformats=HTML,JSON \
             -DskipTestScope=true \

@@ -46,7 +46,7 @@ grep -oE '<module>[^<]+</module>' "$PARENT_POM" \
     | sort > "$work_dir/modules"
 
 # 2) publish-parent.yml 的 mvn deploy -pl 清单（去掉 migoo-framework-parent/ 前缀）
-pl_line=$(grep -E 'mvn deploy -pl' "$PUBLISH_WORKFLOW" | grep -oE '\-pl [^ ]+' | head -n 1 || true)
+pl_line=$(grep -E 'mvnw? deploy -pl' "$PUBLISH_WORKFLOW" | grep -oE '\-pl [^ ]+' | head -n 1 || true)
 if [ -z "$pl_line" ]; then
     fail "publish-parent.yml 未找到 mvn deploy -pl 发布清单"
 else

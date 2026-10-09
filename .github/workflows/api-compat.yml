@@ -35,7 +35,7 @@ jobs:
           cache: maven
 
       - name: Build and Compare API
-        run: mvn -B clean verify -Pjapicmp -DskipTests -Dgpg.skip=true
+        run: ./mvnw -B clean verify -Pjapicmp -DskipTests -Dgpg.skip=true
 
       - name: Publish to Summary
         if: always()
